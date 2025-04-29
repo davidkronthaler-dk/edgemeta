@@ -1,0 +1,13 @@
+Package: metaprediction
+Type: Package
+Title: Predictive Distributions and Prediction Intervals for Meta-Analysis using Confidence Distributions
+Version: 1.0
+Date: 2025-04-29
+Authors@R: 
+    person("David", "Kronthaler", , "david.kronthaler@uzh.ch", role = c("aut", "cre"))
+Description:  Computation of frequentist predictive distributions and prediction intervals for meta-analysis using confidence distributions. Confidence distributions for the average effect are obtained from the Edgington combined p-value function. Uncertainty in the estimate of the between-study heterogeneity is incorporated by use of the generalized heterogeneity statistic.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.14), meta
+LinkingTo: Rcpp, fntl
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
