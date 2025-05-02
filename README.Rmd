@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<!-- needs to be rendered to MD using devtools::build_readme() -->
+<!-- README.Rmd needs to be rendered to MD with devtools::build_readme() -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

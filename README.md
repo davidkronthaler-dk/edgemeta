@@ -1,6 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<!-- needs to be rendered to MD using devtools::build_readme() -->
+<!-- README.Rmd needs to be rendered to MD with devtools::build_readme() -->
 
 # metaprediction
 
@@ -34,7 +34,7 @@ pd <- PredDist(es = es, se = se, method = "FullCD")
 # 95% prediction interval
 pd$PI
 #>      2.5%     97.5% 
-#> -3.284152  4.549387
+#> -3.307166  4.472290
 # Predictive distribution
 hist(pd$samples[,"theta_new"], breaks = 500, main = "Predictive distribution")
 ```
@@ -44,5 +44,5 @@ hist(pd$samples[,"theta_new"], breaks = 500, main = "Predictive distribution")
 ``` r
 # Probability of a future effect larger than 0
 mean(pd$samples[,"theta_new"] > 0)
-#> [1] 0.66484
+#> [1] 0.66279
 ```
