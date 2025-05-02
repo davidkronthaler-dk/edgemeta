@@ -18,6 +18,9 @@ You can install the development version of metaprediction from
 ``` r
 # install.packages("pak")
 pak::pak("davidkronthaler-dk/metaprediction")
+# or
+# install.packages("devtools")
+devtools::install_github(""davidkronthaler-dk/metaprediction")
 ```
 
 ## Example
@@ -34,7 +37,7 @@ pd <- PredDist(es = es, se = se, method = "FullCD")
 # 95% prediction interval
 pd$PI
 #>      2.5%     97.5% 
-#> -3.307166  4.472290
+#> -3.252089  4.471174
 # Predictive distribution
 hist(pd$samples[,"theta_new"], breaks = 500, main = "Predictive distribution")
 ```
@@ -44,5 +47,5 @@ hist(pd$samples[,"theta_new"], breaks = 500, main = "Predictive distribution")
 ``` r
 # Probability of a future effect larger than 0
 mean(pd$samples[,"theta_new"] > 0)
-#> [1] 0.66279
+#> [1] 0.66363
 ```

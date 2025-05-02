@@ -1,17 +1,30 @@
-Package: metaprediction
 Type: Package
-Title: Predictive Distributions and Prediction Intervals for Meta-Analysis using Confidence Distributions
+Package: metaprediction
+Title: Predictive Distributions and Intervals for Meta-Analysis with
+    Confidence Distributions
 Version: 1.0
 Date: 2025-04-29
 Authors@R: 
-    person("David", "Kronthaler", , "david.kronthaler@uzh.ch", role = c("aut", "cre"))
-Description: Computation of frequentist predictive distributions and prediction intervals for meta-analysis using confidence distributions. Confidence distributions for the average effect are obtained from the Edgington combined p-value function. Uncertainty in the estimate of the between-study heterogeneity is incorporated by use of the generalized heterogeneity statistic.
+    person("David", "Kronthaler", , "david.kronthaler@uzh.ch", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0004-9778-0249"))
+Description: Frequentist predictive distributions and prediction intervals
+    for meta-analysis using confidence distributions. Confidence
+    distributions for the average effect are obtained from the Edgington
+    combined p-value function.  Uncertainty in the estimate of the
+    between-study heterogeneity is incorporated by use of the generalized
+    heterogeneity statistic.
 License: MIT + file LICENSE
-Imports: Rcpp (>= 1.0.14), meta
-LinkingTo: Rcpp, fntl
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Encoding: UTF-8
+URL: https://github.com/davidkronthaler-dk/metaprediction
+BugReports: https://github.com/davidkronthaler-dk/metaprediction/issues
+Imports: 
+    meta (>= 8.0.2),
+    Rcpp (>= 1.0.14)
 Suggests: 
     testthat (>= 3.0.0)
+LinkingTo: 
+    fntl,
+    Rcpp
 Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

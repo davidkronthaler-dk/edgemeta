@@ -28,6 +28,9 @@ You can install the development version of metaprediction from [GitHub](https://
 ``` r
 # install.packages("pak")
 pak::pak("davidkronthaler-dk/metaprediction")
+# or
+# install.packages("devtools")
+devtools::install_github(""davidkronthaler-dk/metaprediction")
 ```
 
 ## Example
