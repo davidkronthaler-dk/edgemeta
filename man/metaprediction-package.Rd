@@ -3,20 +3,22 @@
 \alias{metaprediction}
 \docType{package}
 \title{
-  A short title line describing what the package does
+  Frequentist Predictive Distributions and Intervals for Meta-Analysis
 }
 \description{
-  A more detailed description of what the package does. A length
-  of about one to five lines is recommended.
+  Computation of Predictive Distributions and Prediction Intervals utilizing
+  the Edgington combined p-value function inducing a confidence distribution of 
+  the average effect and accounting for uncertainty about the between-study heterogeneity
+  estimate by use of the generalized heterogeneity statistic.
 }
 \details{
-  This section should provide a more detailed overview of how to use the
-  package, including the most important functions.
+  PredDist can be used to compute both predictive distributions as well as prediction intervals
+  in a fully Frequentist framework.
 }
 \author{
-Your Name, email optional.
+David Kronthaler
 
-Maintainer: Your Name <your@email.com>
+Maintainer: David Kronthaler <david.kronthaler@uzh.ch>
 }
 \references{
   This optional section can contain literature or other references for
@@ -27,8 +29,7 @@ Maintainer: Your Name <your@email.com>
   Optional links to other man pages
 }
 \examples{
-  \dontrun{
-     ## Optional simple examples of the most important functions
-     ## These can be in \dontrun{} and \donttest{} blocks.   
-  }
+es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
+se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
+PredDist(es = es, se = se, method = "FullCD")
 }

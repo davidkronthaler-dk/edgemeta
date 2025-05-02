@@ -1,8 +1,4 @@
-// -----------------------------------------------------------------------------
-// Title: ftau2.cpp                                                         
-// Description: contains functions to compute the density based on the       
-// generalized heterogeneity statistic and change of variables               
-// -----------------------------------------------------------------------------
+// Functions for density of tau2 based on the generalized heterogeneity statistic             
 
 // [[Rcpp::depends(fntl)]]
 #include <Rcpp.h>

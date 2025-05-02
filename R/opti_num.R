@@ -1,3 +1,4 @@
+# Optimization of Edgington combined p-value function
 opti_num <- function(es, se, point = TRUE, ci = TRUE, level.ci = 0.95) {
 
   # Compute the point estimate

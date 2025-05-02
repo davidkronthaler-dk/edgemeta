@@ -4,7 +4,7 @@
 using namespace Rcpp;
 
 
-// Edgingtons combined p-value function
+// Edgington combined p-value function
 // [[Rcpp::export]]
 NumericVector pfct_edge_cpp(NumericVector h0,
                             NumericVector es,
@@ -121,7 +121,6 @@ NumericVector sample_mu_cpp(NumericVector s_tau2,
 }
 
 
-
 // Confidence density of mu (evaluated for one mu)
 // [[Rcpp::export]]
 
@@ -139,7 +138,7 @@ double cd_single(NumericVector h0,
   return fntl::fd_deriv(f, h0, 0, h);
 }
 
-// Confidence density of mu (evaluated for multiple mu's)
+// Confidence density of mu (evaluates multiple mu's)
 // [[Rcpp::export]]
 NumericVector CD_cpp(NumericVector h0,
                      NumericVector es,
