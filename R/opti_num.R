@@ -4,8 +4,7 @@ opti_num <- function(es, se, point = TRUE, ci = TRUE, level.ci = 0.95) {
   # Compute the point estimate
   if (point) {
 
-    point_est <- stats::uniroot(f = function(x) pfct_edge_cpp(x, es, se) - 0.5,
-                                interval = c(base::min(es), base::max(es)))$root
+    point_est <- opti_edge(es, se)
   } else {
     point_est <- NA
   }

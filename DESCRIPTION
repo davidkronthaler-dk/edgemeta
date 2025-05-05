@@ -17,7 +17,7 @@ License: MIT + file LICENSE
 URL: https://github.com/davidkronthaler-dk/metaprediction
 BugReports: https://github.com/davidkronthaler-dk/metaprediction/issues
 Imports: 
-    meta (>= 8.0.2),
+    meta,
     Rcpp (>= 1.0.14)
 Suggests: 
     testthat (>= 3.0.0)

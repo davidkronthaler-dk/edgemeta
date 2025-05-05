@@ -112,7 +112,6 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
 
   # Compute a grid for mu and tau2
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = "REML")
-  opt <- opti_num(es = es, se = sqrt(se^2 + ma$tau2), ci = FALSE)$point_estimate
   lim <- ma$TE.random + c(-12, 12) * ma$seTE.random
   gmu <- base::seq(from = lim[1], to = lim[2], length.out = 100)
   gtau2 <- base::seq(from = 0, to = ma$tau2 + 10 * ma$se.tau2, length.out = 100)
@@ -122,7 +121,7 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
 
     # Compute the predictive distribution
     pd <- aq_pd(max.gtau2 = gtau2[100], gmu = gmu, lim = lim,
-                es = es, se = se, es.tau2 = ma$tau2, mu_hat = opt,
+                es = es, se = se, es.tau2 = ma$tau2,
                 subdivisions = subdivisions)
 
     # Prediction interval
@@ -135,7 +134,7 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
   } else if (method == "FullCD") {
 
     # Generate samples of tau2, mu, theta_new
-    s_tau2 <- sample_tau2_cpp(ns = ns, es = es, se = se, mu_hat = opt,
+    s_tau2 <- sample_tau2_cpp(ns = ns, es = es, se = se,
                               upper = ma$tau2 + 100 * ma$se.tau2)
     s_mu <- sample_mu_cpp(s_tau2 = s_tau2, es = es, se = se)
     s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
@@ -154,13 +153,13 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
 ## Adaptive Quadrature: Predictive distribution
 ##------------------------------------------------------------------------------
 aq_pd <- function(max.gtau2, gmu, es, se, es.tau2, lim,
-                  mu_hat, subdivisions) {
+                  subdivisions) {
 
   # Joint density of theta_new, mu, tau2
   joint3 <- function(tn, mu, tau2) {
     return(stats::dnorm(tn, mu, base::sqrt(tau2)) *  # P(theta_new | mu, tau2)
              CD_cpp(mu, es, base::sqrt(se^2 + es.tau2)) * # Marginal P(mu)
-        ftau2_cpp(es, se, tau2, mu_hat)) # Marginal P(tau2)
+        ftau2_cpp(es, se, tau2)) # Marginal P(tau2)
   }
 
   # Marginalize over f(tau2)
