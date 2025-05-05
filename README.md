@@ -20,7 +20,7 @@ You can install the development version of metaprediction from
 pak::pak("davidkronthaler-dk/metaprediction")
 # or
 # install.packages("devtools")
-devtools::install_github(""davidkronthaler-dk/metaprediction")
+devtools::install_github("davidkronthaler-dk/metaprediction")
 ```
 
 ## Example
