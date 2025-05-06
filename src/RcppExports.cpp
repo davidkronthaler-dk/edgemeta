@@ -10,44 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// pfct_edge_cpp
-Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_pfct_edge_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type h0(h0SEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(pfct_edge_cpp(h0, es, se));
-    return rcpp_result_gen;
-END_RCPP
-}
-// p_wald
-Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(p_wald(x, es, se));
-    return rcpp_result_gen;
-END_RCPP
-}
-// opti_edge
-double opti_edge(Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_opti_edge(SEXP esSEXP, SEXP seSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(opti_edge(es, se));
-    return rcpp_result_gen;
-END_RCPP
-}
 // cd_single
 double cd_single(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, double h);
 RcppExport SEXP _metaprediction_cd_single(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
@@ -73,6 +35,59 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< double >::type h(hSEXP);
     rcpp_result_gen = Rcpp::wrap(CD_cpp(h0, es, se, h));
+    return rcpp_result_gen;
+END_RCPP
+}
+// p_wald
+Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    rcpp_result_gen = Rcpp::wrap(p_wald(x, es, se));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pfct_edge_cpp
+Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_pfct_edge_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type h0(h0SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    rcpp_result_gen = Rcpp::wrap(pfct_edge_cpp(h0, es, se));
+    return rcpp_result_gen;
+END_RCPP
+}
+// opti_edge
+double opti_edge(Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_opti_edge(SEXP esSEXP, SEXP seSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    rcpp_result_gen = Rcpp::wrap(opti_edge(es, se));
+    return rcpp_result_gen;
+END_RCPP
+}
+// opti_num
+Rcpp::List opti_num(NumericVector es, NumericVector se, bool point, bool ci, double levelci);
+RcppExport SEXP _metaprediction_opti_num(SEXP esSEXP, SEXP seSEXP, SEXP pointSEXP, SEXP ciSEXP, SEXP levelciSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
+    Rcpp::traits::input_parameter< bool >::type point(pointSEXP);
+    Rcpp::traits::input_parameter< bool >::type ci(ciSEXP);
+    Rcpp::traits::input_parameter< double >::type levelci(levelciSEXP);
+    rcpp_result_gen = Rcpp::wrap(opti_num(es, se, point, ci, levelci));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -113,21 +128,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type tau2(tau2SEXP);
     rcpp_result_gen = Rcpp::wrap(ftau2_cpp(es, se, tau2));
-    return rcpp_result_gen;
-END_RCPP
-}
-// opti_num
-Rcpp::List opti_num(NumericVector es, NumericVector se, bool point, bool ci, double levelci);
-RcppExport SEXP _metaprediction_opti_num(SEXP esSEXP, SEXP seSEXP, SEXP pointSEXP, SEXP ciSEXP, SEXP levelciSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
-    Rcpp::traits::input_parameter< bool >::type point(pointSEXP);
-    Rcpp::traits::input_parameter< bool >::type ci(ciSEXP);
-    Rcpp::traits::input_parameter< double >::type levelci(levelciSEXP);
-    rcpp_result_gen = Rcpp::wrap(opti_num(es, se, point, ci, levelci));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -186,15 +186,15 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_metaprediction_pfct_edge_cpp", (DL_FUNC) &_metaprediction_pfct_edge_cpp, 3},
-    {"_metaprediction_p_wald", (DL_FUNC) &_metaprediction_p_wald, 3},
-    {"_metaprediction_opti_edge", (DL_FUNC) &_metaprediction_opti_edge, 2},
     {"_metaprediction_cd_single", (DL_FUNC) &_metaprediction_cd_single, 4},
     {"_metaprediction_CD_cpp", (DL_FUNC) &_metaprediction_CD_cpp, 4},
+    {"_metaprediction_p_wald", (DL_FUNC) &_metaprediction_p_wald, 3},
+    {"_metaprediction_pfct_edge_cpp", (DL_FUNC) &_metaprediction_pfct_edge_cpp, 3},
+    {"_metaprediction_opti_edge", (DL_FUNC) &_metaprediction_opti_edge, 2},
+    {"_metaprediction_opti_num", (DL_FUNC) &_metaprediction_opti_num, 5},
     {"_metaprediction_Q_cpp", (DL_FUNC) &_metaprediction_Q_cpp, 3},
     {"_metaprediction_dQ_cpp", (DL_FUNC) &_metaprediction_dQ_cpp, 4},
     {"_metaprediction_ftau2_cpp", (DL_FUNC) &_metaprediction_ftau2_cpp, 3},
-    {"_metaprediction_opti_num", (DL_FUNC) &_metaprediction_opti_num, 5},
     {"_metaprediction_sample_one_mu", (DL_FUNC) &_metaprediction_sample_one_mu, 3},
     {"_metaprediction_sample_mu_cpp", (DL_FUNC) &_metaprediction_sample_mu_cpp, 3},
     {"_metaprediction_sample_one_tau2", (DL_FUNC) &_metaprediction_sample_one_tau2, 3},

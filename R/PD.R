@@ -32,7 +32,7 @@ PredDist <- function(es, se, method = c("FullCD", "SimplifiedCD", "FixedTau2"),
                 theta_new = theta_new, subdivisions = subdivisions, ...)
   } else if (method == "SimplifiedCD") {
     rt = pd_cd_tau2(es = es, se = se, lpi = level.pi, theta_new = theta_new,
-                    method = method, subdivisions = subdivisions)
+                    method = method, subdivisions = subdivisions, ...)
   } else if (method == "FullCD") {
     rt = pd_cd_tau2(es = es, se = se, lpi = level.pi, method = method,
                     ns = n_samples)
@@ -51,11 +51,7 @@ pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95,  theta_new = NULL,
 
   # Compute tau2 with the 'meta' package
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
-  tau2 <- ma$tau2
-  if (ma$tau2 < 10e-5) {
-    tau2_PM <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = "PM")$tau2
-    tau2 <- base::max(tau2, tau2_PM)
-  }
+  tau2 = ma$tau2
 
   # Adjust standard errors with tau2
   sea <- base::sqrt(se^2 + tau2)
@@ -64,8 +60,9 @@ pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95,  theta_new = NULL,
   if (tau2 == 0L) {
     opt <- opti_num(es, sea)
     warning("Tau2 is estimated to be zero (no between-study heterogeneity).
-The point estimate and confidence interval for the pooled effect are returned.")
-    return(opt)
+The confidence interval and confidence density for the pooled effect are returned.")
+    return(list(CI = c(opt$cilower, opt$ciupper),
+                fCD = function(mu) CD_cpp(mu, es = es, se = se)))
   }
 
   # Approximate the confidence density of mu
@@ -87,8 +84,7 @@ The point estimate and confidence interval for the pooled effect are returned.")
   }, vectorize.args = "tn_int")
 
   # Approximate the predictive density
-  pd_improper <- stats::approxfun(x = theta_grid,
-                                  y = pd_intern(theta_grid),
+  pd_improper <- stats::approxfun(x = theta_grid, y = pd_intern(theta_grid),
                                   yleft = 0, yright = 0)
 
   # Normalize the predictive density after approximation

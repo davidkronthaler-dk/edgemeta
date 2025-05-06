@@ -36,4 +36,7 @@ double dQ_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2,
 Rcpp::NumericVector ftau2_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, 
                               Rcpp::NumericVector tau2);
 
+Rcpp::List opti_num(NumericVector es, NumericVector se, bool point, 
+                    bool ci, double levelci);
+
 #endif

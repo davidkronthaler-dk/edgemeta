@@ -7,14 +7,26 @@
 using namespace Rcpp;
 using namespace std;
 
+// One-sided Wald p-value function
+// [[Rcpp::export]]
+Rcpp::NumericVector p_wald(double x,
+                           Rcpp::NumericVector es,
+                           Rcpp::NumericVector se) {
+  
+  Rcpp::NumericVector p = es.size();
+  
+  for (int ii = 0; ii < es.size(); ++ii) {
+    p[ii] = R::pnorm(es[ii], x, se[ii], false, false);
+  }
+  
+  return p;
+}
 
 // Edgington combined p-value function
 // [[Rcpp::export]]
 Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0,
                                   Rcpp::NumericVector es,
                                   Rcpp::NumericVector se) {
-  
-  
   // Number of studies
   int k = es.size();
   
@@ -64,22 +76,7 @@ Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0,
   return pcombined;
 }
 
-// One-sided Wald p-value function
-// [[Rcpp::export]]
-Rcpp::NumericVector p_wald(double x,
-                           Rcpp::NumericVector es,
-                           Rcpp::NumericVector se) {
-  
-  Rcpp::NumericVector p = es.size();
-  
-  for (int ii = 0; ii < es.size(); ++ii) {
-    p[ii] = R::pnorm(es[ii], x, se[ii], false, false);
-  }
-  
-  return p;
-}
-
-// Optimize Edgington p-value function
+// Optimize Edgington p-value function (point estimator)
 // [[Rcpp::export]]
 double opti_edge(Rcpp::NumericVector es,
                  Rcpp::NumericVector se) {
@@ -120,40 +117,52 @@ double opti_edge(Rcpp::NumericVector es,
   
 }
 
-// Confidence density of mu (evaluated for one mu)
-// [[Rcpp::export]]
-
-double cd_single(Rcpp::NumericVector h0,
-                 Rcpp::NumericVector es,
-                 Rcpp::NumericVector se,
-                 double h = 1e-4) {
+// Optimization of Edgington combined p-value function (point + CIs)
+//[[Rcpp::export]]
+Rcpp::List opti_num(NumericVector es, 
+                    NumericVector se, 
+                    bool point = true, 
+                    bool ci = true, 
+                    double levelci = 0.95) {
   
-  // Function for which derivative is computed
-  fntl::dfv f = [&](Rcpp::NumericVector x) {
-    return pfct_edge_cpp(x, es, se)[0];
-  };
-  
-  // Compute and return the numerical derivative
-  return fntl::fd_deriv(f, h0, 0, h);
-}
-
-// Confidence density of mu (evaluates multiple mu's)
-// [[Rcpp::export]]
-Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0,
-                           Rcpp::NumericVector es,
-                           Rcpp::NumericVector se,
-                           double h = 1e-4) { // same as in numDeriv::grad
-  
-  Rcpp::NumericVector dv(h0.size());
-  
-  for (int ii = 0; ii < h0.size(); ++ii) {
-    dv[ii] = cd_single(Rcpp::NumericVector::create(h0[ii]), es, se, h);
+  double point_est = NA_REAL;
+  if (point) {
+    point_est = opti_edge(es, se);
   }
   
-  return dv;
+  double cilower = NA_REAL;
+  double ciupper = NA_REAL;
   
+  if (ci) {
+    double min_es = *std::min_element(es.begin(), es.end()) - *std::max_element(se.begin(), se.end());
+    double max_es = *std::max_element(es.begin(), es.end()) + *std::max_element(se.begin(), se.end());
+    double alpha = 1.0 - levelci;
+    
+    fntl::dfd fl = [&](double x) {
+      return pfct_edge_cpp(NumericVector::create(x), es, se)[0] - alpha / 2.0;
+    };
+    
+    fntl::dfd fu = [&](double x) {
+      return pfct_edge_cpp(NumericVector::create(x), es, se)[0] - (1.0 - alpha / 2.0);
+    };
+    
+    fntl::findroot_args args;
+    args.action = fntl::error_action::NONE;
+    
+    // Find roots
+    auto result_lower = fntl::findroot_brent(fl, min_es, max_es, args);
+    auto result_upper = fntl::findroot_brent(fu, min_es, max_es, args);
+    
+    cilower = result_lower.root;
+    ciupper = result_upper.root;
+  }
+  
+  return List::create(
+    _["point"] = point_est,
+    _["cilower"] = cilower,
+    _["ciupper"] = ciupper
+  );
 }
-
 
 
 
