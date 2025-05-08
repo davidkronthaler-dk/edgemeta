@@ -1,4 +1,7 @@
-// Functions for density of tau2 based on the generalized heterogeneity statistic             
+// Functions for density of tau2 based on the generalized heterogeneity statistic       
+
+// REMAINS TO DECIDE WHETHER TO USE EDGINGTON OR IVWE FOR ESTIMATION IN Q(TAU2)
+// THE LATTER IS A LOT FASTER AND THE PROOF IS ORIENTED FOR IT; RESULTS ARE VIRTUALLY IDENTICAL
 
 // [[Rcpp::depends(fntl)]]
 #include <Rcpp.h>
@@ -19,10 +22,23 @@ double Q_cpp(Rcpp::NumericVector es,
   // Adjusted standard errors
   Rcpp::NumericVector sea(se.size());
   for (int ii = 0; ii < se.size(); ++ii) {
-    sea[ii] = std::sqrt(se[ii] * se[ii] + tau2);
+    sea[ii] = (se[ii] * se[ii] + tau2); // need to add square-root in case of Edgington use
   }
   
-  double opt = opti_edge(es, sea);
+  // Edingtons method for estimation
+  // double opt = opti_edge(es, sea);
+  
+  // IVWE for computation of Q (faster and proof is oriented for)
+  double sumw = 0.0;
+  for (int ii = 0; ii < se.size(); ++ii) {
+    sumw += 1.0 / sea[ii];
+  }
+  
+  double opt = 0.0;
+  for (int ll = 0; ll < es.size(); ++ll) {
+    opt += (1 / sea[ll]) * es[ll];
+  }
+  opt = opt / sumw;
   
   double Q = 0.0;
   
@@ -34,7 +50,7 @@ double Q_cpp(Rcpp::NumericVector es,
   
 }
 
-// Derivative of generalized Q-statistic
+// Numerical Derivative of generalized Q-statistic (also valid for estimator from combined p-value functions)
 // [[Rcpp::export]]
 double dQ_cpp(Rcpp::NumericVector es,
               Rcpp::NumericVector se,
@@ -48,6 +64,48 @@ double dQ_cpp(Rcpp::NumericVector es,
   Rcpp::NumericVector x0 = Rcpp::NumericVector::create(tau2); 
   
   return fntl::fd_deriv(f, x0, 0, h);
+}
+
+// Analytic derivative of generalized Q-statistic for IVWE
+// [[Rcpp::export]]
+double dQIVWE(NumericVector es,
+              NumericVector se,
+              double tau2) {
+  
+  int k = es.size(); // Number of studies
+  
+  double sw = 0.0;     // sum of weights
+  double swe = 0.0;    // sum of weights * effect sizes
+  double da = 0.0;     // derivative numerator 
+  double db = 0.0;     // derivative denominator
+  
+  // Compute weights, their derivatives, and derivative of hmu
+  std::vector<double> w(k), dw(k);
+  for (int i = 0; i < k; ++i) {
+    double vi = se[i] * se[i];
+    double denom = vi + tau2;
+    
+    w[i] = 1.0 / denom;
+    dw[i] = -1.0 / (denom * denom);
+    
+    sw += w[i];
+    swe += w[i] * es[i];
+    
+    da += dw[i] * es[i];
+    db += dw[i];
+  }
+  
+  double hmu = swe / sw;
+  double dhmu = (sw * da - swe * db) / (sw * sw);
+  
+  // Compute derivative of Q
+  double dQ = 0.0;
+  for (int i = 0; i < k; ++i) {
+    double diff = es[i] - hmu;
+    dQ += dw[i] * diff * diff + 2.0 * w[i] * diff * dhmu;
+  }
+  
+  return dQ;
 }
 
 // Density of tau2 by change of variables
@@ -67,7 +125,8 @@ Rcpp::NumericVector ftau2_cpp(Rcpp::NumericVector es,
     }
     
     double Q = Q_cpp(es, se, tau);
-    double dQ = dQ_cpp(es, se, tau);
+    double dQ = dQIVWE(es, se, tau);
+    // double dQ = dQ_cpp(es, se, tau);
     
     fd[ll] = R::dchisq(Q, es.size() - 1, false) * std::abs(dQ);
   }

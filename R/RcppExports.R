@@ -33,6 +33,10 @@ dQ_cpp <- function(es, se, tau2, h = 1e-4) {
     .Call(`_metaprediction_dQ_cpp`, es, se, tau2, h)
 }
 
+dQIVWE <- function(es, se, tau2) {
+    .Call(`_metaprediction_dQIVWE`, es, se, tau2)
+}
+
 ftau2_cpp <- function(es, se, tau2) {
     .Call(`_metaprediction_ftau2_cpp`, es, se, tau2)
 }

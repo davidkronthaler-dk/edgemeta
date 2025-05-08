@@ -118,6 +118,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dQIVWE
+double dQIVWE(NumericVector es, NumericVector se, double tau2);
+RcppExport SEXP _metaprediction_dQIVWE(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
+    Rcpp::traits::input_parameter< double >::type tau2(tau2SEXP);
+    rcpp_result_gen = Rcpp::wrap(dQIVWE(es, se, tau2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ftau2_cpp
 Rcpp::NumericVector ftau2_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector tau2);
 RcppExport SEXP _metaprediction_ftau2_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
@@ -194,6 +207,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_metaprediction_opti_num", (DL_FUNC) &_metaprediction_opti_num, 5},
     {"_metaprediction_Q_cpp", (DL_FUNC) &_metaprediction_Q_cpp, 3},
     {"_metaprediction_dQ_cpp", (DL_FUNC) &_metaprediction_dQ_cpp, 4},
+    {"_metaprediction_dQIVWE", (DL_FUNC) &_metaprediction_dQIVWE, 3},
     {"_metaprediction_ftau2_cpp", (DL_FUNC) &_metaprediction_ftau2_cpp, 3},
     {"_metaprediction_sample_one_mu", (DL_FUNC) &_metaprediction_sample_one_mu, 3},
     {"_metaprediction_sample_mu_cpp", (DL_FUNC) &_metaprediction_sample_mu_cpp, 3},
