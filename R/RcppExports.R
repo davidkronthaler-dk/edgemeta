@@ -13,8 +13,8 @@ p_wald <- function(x, es, se) {
     .Call(`_metaprediction_p_wald`, x, es, se)
 }
 
-pfct_edge_cpp <- function(h0, es, se) {
-    .Call(`_metaprediction_pfct_edge_cpp`, h0, es, se)
+pfctedge <- function(h0, es, se) {
+    .Call(`_metaprediction_pfctedge`, h0, es, se)
 }
 
 opti_edge <- function(es, se) {
@@ -37,23 +37,27 @@ dQIVWE <- function(es, se, tau2) {
     .Call(`_metaprediction_dQIVWE`, es, se, tau2)
 }
 
-ftau2_cpp <- function(es, se, tau2) {
-    .Call(`_metaprediction_ftau2_cpp`, es, se, tau2)
+ftau2 <- function(es, se, tau2) {
+    .Call(`_metaprediction_ftau2`, es, se, tau2)
 }
 
-sample_one_mu <- function(s_tau2, es, se) {
-    .Call(`_metaprediction_sample_one_mu`, s_tau2, es, se)
+samponemu <- function(s_tau2, es, se) {
+    .Call(`_metaprediction_samponemu`, s_tau2, es, se)
 }
 
-sample_mu_cpp <- function(s_tau2, es, se) {
-    .Call(`_metaprediction_sample_mu_cpp`, s_tau2, es, se)
+samplemu <- function(s_tau2, es, se) {
+    .Call(`_metaprediction_samplemu`, s_tau2, es, se)
 }
 
-sample_one_tau2 <- function(es, se, upper) {
-    .Call(`_metaprediction_sample_one_tau2`, es, se, upper)
+samponetau2 <- function(es, se, upper) {
+    .Call(`_metaprediction_samponetau2`, es, se, upper)
 }
 
-sample_tau2_cpp <- function(ns, es, se, upper) {
-    .Call(`_metaprediction_sample_tau2_cpp`, ns, es, se, upper)
+samptau2 <- function(ns, es, se, upper) {
+    .Call(`_metaprediction_samptau2`, ns, es, se, upper)
+}
+
+samplemusimple <- function(n_samples, tau2, es, se) {
+    .Call(`_metaprediction_samplemusimple`, n_samples, tau2, es, se)
 }
 

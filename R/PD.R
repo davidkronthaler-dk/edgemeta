@@ -47,7 +47,7 @@ PredDist <- function(es, se, method = c("FullCD", "SimplifiedCD", "FixedTau2"),
 ## PD and PI based on confidence density, fixed tau2
 ##------------------------------------------------------------------------------
 pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95,  theta_new = NULL,
-                  subdivisions = 100L, ...){
+                  ns = 100000L, subdivisions = 100L, ...){
 
   # Compute tau2 with the 'meta' package
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
@@ -94,9 +94,19 @@ The confidence interval and confidence density for the pooled effect are returne
 
   # Prediction interval
   pi <- pinum(density = pd, lpi = lpi, lower = lim[1], upper = lim[2])
+  
+  # Generate samples from the Predictive distribution
+  if (ns > 0) {
+    s_mu <- samplemusimple(n_samples = ns, tau2 = tau2, es = es, se = se)
+    s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(tau2)))
+    s <- base::cbind(s_mu, s_tn)
+    base::colnames(s) <- c("mu", "theta_new")
+  } else {
+    s <- NULL
+  }
 
   # Return
-  return(list(PI = pi, PD.theta_new = pd(theta_new), fPD = pd))
+  return(list(PI = pi, PD.theta_new = pd(theta_new), fPD = pd, samples = s))
 }
 
 
@@ -104,7 +114,7 @@ The confidence interval and confidence density for the pooled effect are returne
 ##------------------------------------------------------------------------------
 pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
                        method = c("SimplifiedCD", "FullCD"),
-                       ns = 100000, subdivisions = 300L) {
+                       ns = 100000L, subdivisions = 300L) {
 
   # Compute a grid for mu and tau2
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = "REML")
@@ -116,23 +126,35 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
   if (method == "SimplifiedCD") {
 
     # Compute the predictive distribution
-    pd <- aq_pd(max.gtau2 = gtau2[100], gmu = gmu, lim = lim,
+    pd <- aq_pd(max.gtau2 = gtau2[length(gtau2)], gmu = gmu, lim = lim,
                 es = es, se = se, es.tau2 = ma$tau2,
                 subdivisions = subdivisions)
 
     # Prediction interval
     pi <- pinum(density = pd, lpi = lpi, lower = lim[1], upper = lim[2])
+    
+    # Generate samples from the Predictive distribution
+    if (ns > 0) {
+      s_tau2 <- samptau2(ns = ns, es = es, se = se,
+                         upper = ma$tau2 + 100 * ma$se.tau2)
+      s_mu <- samplemusimple(n_samples = ns, tau2 = ma$tau2, es = es, se = se)
+      s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
+      s <- base::cbind(s_tau2, s_mu, s_tn)
+      base::colnames(s) <- c("tau2", "mu", "theta_new")
+    } else {
+      s <- NULL
+    }
 
     # Return
-    return(list(PI = pi, PD.theta_new = pd(theta_new), fPD = pd))
+    return(list(PI = pi, PD.theta_new = pd(theta_new), fPD = pd, samples = s))
 
   # Prediction interval using sampling (MC and MCMC)
   } else if (method == "FullCD") {
 
     # Generate samples of tau2, mu, theta_new
-    s_tau2 <- sample_tau2_cpp(ns = ns, es = es, se = se,
+    s_tau2 <- samptau2(ns = ns, es = es, se = se,
                               upper = ma$tau2 + 100 * ma$se.tau2)
-    s_mu <- sample_mu_cpp(s_tau2 = s_tau2, es = es, se = se)
+    s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
     s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
     s <- base::cbind(s_tau2, s_mu, s_tn)
     base::colnames(s) <- c("tau2", "mu", "theta_new")
@@ -155,7 +177,7 @@ aq_pd <- function(max.gtau2, gmu, es, se, es.tau2, lim,
   joint3 <- function(tn, mu, tau2) {
     return(stats::dnorm(tn, mu, base::sqrt(tau2)) *  # P(theta_new | mu, tau2)
              CD_cpp(mu, es, base::sqrt(se^2 + es.tau2)) * # Marginal P(mu)
-        ftau2_cpp(es, se, tau2)) # Marginal P(tau2)
+        ftau2(es, se, tau2)) # Marginal P(tau2)
   }
 
   # Marginalize over f(tau2)

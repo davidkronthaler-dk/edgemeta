@@ -8,10 +8,10 @@ using namespace Rcpp;
 using namespace std;
 
 
-// Function to generate on sample of mu from the confidence distribution
+// Function to generate on sample of mu from the confidence distribution for varying tau2
 // [[Rcpp::export]]
 
-double sample_one_mu(double s_tau2,
+double samponemu(double s_tau2,
                      Rcpp::NumericVector es,
                      Rcpp::NumericVector se) {
   
@@ -30,7 +30,7 @@ double sample_one_mu(double s_tau2,
   
   // Define the Edgington combined p-value function as a lambda function
   fntl::dfd f = [&](double h0) {
-    return pfct_edge_cpp(Rcpp::NumericVector::create(h0), es, adj_se)[0] - u;
+    return pfctedge(Rcpp::NumericVector::create(h0), es, adj_se)[0] - u;
   };
   
   // Root-finding doesnt break evaluation in case of non-convergence
@@ -44,10 +44,10 @@ double sample_one_mu(double s_tau2,
   return out.root;
 }
 
-// Function to generate B samples of mu from the confidence distribution
+// Function to generate B samples of mu from the confidence distribution for varying tau2
 // [[Rcpp::export]]
 
-Rcpp::NumericVector sample_mu_cpp(Rcpp::NumericVector s_tau2,
+Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
                                   Rcpp::NumericVector es,
                                   Rcpp::NumericVector se) {
   
@@ -57,7 +57,7 @@ Rcpp::NumericVector sample_mu_cpp(Rcpp::NumericVector s_tau2,
   // Iterate over all samples of tau2
   for (int ii = 0; ii < s_tau2.size(); ++ii) {
     try {
-      roots[ii] = sample_one_mu(s_tau2[ii], es, se);
+      roots[ii] = samponemu(s_tau2[ii], es, se);
     } catch (...) {
       roots[ii] = NA_REAL;
     }
@@ -70,7 +70,7 @@ Rcpp::NumericVector sample_mu_cpp(Rcpp::NumericVector s_tau2,
 
 // Function to generate one sample of tau2 from Q(tau2)
 // [[Rcpp::export]]
-double sample_one_tau2(Rcpp::NumericVector es,
+double samponetau2(Rcpp::NumericVector es,
                        Rcpp::NumericVector se,
                        double upper) {
   
@@ -98,10 +98,10 @@ double sample_one_tau2(Rcpp::NumericVector es,
 // Function to generate B samples of tau2 from Q(tau2)
 // [[Rcpp::export]]
 
-Rcpp::NumericVector sample_tau2_cpp(int ns,
-                                    Rcpp::NumericVector es,
-                                    Rcpp::NumericVector se,
-                                    double upper) {
+Rcpp::NumericVector samptau2(int ns,
+                             Rcpp::NumericVector es,
+                             Rcpp::NumericVector se,
+                             double upper) {
   
   // Initialize a vector for roots
   Rcpp::NumericVector roots(ns);
@@ -109,7 +109,7 @@ Rcpp::NumericVector sample_tau2_cpp(int ns,
   // Iterate for N samples
   for (int ii = 0; ii < ns; ++ii) {
     try {
-      roots[ii] = sample_one_tau2(es, se, upper);
+      roots[ii] = samponetau2(es, se, upper);
     } catch (...) {
       roots[ii] = NA_REAL;  // return NA if root-finding fails
     }
@@ -119,5 +119,69 @@ Rcpp::NumericVector sample_tau2_cpp(int ns,
   return roots;
   
 } 
+
+// Function to generate samples of mu confidence distribution for fixed tau2
+//[[Rcpp::export]]
+Rcpp::NumericVector samplemusimple(int n_samples, 
+                               double tau2,
+                               Rcpp::NumericVector es,
+                               Rcpp::NumericVector se) {
+  
+  // Adjust the standard errors based on tau2
+  Rcpp::NumericVector adj_se = clone(se);
+  for (int i = 0; i < se.size(); ++i) {
+    adj_se[i] = std::sqrt(se[i] * se[i] + tau2);
+  }
+  
+  // Boundaries for root-finding
+  double min_es = *std::min_element(es.begin(), es.end()) - *std::max_element(se.begin(), se.end());
+  double max_es = *std::max_element(es.begin(), es.end()) + *std::max_element(se.begin(), se.end());
+  
+  // Generate random uniform numbers
+  Rcpp::NumericVector u(n_samples);
+  for (int ll = 0; ll < n_samples; ++ll){
+    u[ll] = R::runif(0, 1);
+  }
+  
+  // Root-finding doesnt break evaluation in case of non-convergence
+  fntl::findroot_args args;
+  args.action = fntl::error_action::NONE;
+  
+  // Iterate for n_samples
+  Rcpp::NumericVector smu(n_samples);
+  for (int ll = 0; ll < n_samples; ++ll) {
+    double u_ll = u[ll];
+    
+    // Edgington p-value function
+    fntl::dfd f = [&](double h0) {
+      return pfctedge(Rcpp::NumericVector::create(h0), es, adj_se)[0] - u_ll;
+    };
+    
+    auto out = fntl::findroot_brent(f, min_es, max_es, args);
+    smu[ll] = out.root;
+  }
+  
+  
+  // Return
+  return smu;
+}
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
 

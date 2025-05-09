@@ -51,16 +51,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// pfct_edge_cpp
-Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_pfct_edge_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
+// pfctedge
+Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_pfctedge(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type h0(h0SEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(pfct_edge_cpp(h0, es, se));
+    rcpp_result_gen = Rcpp::wrap(pfctedge(h0, es, se));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -131,61 +131,61 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ftau2_cpp
-Rcpp::NumericVector ftau2_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector tau2);
-RcppExport SEXP _metaprediction_ftau2_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
+// ftau2
+Rcpp::NumericVector ftau2(Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector tau2);
+RcppExport SEXP _metaprediction_ftau2(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type tau2(tau2SEXP);
-    rcpp_result_gen = Rcpp::wrap(ftau2_cpp(es, se, tau2));
+    rcpp_result_gen = Rcpp::wrap(ftau2(es, se, tau2));
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_one_mu
-double sample_one_mu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_sample_one_mu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+// samponemu
+double samponemu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_samponemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double >::type s_tau2(s_tau2SEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_one_mu(s_tau2, es, se));
+    rcpp_result_gen = Rcpp::wrap(samponemu(s_tau2, es, se));
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_mu_cpp
-Rcpp::NumericVector sample_mu_cpp(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_sample_mu_cpp(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+// samplemu
+Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_samplemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type s_tau2(s_tau2SEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_mu_cpp(s_tau2, es, se));
+    rcpp_result_gen = Rcpp::wrap(samplemu(s_tau2, es, se));
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_one_tau2
-double sample_one_tau2(Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
-RcppExport SEXP _metaprediction_sample_one_tau2(SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
+// samponetau2
+double samponetau2(Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
+RcppExport SEXP _metaprediction_samponetau2(SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< double >::type upper(upperSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_one_tau2(es, se, upper));
+    rcpp_result_gen = Rcpp::wrap(samponetau2(es, se, upper));
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_tau2_cpp
-Rcpp::NumericVector sample_tau2_cpp(int ns, Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
-RcppExport SEXP _metaprediction_sample_tau2_cpp(SEXP nsSEXP, SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
+// samptau2
+Rcpp::NumericVector samptau2(int ns, Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
+RcppExport SEXP _metaprediction_samptau2(SEXP nsSEXP, SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -193,7 +193,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< double >::type upper(upperSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_tau2_cpp(ns, es, se, upper));
+    rcpp_result_gen = Rcpp::wrap(samptau2(ns, es, se, upper));
+    return rcpp_result_gen;
+END_RCPP
+}
+// samplemusimple
+Rcpp::NumericVector samplemusimple(int n_samples, double tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _metaprediction_samplemusimple(SEXP n_samplesSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n_samples(n_samplesSEXP);
+    Rcpp::traits::input_parameter< double >::type tau2(tau2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    rcpp_result_gen = Rcpp::wrap(samplemusimple(n_samples, tau2, es, se));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -202,17 +216,18 @@ static const R_CallMethodDef CallEntries[] = {
     {"_metaprediction_cd_single", (DL_FUNC) &_metaprediction_cd_single, 4},
     {"_metaprediction_CD_cpp", (DL_FUNC) &_metaprediction_CD_cpp, 4},
     {"_metaprediction_p_wald", (DL_FUNC) &_metaprediction_p_wald, 3},
-    {"_metaprediction_pfct_edge_cpp", (DL_FUNC) &_metaprediction_pfct_edge_cpp, 3},
+    {"_metaprediction_pfctedge", (DL_FUNC) &_metaprediction_pfctedge, 3},
     {"_metaprediction_opti_edge", (DL_FUNC) &_metaprediction_opti_edge, 2},
     {"_metaprediction_opti_num", (DL_FUNC) &_metaprediction_opti_num, 5},
     {"_metaprediction_Q_cpp", (DL_FUNC) &_metaprediction_Q_cpp, 3},
     {"_metaprediction_dQ_cpp", (DL_FUNC) &_metaprediction_dQ_cpp, 4},
     {"_metaprediction_dQIVWE", (DL_FUNC) &_metaprediction_dQIVWE, 3},
-    {"_metaprediction_ftau2_cpp", (DL_FUNC) &_metaprediction_ftau2_cpp, 3},
-    {"_metaprediction_sample_one_mu", (DL_FUNC) &_metaprediction_sample_one_mu, 3},
-    {"_metaprediction_sample_mu_cpp", (DL_FUNC) &_metaprediction_sample_mu_cpp, 3},
-    {"_metaprediction_sample_one_tau2", (DL_FUNC) &_metaprediction_sample_one_tau2, 3},
-    {"_metaprediction_sample_tau2_cpp", (DL_FUNC) &_metaprediction_sample_tau2_cpp, 4},
+    {"_metaprediction_ftau2", (DL_FUNC) &_metaprediction_ftau2, 3},
+    {"_metaprediction_samponemu", (DL_FUNC) &_metaprediction_samponemu, 3},
+    {"_metaprediction_samplemu", (DL_FUNC) &_metaprediction_samplemu, 3},
+    {"_metaprediction_samponetau2", (DL_FUNC) &_metaprediction_samponetau2, 3},
+    {"_metaprediction_samptau2", (DL_FUNC) &_metaprediction_samptau2, 4},
+    {"_metaprediction_samplemusimple", (DL_FUNC) &_metaprediction_samplemusimple, 4},
     {NULL, NULL, 0}
 };
 

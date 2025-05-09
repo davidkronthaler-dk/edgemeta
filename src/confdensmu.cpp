@@ -17,7 +17,7 @@ double cd_single(Rcpp::NumericVector h0,
   
   // Function for which derivative is computed
   fntl::dfv f = [&](Rcpp::NumericVector x) {
-    return pfct_edge_cpp(x, es, se)[0];
+    return pfctedge(x, es, se)[0];
   };
   
   // Compute and return the numerical derivative

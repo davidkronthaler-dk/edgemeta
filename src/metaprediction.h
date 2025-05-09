@@ -5,7 +5,7 @@
 using namespace Rcpp;
 
 // Declared functions
-Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, 
+Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0, Rcpp::NumericVector es, 
                                   Rcpp::NumericVector se);
 
 Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
@@ -18,14 +18,14 @@ double cd_single(Rcpp::NumericVector h0, Rcpp::NumericVector es,
 Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, 
                            Rcpp::NumericVector se, double h);
 
-double sample_one_mu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
+double samponemu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
 
-Rcpp::NumericVector sample_mu_cpp(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, 
+Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, 
                             Rcpp::NumericVector se);
 
-double sample_one_tau2(Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
+double samponetau2(Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
 
-Rcpp::NumericVector sample_tau2_cpp(int ns, Rcpp::NumericVector es, 
+Rcpp::NumericVector samptau2(int ns, Rcpp::NumericVector es, 
                                     Rcpp::NumericVector se, double upper);
 
 double Q_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2);
@@ -33,7 +33,9 @@ double Q_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2);
 double dQ_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2, 
               double h) ;
 
-Rcpp::NumericVector ftau2_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, 
+double dQIVWE(NumericVector es, NumericVector se, double tau2);
+
+Rcpp::NumericVector ftau2(Rcpp::NumericVector es, Rcpp::NumericVector se, 
                               Rcpp::NumericVector tau2);
 
 Rcpp::List opti_num(NumericVector es, NumericVector se, bool point, 

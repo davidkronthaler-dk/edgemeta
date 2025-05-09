@@ -24,7 +24,7 @@ Rcpp::NumericVector p_wald(double x,
 
 // Edgington combined p-value function
 // [[Rcpp::export]]
-Rcpp::NumericVector pfct_edge_cpp(Rcpp::NumericVector h0,
+Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
                                   Rcpp::NumericVector es,
                                   Rcpp::NumericVector se) {
   // Number of studies
@@ -139,11 +139,11 @@ Rcpp::List opti_num(NumericVector es,
     double alpha = 1.0 - levelci;
     
     fntl::dfd fl = [&](double x) {
-      return pfct_edge_cpp(NumericVector::create(x), es, se)[0] - alpha / 2.0;
+      return pfctedge(NumericVector::create(x), es, se)[0] - alpha / 2.0;
     };
     
     fntl::dfd fu = [&](double x) {
-      return pfct_edge_cpp(NumericVector::create(x), es, se)[0] - (1.0 - alpha / 2.0);
+      return pfctedge(NumericVector::create(x), es, se)[0] - (1.0 - alpha / 2.0);
     };
     
     fntl::findroot_args args;

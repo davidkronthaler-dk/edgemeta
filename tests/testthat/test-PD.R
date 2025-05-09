@@ -68,9 +68,9 @@ test_that("returned object has expected structure", {
   result1 <- PredDist(es = es, se = se, method = "FullCD")
   expect_named(result1, c("PI", "samples"))
   result2 <- PredDist(es = es, se = se, method = "SimplifiedCD")
-  expect_named(result2, c("PI", "PD.theta_new", "fPD"))
+  expect_named(result2, c("PI", "PD.theta_new", "fPD", "samples"))
   result3 <- PredDist(es = es, se = se, method = "FixedTau2")
-  expect_named(result3, c("PI", "PD.theta_new", "fPD"))
+  expect_named(result3, c("PI", "PD.theta_new", "fPD", "samples"))
 })
 
 # Subdivisions

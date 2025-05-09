@@ -110,7 +110,7 @@ double dQIVWE(NumericVector es,
 
 // Density of tau2 by change of variables
 // [[Rcpp::export]]
-Rcpp::NumericVector ftau2_cpp(Rcpp::NumericVector es, 
+Rcpp::NumericVector ftau2(Rcpp::NumericVector es, 
                               Rcpp::NumericVector se, 
                               Rcpp::NumericVector tau2) {
   
