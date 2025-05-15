@@ -25,9 +25,9 @@ PredDist(
 
 \item{level.pi}{Level of the prediction interval computed (numeric, between 0 and 1).}
 
-\item{n_samples}{In case method is "FullCD", this determines the number of samples generated for the computation of the predictive distribution.}
+\item{n_samples}{In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution.}
 
-\item{theta_new}{In case method is "FixedTau2" or "SimplifiedCD", these are the points for which the predictive density is evaluated and returned.}
+\item{theta_new}{In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.}
 
 \item{method.tau2}{In case method is "FixedTau2", this determines the method of estimating tau2. Check 'help(meta)' for information.}
 
@@ -36,7 +36,7 @@ PredDist(
 \item{...}{Additional arguments handed to 'stats::integrate'.}
 }
 \value{
-Return a prediction interval. In case method is "FullCD" returns a matrix containing samples of theta.new, mu and tau2. In case method is "SimplifiedCD" or "FixedTau2" returns additionally the predictive density in form of a function.
+Return a prediction interval.
 }
 \description{
 Frequentist Predictive Distributions and Prediction Intervals for Meta-Analysis

@@ -1,8 +1,5 @@
 // Functions for density of tau2 based on the generalized heterogeneity statistic       
 
-// REMAINS TO DECIDE WHETHER TO USE EDGINGTON OR IVWE FOR ESTIMATION IN Q(TAU2)
-// THE LATTER IS A LOT FASTER AND THE PROOF IS ORIENTED FOR IT; RESULTS ARE VIRTUALLY IDENTICAL
-
 // [[Rcpp::depends(fntl)]]
 #include <Rcpp.h>
 #include "fntl.h"

@@ -4,13 +4,13 @@
 #' @param se Standard errors from individual studies (numeric vector, length >= 2).
 #' @param method One of "FullCD", "SimplifiedCD", "FixedTau2". Check details for information.
 #' @param level.pi Level of the prediction interval computed (numeric, between 0 and 1).
-#' @param n_samples In case method is "FullCD", this determines the number of samples generated for the computation of the predictive distribution.
-#' @param theta_new In case method is "FixedTau2" or "SimplifiedCD", these are the points for which the predictive density is evaluated and returned.
+#' @param n_samples In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution.
+#' @param theta_new In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.
 #' @param method.tau2 In case method is "FixedTau2", this determines the method of estimating tau2. Check 'help(meta)' for information.
 #' @param subdivisions Number of subdivisions used for integration.
 #' @param ... Additional arguments handed to 'stats::integrate'.
 #'
-#' @return Return a prediction interval. In case method is "FullCD" returns a matrix containing samples of theta.new, mu and tau2. In case method is "SimplifiedCD" or "FixedTau2" returns additionally the predictive density in form of a function.
+#' @return Return a prediction interval. 
 #' @export
 #'
 #' @examples
@@ -29,12 +29,10 @@ PredDist <- function(es, se, method = c("FullCD", "SimplifiedCD", "FixedTau2"),
   # computation
   if (method == "FixedTau2") {
     rt = pd_cd(es = es, se = se, mtau2 = method.tau2, lpi = level.pi,
-                theta_new = theta_new, subdivisions = subdivisions, ...)
-  } else if (method == "SimplifiedCD") {
-    rt = pd_cd_tau2(es = es, se = se, lpi = level.pi, theta_new = theta_new,
-                    method = method, subdivisions = subdivisions, ...)
-  } else if (method == "FullCD") {
-    rt = pd_cd_tau2(es = es, se = se, lpi = level.pi, method = method,
+               theta_new = theta_new, subdivisions = subdivisions,
+               ns = n_samples, ...)
+  } else if (method == "SimplifiedCD" | method == "FullCD") {
+    rt = pd_cd_tau2(es = es, se = se, lpi = level.pi, method = method, 
                     ns = n_samples)
   }
 
@@ -42,7 +40,6 @@ PredDist <- function(es, se, method = c("FullCD", "SimplifiedCD", "FixedTau2"),
   return(rt)
 
 }
-
 
 ## PD and PI based on confidence density, fixed tau2
 ##------------------------------------------------------------------------------
@@ -54,7 +51,7 @@ pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95,  theta_new = NULL,
   tau2 = ma$tau2
 
   # Adjust standard errors with tau2
-  sea <- base::sqrt(se^2 + tau2)
+  sea <- base::sqrt(se ^ 2 + tau2)
 
   # If estimated tau2 is zero, return the confidence interval for mu
   if (tau2 == 0L) {
@@ -112,111 +109,36 @@ The confidence interval and confidence density for the pooled effect are returne
 
 ## Function to compute predictive distribution and PI for CD and tau2 density
 ##------------------------------------------------------------------------------
-pd_cd_tau2 <- function(es, se, lpi = 0.95, theta_new = NULL,
-                       method = c("SimplifiedCD", "FullCD"),
-                       ns = 100000L, subdivisions = 300L) {
+pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
+                       ns = 100000L) {
 
   # Compute a grid for mu and tau2
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = "REML")
-  lim <- ma$TE.random + c(-12, 12) * ma$seTE.random
-  gmu <- base::seq(from = lim[1], to = lim[2], length.out = 100)
-  gtau2 <- base::seq(from = 0, to = ma$tau2 + 10 * ma$se.tau2, length.out = 100)
 
-  # Prediction interval using Adaptive Quadrature (AQ) integration
+  # Samples of tau2
+  s_tau2 <- samptau2(ns = ns, es = es, se = se, 
+                     upper = ma$tau2 + 100 * ma$se.tau2)
+  # Samples of mu 
   if (method == "SimplifiedCD") {
-
-    # Compute the predictive distribution
-    pd <- aq_pd(max.gtau2 = gtau2[length(gtau2)], gmu = gmu, lim = lim,
-                es = es, se = se, es.tau2 = ma$tau2,
-                subdivisions = subdivisions)
-
-    # Prediction interval
-    pi <- pinum(density = pd, lpi = lpi, lower = lim[1], upper = lim[2])
-    
-    # Generate samples from the Predictive distribution
-    if (ns > 0) {
-      s_tau2 <- samptau2(ns = ns, es = es, se = se,
-                         upper = ma$tau2 + 100 * ma$se.tau2)
-      s_mu <- samplemusimple(n_samples = ns, tau2 = ma$tau2, es = es, se = se)
-      s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
-      s <- base::cbind(s_tau2, s_mu, s_tn)
-      base::colnames(s) <- c("tau2", "mu", "theta_new")
-    } else {
-      s <- NULL
-    }
-
-    # Return
-    return(list(PI = pi, PD.theta_new = pd(theta_new), fPD = pd, samples = s))
-
-  # Prediction interval using sampling (MC and MCMC)
+    s_mu <- samplemusimple(n_samples = ns, tau2 = ma$tau2, es = es, se = se)
   } else if (method == "FullCD") {
-
-    # Generate samples of tau2, mu, theta_new
-    s_tau2 <- samptau2(ns = ns, es = es, se = se,
-                              upper = ma$tau2 + 100 * ma$se.tau2)
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
-    s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
-    s <- base::cbind(s_tau2, s_mu, s_tn)
-    base::colnames(s) <- c("tau2", "mu", "theta_new")
-    
-    # Prediction interval
-    PI <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1))/2, na.rm = T)
-
-    # Return
-    return(list(PI = PI, samples = s))
-
   }
-}
+  
+  # Samples of tn
+  s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
 
-## Adaptive Quadrature: Predictive distribution
-##------------------------------------------------------------------------------
-aq_pd <- function(max.gtau2, gmu, es, se, es.tau2, lim,
-                  subdivisions) {
+  # Combine 
+  s <- base::cbind(s_tau2, s_mu, s_tn)
+  base::colnames(s) <- c("tau2", "mu", "theta_new")
 
-  # Joint density of theta_new, mu, tau2
-  joint3 <- function(tn, mu, tau2) {
-    return(stats::dnorm(tn, mu, base::sqrt(tau2)) *  # P(theta_new | mu, tau2)
-             CD_cpp(mu, es, base::sqrt(se^2 + es.tau2)) * # Marginal P(mu)
-        ftau2(es, se, tau2)) # Marginal P(tau2)
-  }
-
-  # Marginalize over f(tau2)
-  joint2 <- base::Vectorize(function(tn, mu) {
-    tryCatch({
-      stats::integrate(function(tau2_intern) joint3(tn, mu, tau2_intern),
-                subdivisions = subdivisions,
-                lower = .Machine$double.eps,
-                upper = max.gtau2)$value
-    }, error = function(e) { return(NA) })
-  }, vectorize.args = c("tn", "mu"))
-
-  # Marginalize over f(mu)
-  marginal_tn_improper <- base::Vectorize(function(tn) {
-    base::tryCatch({
-      stats::integrate(function(mu) joint2(tn, mu),
-                subdivisions = subdivisions,
-                lower = lim[1],
-                upper = lim[2])$value
-    }, error = function(e) { return(NA) })
-  }, vectorize.args = "tn")
-
-  # Approximate the predictive density
-  marginal_tn_approx <- stats::approxfun(gmu, marginal_tn_improper(gmu),
-                                  yleft = 0, yright = 0)
-
-  # Ensure the pred. density integrates to 1
-  c <- base::tryCatch({
-    stats::integrate(f = marginal_tn_approx, lower = lim[1], upper = lim[2],
-                     subdivisions = subdivisions)$value},
-                    error = function(e) { return(1) })
-
-  # Normalized predictive density
-  marginal_tn <- function(theta_new) { marginal_tn_approx(theta_new)/c }
-
+  # Prediction interval
+  PI <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1))/2, na.rm = T)
+  
   # Return
-  return(marginal_tn)
-}
+  return(list(PI = PI, samples = s))
 
+}
 
 ## Numerically evaluate density to obtain prediction (or confidence) intervals
 ##------------------------------------------------------------------------------
