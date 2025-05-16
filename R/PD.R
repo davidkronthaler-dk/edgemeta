@@ -4,49 +4,75 @@
 #' @param se Standard errors from individual studies (numeric vector, length >= 2).
 #' @param method One of "FullCD", "SimplifiedCD", "FixedTau2". Check details for information.
 #' @param level.pi Level of the prediction interval computed (numeric, between 0 and 1).
-#' @param n_samples In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution.
+#' @param n_samples In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution. For method "FixedTau", this determines the number of samples generated from the deterministic predictive distribution function.
 #' @param theta_new In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.
-#' @param method.tau2 In case method is "FixedTau2", this determines the method of estimating tau2. Check 'help(meta)' for information.
-#' @param subdivisions Number of subdivisions used for integration.
-#' @param ... Additional arguments handed to 'stats::integrate'.
+#' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating tau2. Check 'help(meta)' for information.
+#' @param subdivisions Number of subdivisions used for integration (relevant for method "FixedTau2)"
+#' @param ... Additional arguments handed to 'stats::integrate' (relevant for method "FixedTau2).
 #'
-#' @return Return a prediction interval. 
+#' @return Return a prediction interval.
 #' @export
 #'
 #' @examples
 #' es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 #' se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 #' PredDist(es = es, se = se, method = "FullCD")
-PredDist <- function(es, se, method = c("FullCD", "SimplifiedCD", "FixedTau2"),
-                     level.pi = 0.95, n_samples = 100000L, theta_new = NULL,
-                     method.tau2 = "REML", subdivisions = 300L, ...) {
-
-  # validate input
-  validate_input(es = es, se = se, method = method, lpi = level.pi,
-                 ns = n_samples, theta_new = theta_new,
-                 mtau2 = method.tau2, subdivisions = subdivisions)
-
-  # computation
-  if (method == "FixedTau2") {
-    rt = pd_cd(es = es, se = se, mtau2 = method.tau2, lpi = level.pi,
-               theta_new = theta_new, subdivisions = subdivisions,
-               ns = n_samples, ...)
-  } else if (method == "SimplifiedCD" | method == "FullCD") {
-    rt = pd_cd_tau2(es = es, se = se, lpi = level.pi, method = method, 
-                    ns = n_samples)
+PredDist <-
+  function(es,
+           se,
+           method = c("FullCD", "SimplifiedCD", "FixedTau2"),
+           level.pi = 0.95,
+           n_samples = 100000L,
+           theta_new = NULL,
+           method.tau2 = "REML",
+           subdivisions = 300L,
+           ...) {
+    # validate input
+    validate_input(
+      es = es,
+      se = se,
+      method = method,
+      lpi = level.pi,
+      ns = n_samples,
+      theta_new = theta_new,
+      mtau2 = method.tau2,
+      subdivisions = subdivisions
+    )
+    
+    # computation
+    if (method == "FixedTau2") {
+      rt = pd_cd(
+        es = es,
+        se = se,
+        mtau2 = method.tau2,
+        lpi = level.pi,
+        theta_new = theta_new,
+        subdivisions = subdivisions,
+        ns = n_samples,
+        ...
+      )
+    } else if (method == "SimplifiedCD" | method == "FullCD") {
+      rt = pd_cd_tau2(
+        es = es,
+        se = se,
+        lpi = level.pi,
+        method = method,
+        ns = n_samples,
+        mtau2 = method.tau2
+      )
+    }
+    
+    # Return
+    return(rt)
+    
   }
-
-  # Return
-  return(rt)
-
-}
 
 ## PD and PI based on confidence density, fixed tau2
 ##------------------------------------------------------------------------------
-pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95,  theta_new = NULL,
+pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95, theta_new = NULL,
                   ns = 100000L, subdivisions = 100L, ...){
 
-  # Compute tau2 with the 'meta' package
+  # Estimate tau2
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
   tau2 = ma$tau2
 
@@ -92,7 +118,7 @@ The confidence interval and confidence density for the pooled effect are returne
   # Prediction interval
   pi <- pinum(density = pd, lpi = lpi, lower = lim[1], upper = lim[2])
   
-  # Generate samples from the Predictive distribution
+  # Generate samples from the predictive distribution
   if (ns > 0) {
     s_mu <- samplemusimple(n_samples = ns, tau2 = tau2, es = es, se = se)
     s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(tau2)))
@@ -107,13 +133,13 @@ The confidence interval and confidence density for the pooled effect are returne
 }
 
 
-## Function to compute predictive distribution and PI for CD and tau2 density
+## Predictive distribution generated using sampling algorithm
 ##------------------------------------------------------------------------------
 pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
-                       ns = 100000L) {
+                       ns = 100000L, mtau2 = "REML") {
 
-  # Compute a grid for mu and tau2
-  ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = "REML")
+  # Initial guess for tau2
+  ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
 
   # Samples of tau2
   s_tau2 <- samptau2(ns = ns, es = es, se = se, 
@@ -133,14 +159,14 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
   base::colnames(s) <- c("tau2", "mu", "theta_new")
 
   # Prediction interval
-  PI <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1))/2, na.rm = T)
+  PI <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1)) / 2, na.rm = T)
   
   # Return
   return(list(PI = PI, samples = s))
 
 }
 
-## Numerically evaluate density to obtain prediction (or confidence) intervals
+## Numerically evaluate density to obtain prediction intervals
 ##------------------------------------------------------------------------------
 
 pinum <- function(density, lpi = 0.95, lower, upper) {
