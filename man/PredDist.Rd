@@ -10,10 +10,7 @@ PredDist(
   method = c("FullCD", "SimplifiedCD", "FixedTau2"),
   level.pi = 0.95,
   n_samples = 100000L,
-  theta_new = NULL,
-  method.tau2 = "REML",
-  subdivisions = 300L,
-  ...
+  method.tau2 = "REML"
 )
 }
 \arguments{
@@ -27,11 +24,9 @@ PredDist(
 
 \item{n_samples}{In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution. For method "FixedTau", this determines the number of samples generated from the deterministic predictive distribution function.}
 
-\item{theta_new}{In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.}
-
 \item{method.tau2}{In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating tau2. Check 'help(meta)' for information.}
 
-\item{subdivisions}{Number of subdivisions used for integration (relevant for method "FixedTau2)"}
+\item{theta_new}{In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.}
 
 \item{...}{Additional arguments handed to 'stats::integrate' (relevant for method "FixedTau2).}
 }

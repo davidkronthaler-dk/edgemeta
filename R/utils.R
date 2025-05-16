@@ -1,9 +1,7 @@
 # Validate input
 validate_input <- function(es, se, method = c("FixedTau2", "SimplifiedCD", "FullCD"),
                            lpi, ns, 
-                           theta_new, 
-                           mtau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB"),
-                           subdivisions) {
+                           mtau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")) {
   
   # Check if meta-package is available
   if (!requireNamespace("meta", quietly = TRUE)) {
@@ -44,18 +42,6 @@ validate_input <- function(es, se, method = c("FixedTau2", "SimplifiedCD", "Full
   # Validate Number of samples
   if (!is.numeric(ns) || length(ns) != 1 || ns %% 1 != 0 || ns <= 0) {
     stop("Number of samples ('n_samples') must be a positive integer.", call. = FALSE)
-  }
-  
-  # Validate subdivisions
-  if (!is.numeric(subdivisions) || length(subdivisions) != 1 || subdivisions %% 1 != 0 || subdivisions <= 0) {
-    stop("Number of subdivisions ('subdivisions') must be a positive integer.", call. = FALSE)
-  }
-  
-  # Validate theta_new
-  if (!is.null(theta_new)) {
-    if (!is.numeric(theta_new) || anyNA(theta_new)) {
-      stop("'theta_new' must be a numeric value or vector without missing values.", call. = FALSE)
-    }
   }
 
 }

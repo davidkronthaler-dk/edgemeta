@@ -7,7 +7,6 @@
 #' @param n_samples In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution. For method "FixedTau", this determines the number of samples generated from the deterministic predictive distribution function.
 #' @param theta_new In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.
 #' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating tau2. Check 'help(meta)' for information.
-#' @param subdivisions Number of subdivisions used for integration (relevant for method "FixedTau2)"
 #' @param ... Additional arguments handed to 'stats::integrate' (relevant for method "FixedTau2).
 #'
 #' @return Return a prediction interval.
@@ -23,10 +22,7 @@ PredDist <-
            method = c("FullCD", "SimplifiedCD", "FixedTau2"),
            level.pi = 0.95,
            n_samples = 100000L,
-           theta_new = NULL,
-           method.tau2 = "REML",
-           subdivisions = 300L,
-           ...) {
+           method.tau2 = "REML") {
     # validate input
     validate_input(
       es = es,
@@ -34,9 +30,7 @@ PredDist <-
       method = method,
       lpi = level.pi,
       ns = n_samples,
-      theta_new = theta_new,
-      mtau2 = method.tau2,
-      subdivisions = subdivisions
+      mtau2 = method.tau2
     )
     
     # computation
@@ -46,10 +40,7 @@ PredDist <-
         se = se,
         mtau2 = method.tau2,
         lpi = level.pi,
-        theta_new = theta_new,
-        subdivisions = subdivisions,
-        ns = n_samples,
-        ...
+        ns = n_samples
       )
     } else if (method == "SimplifiedCD" | method == "FullCD") {
       rt = pd_cd_tau2(
@@ -69,67 +60,36 @@ PredDist <-
 
 ## PD and PI based on confidence density, fixed tau2
 ##------------------------------------------------------------------------------
-pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95, theta_new = NULL,
-                  ns = 100000L, subdivisions = 100L, ...){
+pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95, ns = 100000L){
 
   # Estimate tau2
   ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
   tau2 = ma$tau2
 
-  # Adjust standard errors with tau2
-  sea <- base::sqrt(se ^ 2 + tau2)
-
   # If estimated tau2 is zero, return the confidence interval for mu
   if (tau2 == 0L) {
-    opt <- opti_num(es, sea)
+    opt <- opti_num(es, sqrt(se ^ 2 + tau2))
     warning("Tau2 is estimated to be zero (no between-study heterogeneity).
 The confidence interval and confidence density for the pooled effect are returned.")
     return(list(CI = c(opt$cilower, opt$ciupper),
                 fCD = function(mu) CD_cpp(mu, es = es, se = se)))
   }
-
-  # Approximate the confidence density of mu
-  lim <- ma$TE.random + c(-10, 10) * ma$seTE.random
-  theta_grid <- base::seq(from = lim[1], to = lim[2], l = 500)
-  cd_apprx <- stats::approxfun(x = theta_grid,
-                               y = CD_cpp(h0 = theta_grid, es = es, se = sea),
-                               rule = 2)
-
-  # Joint density of theta_new and mu
-  pd_intern <- base::Vectorize(function(tn_int) {
-    result <- base::tryCatch({
-      stats::integrate(f = function(mu) {
-        return(stats::dnorm(tn_int, mu, sqrt(ma$tau2)) * cd_apprx(mu))
-      }, subdivisions = subdivisions, lower = lim[1], upper = lim[2], ...)$value
-    }, error = function(e) {
-      return(NA)
-    })
-  }, vectorize.args = "tn_int")
-
-  # Approximate the predictive density
-  pd_improper <- stats::approxfun(x = theta_grid, y = pd_intern(theta_grid),
-                                  yleft = 0, yright = 0)
-
-  # Normalize the predictive density after approximation
-  c <- stats::integrate(f = pd_improper, lower = lim[1], upper = lim[2],
-                        subdivisions = subdivisions, ...)$value
-  pd <- function(x) pd_improper(x)/c
-
-  # Prediction interval
-  pi <- pinum(density = pd, lpi = lpi, lower = lim[1], upper = lim[2])
   
-  # Generate samples from the predictive distribution
-  if (ns > 0) {
-    s_mu <- samplemusimple(n_samples = ns, tau2 = tau2, es = es, se = se)
-    s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(tau2)))
-    s <- base::cbind(s_mu, s_tn)
-    base::colnames(s) <- c("mu", "theta_new")
-  } else {
-    s <- NULL
-  }
+  # Generate samples of mu
+  s_mu <- samplemusimple(n_samples = ns, tau2 = tau2, es = es, se = se)
+  
+  # Generate samples of theta_new
+  s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(tau2)))
+  
+  # Combine
+  s <- base::cbind(s_mu, s_tn)
+  base::colnames(s) <- c("mu", "theta_new")
+  
+  # Prediction interval
+  PI <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1)) / 2, na.rm = T)
 
   # Return
-  return(list(PI = pi, PD.theta_new = pd(theta_new), fPD = pd, samples = s))
+  return(list(PI = pi, samples = s))
 }
 
 
@@ -165,51 +125,5 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
   return(list(PI = PI, samples = s))
 
 }
-
-## Numerically evaluate density to obtain prediction intervals
-##------------------------------------------------------------------------------
-
-pinum <- function(density, lpi = 0.95, lower, upper) {
-
-  # quantiles
-  probs <- c((1 - lpi) / 2, (1 + lpi) / 2)
-
-  # Function to find bounds
-  fb <- function(p) {
-    integrand <- function(u) {
-      base::abs(stats::integrate(f = density, lower = lower, upper = u)$value - p)
-    }
-
-    # Integration with fallback option
-    b <- tryCatch(
-      stats::optimize(f = integrand, lower = lower, upper = upper)$minimum,
-      error = function(e) {
-        sfb <- function(u) {
-          base::abs(stats::integrate(density, lower = lower, upper = u,
-                                     subdivisions = 1000)$value - p)
-        }
-        stats::optimize(f = sfb, lower = lower * 0.9, upper = upper * 0.9)$minimum
-      }
-    )
-    return(b)
-  }
-
-  # Compute lower and upper bounds
-  lwr <- fb(probs[1])
-  upr <- fb(probs[2])
-
-  # Return
-  invisible(c(lwr, upr))
-}
-
-
-
-
-
-
-
-
-
-
 
 

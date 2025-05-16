@@ -48,12 +48,6 @@ test_that("n_samples must be positive integer for FullCD", {
   expect_no_error(PredDist(es = es, se = se, method = "FullCD", n_samples = 100))
 })
 
-# Theta New
-test_that("theta_new input works with FixedTau2 and SimplifiedCD", {
-  theta = seq(-5, 5, length.out = 100)
-  expect_no_error(PredDist(es = es, se = se, method = "FixedTau2", theta_new = theta))
-})
-
 # Different tau2 methods
 test_that("method.tau2 variations for FixedTau2 work", {
   expect_no_error(PredDist(es = es, se = se, method = "FixedTau2", method.tau2 = "REML"))
@@ -69,14 +63,9 @@ test_that("returned object has expected structure", {
   result2 <- PredDist(es = es, se = se, method = "SimplifiedCD")
   expect_named(result2, c("PI", "samples"))
   result3 <- PredDist(es = es, se = se, method = "FixedTau2")
-  expect_named(result3, c("PI", "PD.theta_new", "fPD", "samples"))
+  expect_named(result3, c("PI", "samples"))
 })
 
-# Subdivisions
-test_that("integration subdivisions argument is respected", {
-  expect_no_error(PredDist(es = es, se = se, method = "FixedTau2", subdivisions = 100))
-  expect_error(PredDist(es = es, se = se, method = "FixedTau2", subdivisions = -10))
-})
 
 
 
