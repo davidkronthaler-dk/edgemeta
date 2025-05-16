@@ -86,7 +86,7 @@ The confidence interval and confidence density for the pooled effect are returne
   base::colnames(s) <- c("mu", "theta_new")
   
   # Prediction interval
-  PI <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1)) / 2, na.rm = T)
+  pi <- stats::quantile(x = s_tn, p = (1 + lpi * c(-1, 1)) / 2, na.rm = T)
 
   # Return
   return(list(PI = pi, samples = s))
