@@ -110,16 +110,16 @@ print.metaprediction <- function(obj, lower = NULL, upper = NULL, ...) {
   base::class(s) <- "data.frame"
   param_labels <- base::colnames(obj$samples)
   base::rownames(s) <- base::paste(c("PD", "CD", "CD")[base::seq_along(param_labels)], param_labels)
-  base::cat("\n============================== MetaPrediction Summary ==============================\n")
+  base::cat("\n=================== MetaPrediction Summary ==================\n")
   base::cat("\nSummary of predictive distribution (PD) and confidence distributions (CD)\n\n")
   base::print(s)
   base::cat("\nProbability calculations:\n")
-  prob.metaprediction(obj, 0, )
+  prob.metaprediction(obj, 0, Inf)
   base::cat("\n")
-  prob.metaprediction(obj, Inf, 0)
+  prob.metaprediction(obj, -Inf, 0)
   if (!base::is.null(lower) || !base::is.null(upper)) {
     prob.metaprediction(obj, lower, upper)
   }
-  base::cat("\n=======================================================================================\n")
+  base::cat("\n=============================================================\n")
 }
 
