@@ -22,8 +22,10 @@ double samponemu(double s_tau2,
   }
   
   // Boundaries for root-finding
-  double min_es = *std::min_element(es.begin(), es.end()) - *std::max_element(se.begin(), se.end());
-  double max_es = *std::max_element(es.begin(), es.end()) + *std::max_element(se.begin(), se.end());
+  double max_se = *std::max_element(se.begin(), se.end());
+  double min_es = *std::min_element(es.begin(), es.end()) - 4 * max_se;
+  double max_es = *std::max_element(es.begin(), es.end()) + 4 * max_se;
+  
   
   // Generate a random uniform number
   double u = R::runif(0, 1);
@@ -134,8 +136,9 @@ Rcpp::NumericVector samplemusimple(int n_samples,
   }
   
   // Boundaries for root-finding
-  double min_es = *std::min_element(es.begin(), es.end()) - *std::max_element(se.begin(), se.end());
-  double max_es = *std::max_element(es.begin(), es.end()) + *std::max_element(se.begin(), se.end());
+  double max_se = *std::max_element(se.begin(), se.end());
+  double min_es = *std::min_element(es.begin(), es.end()) - 4 * max_se;
+  double max_es = *std::max_element(es.begin(), es.end()) + 4 * max_se;
   
   // Generate random uniform numbers
   Rcpp::NumericVector u(n_samples);

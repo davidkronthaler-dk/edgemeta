@@ -26,8 +26,6 @@ PredDist(
 
 \item{method.tau2}{In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating tau2. Check 'help(meta)' for information.}
 
-\item{theta_new}{In case method is "FixedTau2", these are the points for which the predictive density is evaluated and returned.}
-
 \item{...}{Additional arguments handed to 'stats::integrate' (relevant for method "FixedTau2).}
 }
 \value{
