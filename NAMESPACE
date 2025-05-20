@@ -1,3 +1,17 @@
 useDynLib(metaprediction, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 export(PredDist)
+
+S3method(plot, metaprediction)
+S3method(print, metaprediction)
+S3method(summary, metaprediction)
+S3method(print, summary.metaprediction)
+S3method(prob, metaprediction)
+
+export(plot.metaprediction)
+export(print.metaprediction)
+export(summary.metaprediction)
+export(print.summary.metaprediction)
+export(prob)
+
+
