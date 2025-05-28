@@ -28,12 +28,12 @@ plot.metaprediction <- function(obj, param = c("theta_new", "mu", "tau2"), ...) 
                          "tau2" = expression(tau^2))
   default_ylab <- switch(param,
                          "theta_new" = expression(f(theta[new])),
-                         "mu" = expression(CD(mu)),
-                         "tau2" = expression(CD(tau^2)))
+                         "mu" = expression(c(mu)),
+                         "tau2" = expression(c(tau^2)))
   default_main <- switch(param,
                          "theta_new" = "Predictive distribution",
-                         "mu" = "Confidence density",
-                         "tau2" = "Confidence density")
+                         "mu" = "Confidence distribution",
+                         "tau2" = "Confidence distribution")
   xlab <- if ("xlab" %in% names(dots)) dots$xlab else default_xlab
   ylab <- if ("ylab" %in% names(dots)) dots$ylab else default_ylab
   main <- if ("main" %in% names(dots)) dots$main else default_main
@@ -109,7 +109,7 @@ print.metaprediction <- function(obj, lower = NULL, upper = NULL, ...) {
   s <- summary.metaprediction(obj)
   base::class(s) <- "data.frame"
   param_labels <- base::colnames(obj$samples)
-  base::rownames(s) <- base::paste(c("PD", "CD", "CD")[base::seq_along(param_labels)], param_labels)
+  base::rownames(s) <- base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels)
   base::cat("\n=================== MetaPrediction Summary ==================\n")
   base::cat("\nSummary of predictive distribution (PD) and confidence distributions (CD)\n\n")
   base::print(s)
