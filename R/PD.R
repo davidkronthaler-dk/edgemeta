@@ -4,10 +4,9 @@
 #' @param se Standard errors from individual studies (numeric vector, length >= 2).
 #' @param method One of "FullCD", "SimplifiedCD", "FixedTau2". Check details for information.
 #' @param level.pi Level of the prediction interval computed (numeric, between 0 and 1).
-#' @param n_samples In case method is "FullCD" or "SimplifiedCD", this determines the number of samples generated for the computation of the predictive distribution. For method "FixedTau", this determines the number of samples generated from the deterministic predictive distribution function.
+#' @param n_samples Determines the number of samples generated for the computation of the predictive distribution. 
 #' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating tau2. Check 'help(meta)' for information.
-#' @param ... Additional arguments handed to 'stats::integrate' (relevant for method "FixedTau2).
-#'
+#' @param seed Can be set to ensure reproducibility
 #' @return Return a prediction interval.
 #' @export
 #'
@@ -21,7 +20,8 @@ PredDist <-
            method = c("FullCD", "SimplifiedCD", "FixedTau2"),
            level.pi = 0.95,
            n_samples = 100000L,
-           method.tau2 = "REML") {
+           method.tau2 = "REML",
+           seed = NULL) {
     # validate input
     validate_input(
       es = es,
@@ -31,6 +31,9 @@ PredDist <-
       ns = n_samples,
       mtau2 = method.tau2
     )
+    
+    # reproducibility, if required
+    if (!is.null(seed)) set.seed(seed)
     
     # computation
     if (method == "FixedTau2") {
