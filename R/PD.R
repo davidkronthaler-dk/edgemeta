@@ -1,13 +1,48 @@
 #' Frequentist Predictive Distributions and Prediction Intervals for Meta-Analysis
+#' 
+#' This function computes the frequentist predictive distribution and prediction interval for a future effect \eqn{\theta_{new}} based on the confidence distributions of the average effect and the between-study heterogeneity. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
 #'
-#' @param es Estimates from individual studies (numeric vector, length >= 2).
-#' @param se Standard errors from individual studies (numeric vector, length >= 2).
-#' @param method One of "FullCD", "SimplifiedCD", "FixedTau2". Check details for information.
-#' @param level.pi Level of the prediction interval computed (numeric, between 0 and 1).
-#' @param n_samples Determines the number of samples generated for the computation of the predictive distribution. 
-#' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating tau2. Check 'help(meta)' for information.
-#' @param seed Can be set to ensure reproducibility
-#' @return Return a prediction interval.
+#' @param es Numeric vector of effect estimates from individual studies (length >= 2).
+#' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
+#' @param method Either "FullCD" (recommended for practical application), "SimplifiedCD" or "FixedTau2". Check details for information. 
+#' @param level.pi Coverage level of the prediction interval computed (numeric, between 0 and 1).
+#' @param n_samples Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).
+#' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity. Check 'help(meta)' for information on estimation methods (default is "REML").
+#' @param seed Optional integer to ensure reproducibility of the random sampling.
+#' @return A list containing:
+#' \describe{
+#'   \item{PI}{Prediction interval for a future effect \eqn{\theta_{new}}.}
+#'   \item{samples}{A matrix containing samples \eqn{\theta_{new}} from the predictive distribution ('theta_new'), samples \eqn{\mu} from the confidence distribution of the average effect ('mu') and samples \eqn{\tau^2} from the confidence distribution of the between-study heterogeneity ('tau2').}
+#' }
+#'
+#' @details
+#' The predictive distributions are based on the confidence distribution of the average effect 
+#' \eqn{\mu}. The function supports three methods:
+#' 
+#' - **"FullCD"**: This method generates samples from the confidence distribution of 
+#'   \eqn{\tau^2}, and for each sampled \eqn{\tau^2}, it computes the corresponding confidence 
+#'   distribution of \eqn{\mu}. It then generates a sample of the future effect \eqn{\theta_{new}} 
+#'   for each (\eqn{\tau^2}, \eqn{\mu}) pair. This is the most comprehensive method, as it fully 
+#'   accounts for uncertainty in both parameters.
+#' 
+#' - **"SimplifiedCD"**: This method generates samples from the confidence distribution of 
+#'   \eqn{\tau^2}, but computes the confidence distribution of \eqn{\mu} using a simplified 
+#'   approach. Specifically, it uses a fixed \eqn{\tau^2} to compute the Edgington combined 
+#'   \eqn{p}-value function, from which samples of \eqn{\mu} are drawn. This method is 
+#'   computationally efficient but may be less accurate.
+#' 
+#' - **"FixedTau2"**: This method assumes a fixed value for \eqn{\tau^2}, and uses it to compute 
+#'   the confidence distribution of \eqn{\mu}. It does 
+#'   not account for uncertainty in the estimation of \eqn{\tau^2}.
+#' 
+#' The confidence distribution of the between-study heterogeneity parameter \eqn{\tau^2} is 
+#' derived from the generalized heterogeneity statistic. The confidence distribution of the 
+#' average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function.
+#' 
+#' The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the predictive 
+#' distribution of future effects. This distribution can be used to compute prediction intervals, 
+#' summarize predictive uncertainty, or generate visualizations.
+
 #' @export
 #'
 #' @examples
