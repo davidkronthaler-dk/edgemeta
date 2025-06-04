@@ -115,7 +115,8 @@ pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95, ns = 100000L){
     opt <- opti_num(es, sqrt(se ^ 2 + tau2))
     warning("Tau2 is estimated to be zero (no between-study heterogeneity).
 The confidence interval and confidence density for the pooled effect are returned.")
-    return(list(CI = c(opt$cilower, opt$ciupper),
+    return(list(estimate = opt$point,
+                CI = c(opt$cilower, opt$ciupper),
                 fCD = function(mu) CD_cpp(mu, es = es, se = se)))
   }
   
