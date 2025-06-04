@@ -206,6 +206,15 @@ run_metagen <- function(es, se, mtau2 = "REML") {
     )
   }
   
+  # Attempt 5: increase both maxiter and decrease step size
+  if (is.null(result)) {
+    result <- tryCatch(
+      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
+                    control = list(maxiter = 100000, stepadj = 0.25)),
+      error = function(e) NULL
+    )
+  }
+  
   return(result)
 }
 
