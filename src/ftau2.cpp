@@ -9,8 +9,7 @@
 using namespace Rcpp;
 using namespace std;
 
-
-// Generalized Q statistic
+// F: generalized Q statistic
 // [[Rcpp::export]]
 double Q_cpp(Rcpp::NumericVector es, 
              Rcpp::NumericVector se, 
@@ -19,13 +18,10 @@ double Q_cpp(Rcpp::NumericVector es,
   // Adjusted standard errors
   Rcpp::NumericVector sea(se.size());
   for (int ii = 0; ii < se.size(); ++ii) {
-    sea[ii] = (se[ii] * se[ii] + tau2); // need to add square-root in case of Edgington use
+    sea[ii] = (se[ii] * se[ii] + tau2);
   }
   
-  // Edingtons method for estimation
-  // double opt = opti_edge(es, sea);
-  
-  // IVWE for computation of Q (faster and proof is oriented for)
+  // IVWE for computation of Q
   double sumw = 0.0;
   for (int ii = 0; ii < se.size(); ++ii) {
     sumw += 1.0 / sea[ii];
@@ -47,7 +43,7 @@ double Q_cpp(Rcpp::NumericVector es,
   
 }
 
-// Numerical Derivative of generalized Q-statistic (also valid for estimator from combined p-value functions)
+// F: numerical derivative of generalized Q-statistic 
 // [[Rcpp::export]]
 double dQ_cpp(Rcpp::NumericVector es,
               Rcpp::NumericVector se,
@@ -63,7 +59,7 @@ double dQ_cpp(Rcpp::NumericVector es,
   return fntl::fd_deriv(f, x0, 0, h);
 }
 
-// Analytic derivative of generalized Q-statistic for IVWE
+// F: analytic derivative of generalized Q-statistic for ivwe
 // [[Rcpp::export]]
 double dQIVWE(NumericVector es,
               NumericVector se,
@@ -105,11 +101,11 @@ double dQIVWE(NumericVector es,
   return dQ;
 }
 
-// Density of tau2 by change of variables
+// F: density of tau2 by change of variables
 // [[Rcpp::export]]
 Rcpp::NumericVector ftau2(Rcpp::NumericVector es, 
-                              Rcpp::NumericVector se, 
-                              Rcpp::NumericVector tau2) {
+                          Rcpp::NumericVector se, 
+                          Rcpp::NumericVector tau2) {
   
   Rcpp::NumericVector fd(tau2.size());
   

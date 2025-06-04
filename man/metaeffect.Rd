@@ -43,7 +43,7 @@ this distribution.
 By repeatedly sampling \eqn{\tau^2} and recalculating the confidence distribution of \eqn{\mu},
 the method incorporates the uncertainty in heterogeneity estimation into the final
 average effect estimate. The function returns the point estimate, its confidence
-interval, and the full sample of values drawn from the confidence distribution.
+interval, and the full sample of values drawn from the confidence distributions.
 
 Since the method accounts for the uncertainty in \eqn{\tau^2}, it always returns a
 confidence interval that adjusts for potential between-study heterogeneity,

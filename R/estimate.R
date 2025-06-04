@@ -63,13 +63,7 @@ metaeffect <-
     )
     
     # Initial guess for tau2
-    ma <-
-      meta::metagen(
-        TE = es,
-        seTE = se,
-        random = TRUE,
-        method.tau = "REML"
-      )
+    ma <- run_metagen(es = es, se = se, mtau2 = "REML")
     
     # Samples of tau2
     s_tau2 <- samptau2(

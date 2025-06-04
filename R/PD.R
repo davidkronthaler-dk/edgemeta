@@ -107,7 +107,7 @@ PredDist <-
 pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95, ns = 100000L){
 
   # Estimate tau2
-  ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
+  ma <- run_metagen(es = es, se = se, mtau2 = mtau2)
   tau2 = ma$tau2
 
   # If estimated tau2 is zero, return the confidence interval for mu
@@ -143,7 +143,7 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
                        ns = 100000L, mtau2 = "REML") {
 
   # Initial guess for tau2
-  ma <- meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2)
+  ma <- run_metagen(es = es, se = se, mtau2 = mtau2)
 
   # Samples of tau2
   s_tau2 <- samptau2(ns = ns, es = es, se = se, 
@@ -168,6 +168,45 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
   # Return
   return(list(PI = PI, samples = s))
 
+}
+
+## Estimation of between-study heterogeneity
+## -----------------------------------------------------------------------------
+run_metagen <- function(es, se, mtau2 = "REML") {
+  # Attempt 1: default settings
+  result <- tryCatch(
+    meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2),
+    error = function(e) NULL
+  )
+  
+  # Attempt 2: increase max iterations
+  if (is.null(result)) {
+    result <- tryCatch(
+      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
+                    control = list(maxiter = 10000)),
+      error = function(e) NULL
+    )
+  }
+  
+  # Attempt 3: decrease step size
+  if (is.null(result)) {
+    result <- tryCatch(
+      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
+                    control = list(stepadj = 0.5)),
+      error = function(e) NULL
+    )
+  }
+  
+  # Attempt 4: increase both maxiter and decrease step size
+  if (is.null(result)) {
+    result <- tryCatch(
+      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
+                    control = list(maxiter = 10000, stepadj = 0.5)),
+      error = function(e) NULL
+    )
+  }
+  
+  return(result)
 }
 
 

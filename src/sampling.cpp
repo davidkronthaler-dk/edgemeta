@@ -8,7 +8,7 @@ using namespace Rcpp;
 using namespace std;
 
 
-// Function to generate on sample of mu from the confidence distribution for varying tau2
+// F: generate on sample of mu from the confidence distribution for varying tau2
 // [[Rcpp::export]]
 
 double samponemu(double s_tau2,
@@ -46,7 +46,7 @@ double samponemu(double s_tau2,
   return out.root;
 }
 
-// Function to generate B samples of mu from the confidence distribution for varying tau2
+// F: generate B samples of mu from the confidence distribution for varying tau2
 // [[Rcpp::export]]
 
 Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
@@ -69,9 +69,9 @@ Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
   return roots;
 }
 
-
-// Function to generate one sample of tau2 from Q(tau2)
+// F: generate one sample of tau2 from confidence distribution induced by Q(tau2)
 // [[Rcpp::export]]
+
 double samponetau2(Rcpp::NumericVector es,
                        Rcpp::NumericVector se,
                        double upper) {
@@ -96,8 +96,7 @@ double samponetau2(Rcpp::NumericVector es,
   return out.root;
 }
 
-
-// Function to generate B samples of tau2 from Q(tau2)
+// F: generate B samples of tau2 from confidence distribution induced by Q(tau2)
 // [[Rcpp::export]]
 
 Rcpp::NumericVector samptau2(int ns,
@@ -122,8 +121,9 @@ Rcpp::NumericVector samptau2(int ns,
   
 } 
 
-// Function to generate samples of mu confidence distribution for fixed tau2
+// F: generate samples of mu from confidence distribution for fixed tau2
 //[[Rcpp::export]]
+
 Rcpp::NumericVector samplemusimple(int n_samples, 
                                double tau2,
                                Rcpp::NumericVector es,
@@ -168,23 +168,3 @@ Rcpp::NumericVector samplemusimple(int n_samples,
   // Return
   return smu;
 }
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-
