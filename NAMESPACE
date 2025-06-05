@@ -15,4 +15,6 @@ export(summary.metaprediction)
 export(print.summary.metaprediction)
 export(prob)
 
+export(opti_num)
+
 
