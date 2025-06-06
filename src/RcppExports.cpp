@@ -38,6 +38,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// crps
+double crps(const std::vector<double>& s, const std::vector<double>& tn);
+RcppExport SEXP _metaprediction_crps(SEXP sSEXP, SEXP tnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type s(sSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type tn(tnSEXP);
+    rcpp_result_gen = Rcpp::wrap(crps(s, tn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // p_wald
 Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
 RcppExport SEXP _metaprediction_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
@@ -215,6 +227,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_metaprediction_cd_single", (DL_FUNC) &_metaprediction_cd_single, 4},
     {"_metaprediction_CD_cpp", (DL_FUNC) &_metaprediction_CD_cpp, 4},
+    {"_metaprediction_crps", (DL_FUNC) &_metaprediction_crps, 2},
     {"_metaprediction_p_wald", (DL_FUNC) &_metaprediction_p_wald, 3},
     {"_metaprediction_pfctedge", (DL_FUNC) &_metaprediction_pfctedge, 3},
     {"_metaprediction_opti_edge", (DL_FUNC) &_metaprediction_opti_edge, 2},

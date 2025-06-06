@@ -9,6 +9,10 @@ CD_cpp <- function(h0, es, se, h = 1e-4) {
     .Call(`_metaprediction_CD_cpp`, h0, es, se, h)
 }
 
+crps <- function(s, tn) {
+    .Call(`_metaprediction_crps`, s, tn)
+}
+
 p_wald <- function(x, es, se) {
     .Call(`_metaprediction_p_wald`, x, es, se)
 }
