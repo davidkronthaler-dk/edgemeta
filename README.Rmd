@@ -32,7 +32,7 @@ The considered predictive distributions are then constructed by marginalizing th
 You can install the development version of `metaprediction` from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
+# install.packages("remotes")
 remotes::install_github("davidkronthaler-dk/metaprediction")
 # or
 # install.packages("devtools")

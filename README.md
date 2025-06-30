@@ -36,7 +36,7 @@ You can install the development version of `metaprediction` from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
+# install.packages("remotes")
 remotes::install_github("davidkronthaler-dk/metaprediction")
 # or
 # install.packages("devtools")
@@ -72,27 +72,27 @@ pd <- PredDist(es = es, se = se, method = "FullCD")
 #> Method: FullCD 
 #> Number of Monte Carlo samples: 100,000 
 #> 
-#> 95% prediction interval from -3.26 to 4.482 
+#> 95% prediction interval from -3.24 to 4.528 
 #> 
 #> Summary of predictive distribution (PD):
 #>               2.5%  25.0% Median  Mean 75.0% 97.5%
-#> PD theta_new -3.26 -0.384  0.632 0.629 1.647 4.482
+#> PD theta_new -3.24 -0.373   0.63 0.633 1.644 4.528
 #> 
 #> Confidence calculations:
 #> Confidence of `theta_new` lying between 0 and Inf:
-#> 0.66616
+#> 0.66746
 #> Confidence of `theta_new` lying between -Inf and 0:
-#> 0.33384
+#> 0.33254
 #> 
 #> Summary of confidence distributions (CD):
 #>           2.5% 25.0% Median  Mean 75.0%  97.5%
-#> CD mu   -0.911 0.175  0.638 0.632 1.093  2.152
-#> CD tau2  0.367 1.023  1.822 3.239 3.417 14.977
+#> CD mu   -0.899 0.178  0.640 0.635 1.095  2.166
+#> CD tau2  0.365 1.021  1.812 3.246 3.416 14.554
 
 # 95% prediction interval
 pd$PI
 #>      2.5%     97.5% 
-#> -3.260120  4.481634
+#> -3.239617  4.528168
 
 # Plot the predictive distribution
 plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
@@ -118,17 +118,17 @@ me <- remaeffect(es = es, se = se)
 #> Number of studies: 5 
 #> Number of Monte Carlo samples: 100,000 
 #> 
-#> Average effect: 0.635 
-#> 95% Confidence interval from -0.890 to 2.133 
+#> Average effect: 0.633 
+#> 95% Confidence interval from -0.902 to 2.143 
 #> 
 #> Summary of confidence distribution of the average effect:
 #>        2.5%     25.0%    Median      Mean    75.0%    97.5%
-#>  -0.8901761 0.1794269 0.6429719 0.6354832 1.096782 2.133462
+#>  -0.9024812 0.1778291 0.6416051 0.6333235 1.091761 2.143147
 me$estimate
-#> [1] 0.6354832
+#> [1] 0.6333235
 me$CI
 #>       2.5%      97.5% 
-#> -0.8901761  2.1334618
+#> -0.9024812  2.1431473
 
 # Further information: 'help(remaeffect)'
 ```
