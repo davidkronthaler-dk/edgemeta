@@ -47,8 +47,8 @@
 #' @examples
 #' es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 #' se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-#' metaeffect(es = es, se = se)
-metaeffect <-
+#' remaeffect(es = es, se = se)
+remaeffect <-
   function(es,
            se,
            level.ci = 0.95,

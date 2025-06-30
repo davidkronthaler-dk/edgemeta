@@ -1,7 +1,7 @@
 useDynLib(metaprediction, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 export(PredDist)
-export(metaeffect)
+export(remaeffect)
 
 S3method(plot, metaprediction)
 S3method(print, metaprediction)

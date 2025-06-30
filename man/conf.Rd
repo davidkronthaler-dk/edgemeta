@@ -4,7 +4,7 @@
 \alias{conf}
 \title{Confidence Probabilities for Future Effects in Meta-Analysis}
 \usage{
-conf(obj, ...)
+conf(obj, lower, upper)
 }
 \arguments{
 \item{obj}{An object of class \code{metaprediction}.}

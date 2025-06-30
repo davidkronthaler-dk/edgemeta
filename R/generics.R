@@ -4,7 +4,7 @@
 #' For \code{param = "mu"} and \code{param = "tau2"}, the corresponding confidence distributions are shown.
 #' The latter is only valid if the estimation method in \code{PredDist} was not set to \code{"FixedTau2"}.
 #'
-#' @param obj An object of class \code{metaprediction}.
+#' @param x An object of class \code{metaprediction}.
 #' @param param The parameter to display. One of \code{theta_new} (predictive distribution), \code{mu} (confidence distribution), or \code{tau2} (confidence distribution).
 #' @param ... Additional arguments passed to \code{graphics::hist()}, including optional \code{main}, \code{xlab}, and \code{ylab} to override default plot title and axis labels.
 #'
@@ -19,7 +19,7 @@
 #' plot(pd, param = "theta_new", breaks = 100)
 #' plot(pd, param = "mu", main = "CD for Mu", xlab = "Mu values", ylab = "Density")
 #' @export
-plot.metaprediction <- function(obj, param = c("theta_new", "mu", "tau2"), ...) {
+plot.metaprediction <- function(x, param = c("theta_new", "mu", "tau2"), ...) {
   param <- base::match.arg(param)
   graphics::par(mar = c(5, 4.5, 4, 2))
   dots <- list(...)
@@ -42,15 +42,15 @@ plot.metaprediction <- function(obj, param = c("theta_new", "mu", "tau2"), ...) 
                 "theta_new" = "theta_new",
                 "mu" = "mu",
                 "tau2" = "tau2")
-  if (!col %in% colnames(obj$samples)) {
-    stop(sprintf("Column '%s' not found in obj$samples", col))
+  if (!col %in% colnames(x$samples)) {
+    stop(sprintf("Column '%s' not found in x$samples", col))
   }
-  if (param == "tau2" && identical(attr(obj, "method"), "FixedTau2")) {
+  if (param == "tau2" && identical(attr(x, "method"), "FixedTau2")) {
     warning("Distribution of Tau2 not available for method 'FixedTau2'")
     return(invisible(NULL))
   }
   hist_args <- c(
-    list(x = obj$samples[, col],
+    list(x = x$samples[, col],
          xlab = xlab,
          ylab = ylab,
          main = main,
@@ -61,9 +61,9 @@ plot.metaprediction <- function(obj, param = c("theta_new", "mu", "tau2"), ...) 
 }
 
 #' @export
-summary.metaprediction <- function(obj, probs = c(0.025, 0.25, 0.5, 0.75, 0.975), ...) {
-  method <- base::attr(obj, "method")
-  stats <- base::t(base::apply(obj$samples, 2, function(x) {
+summary.metaprediction <- function(object, probs = c(0.025, 0.25, 0.5, 0.75, 0.975), ...) {
+  method <- base::attr(object, "method")
+  stats <- base::t(base::apply(object$samples, 2, function(x) {
     m <- base::mean(x, na.rm = TRUE)
     qs <- stats::quantile(x, probs = probs, na.rm = TRUE)
     c(qs[1:2], Median = qs[3], Mean = m, qs[4:5])
@@ -75,7 +75,7 @@ summary.metaprediction <- function(obj, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)
     base::sprintf("%.1f%%", probs[4] * 100),
     base::sprintf("%.1f%%", probs[5] * 100)
   )
-  base::rownames(stats) <- base::colnames(obj$samples)
+  base::rownames(stats) <- base::colnames(object$samples)
   stats <- stats[base::nrow(stats):1, ]
   res <- base::as.data.frame(stats)
   base::attr(res, "method") <- method
@@ -106,7 +106,7 @@ print.summary.metaprediction <- function(x, ...) {
 #'
 #' @seealso \code{\link{PredDist}}
 #' @export
-conf <- function(obj, ...) {
+conf <- function(obj, lower, upper) {
   base::UseMethod("conf")
 }
 
@@ -121,34 +121,34 @@ conf.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
 }
 
 #' @export
-print.metaprediction <- function(obj, lower = NULL, upper = NULL, ...) {
-  if (!is.null(obj$samples) && nrow(obj$samples) > 0) {
-    s <- summary.metaprediction(obj)
+print.metaprediction <- function(x, lower = NULL, upper = NULL, ...) {
+  if (!is.null(x$samples) && nrow(x$samples) > 0) {
+    s <- summary.metaprediction(x)
     base::class(s) <- "data.frame"
-    param_labels <- base::colnames(obj$samples)
+    param_labels <- base::colnames(x$samples)
     base::rownames(s) <- rev(base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels))
     
     base::cat("\nPredictive & Confidence Distributions for Random-Effects Meta-Analysis\n\n")
     
-    base::cat("Number of studies:", attr(obj, "k"), "\n")
-    base::cat("Method:", attr(obj, "method"), "\n")
+    base::cat("Number of studies:", attr(x, "k"), "\n")
+    base::cat("Method:", attr(x, "method"), "\n")
     base::cat("Number of Monte Carlo samples:", 
-              format(attr(obj, "n_samples"), big.mark = ",", scientific = FALSE), "\n\n")
-    base::cat(paste0(attr(obj, "level_pi") * 100, "%"), "prediction interval from", round(obj$PI[1], 3),
-              "to", round(obj$PI[2], 3), "\n")
+              format(attr(x, "n_samples"), big.mark = ",", scientific = FALSE), "\n\n")
+    base::cat(paste0(attr(x, "level_pi") * 100, "%"), "prediction interval from", round(x$PI[1], 3),
+              "to", round(x$PI[2], 3), "\n")
     
     base::cat("\nSummary of predictive distribution (PD):\n")
     base::print(round(s[1,],3))
     
     base::cat("\nConfidence calculations:\n")
-    conf.metaprediction(obj, 0, Inf)
-    conf.metaprediction(obj, -Inf, 0)
+    conf.metaprediction(x, 0, Inf)
+    conf.metaprediction(x, -Inf, 0)
               
     base::cat("\nSummary of confidence distributions (CD):\n")
     base::print(round(s[2:nrow(s),],3))
     
     if (!is.null(lower) || !is.null(upper)) {
-      conf.metaprediction(obj, lower, upper)
+      conf.metaprediction(x, lower, upper)
     }
     
   }

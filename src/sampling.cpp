@@ -26,7 +26,6 @@ double samponemu(double s_tau2,
   double min_es = *std::min_element(es.begin(), es.end()) - 4 * max_se;
   double max_es = *std::max_element(es.begin(), es.end()) + 4 * max_se;
   
-  
   // Generate a random uniform number
   double u = R::runif(0, 1);
   
@@ -75,7 +74,6 @@ Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
 double samponetau2(Rcpp::NumericVector es,
                        Rcpp::NumericVector se,
                        double upper) {
-  
   
   // Generate samples of Q(tau2)
   double c = R::rchisq(es.size() - 1);
@@ -163,7 +161,6 @@ Rcpp::NumericVector samplemusimple(int n_samples,
     auto out = fntl::findroot_brent(f, min_es, max_es, args);
     smu[ll] = out.root;
   }
-  
   
   // Return
   return smu;

@@ -1,4 +1,4 @@
-// Functions for density of tau2 based on the generalized heterogeneity statistic       
+// Functions for confidence density of tau2 based on the generalized heterogeneity statistic       
 
 // [[Rcpp::depends(fntl)]]
 #include <Rcpp.h>

@@ -4,10 +4,10 @@
 \alias{plot.metaprediction}
 \title{Plotting Predictive and Confidence Distributions from metaprediction Class Objects}
 \usage{
-\method{plot}{metaprediction}(obj, param = c("theta_new", "mu", "tau2"), ...)
+\method{plot}{metaprediction}(x, param = c("theta_new", "mu", "tau2"), ...)
 }
 \arguments{
-\item{obj}{An object of class \code{metaprediction}.}
+\item{x}{An object of class \code{metaprediction}.}
 
 \item{param}{The parameter to display. One of \code{theta_new} (predictive distribution), \code{mu} (confidence distribution), or \code{tau2} (confidence distribution).}
 

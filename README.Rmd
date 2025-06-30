@@ -64,14 +64,14 @@ plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
 # Futher information: 'help(PredDist)'
 ```
 
-The `metaeffect` function can be used to estimate the average effect $\mu$ and its confidence interval, which incorporates the uncertainty in the estimation of the between-study heterogeneity:
+The `remaeffect` function can be used to estimate the average effect $\mu$ and its confidence interval, which incorporates the uncertainty in the estimation of the between-study heterogeneity:
 
 ```{r example average effect}
 # Average effect and confidence interval
-me <- metaeffect(es = es, se = se)
+me <- remaeffect(es = es, se = se)
 me$estimate
 me$CI
 
-# Further information: 'help(metaeffect)'
+# Further information: 'help(remaeffect)'
 ```
 

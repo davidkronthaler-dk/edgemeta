@@ -66,32 +66,33 @@ se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 # Computation of predictive distribution
 pd <- PredDist(es = es, se = se, method = "FullCD")
 #> 
-#> =================== MetaPrediction Summary ==================
+#> Predictive & Confidence Distributions for Random-Effects Meta-Analysis
 #> 
 #> Number of studies: 5 
-#> Method:  FullCD 
-#> Number of Monte Carlo samples: 100000 
+#> Method: FullCD 
+#> Number of Monte Carlo samples: 100,000 
 #> 
-#> 95 % prediction interval from -3.285 to 4.502 
+#> 95% prediction interval from -3.26 to 4.482 
 #> 
-#> Summary of predictive distribution (PD) and confidence distributions (CD)
-#>                    2.5%      25.0%    Median      Mean    75.0%    97.5%
-#> PD theta_new -3.2845101 -0.3922720 0.6333064 0.6252145 1.639966  4.50216
-#> CD mu        -0.8879358  0.1781743 0.6365155 0.6321113 1.089866  2.12975
-#> CD tau2       0.3672642  1.0246826 1.8132607 3.2422750 3.413068 14.74459
+#> Summary of predictive distribution (PD):
+#>               2.5%  25.0% Median  Mean 75.0% 97.5%
+#> PD theta_new -3.26 -0.384  0.632 0.629 1.647 4.482
 #> 
 #> Confidence calculations:
-#> Confidence of `theta_new` lying between 0 and Inf :
-#> 0.66492
-#> Confidence of `theta_new` lying between -Inf and 0 :
-#> 0.33508
+#> Confidence of `theta_new` lying between 0 and Inf:
+#> 0.66616
+#> Confidence of `theta_new` lying between -Inf and 0:
+#> 0.33384
 #> 
-#> =============================================================
+#> Summary of confidence distributions (CD):
+#>           2.5% 25.0% Median  Mean 75.0%  97.5%
+#> CD mu   -0.911 0.175  0.638 0.632 1.093  2.152
+#> CD tau2  0.367 1.023  1.822 3.239 3.417 14.977
 
 # 95% prediction interval
 pd$PI
-#>     2.5%    97.5% 
-#> -3.28451  4.50216
+#>      2.5%     97.5% 
+#> -3.260120  4.481634
 
 # Plot the predictive distribution
 plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
@@ -104,33 +105,30 @@ plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
 # Futher information: 'help(PredDist)'
 ```
 
-The `metaeffect` function can be used to estimate the average effect
+The `remaeffect` function can be used to estimate the average effect
 $\mu$ and its confidence interval, which incorporates the uncertainty in
 the estimation of the between-study heterogeneity:
 
 ``` r
 # Average effect and confidence interval
-me <- metaeffect(es = es, se = se)
+me <- remaeffect(es = es, se = se)
 #> 
-#> ===== Random-Effects Meta-Analysis (Confidence Distributions) =====
+#> Random-Effects Meta-Analysis using Confidence Distributions
 #> 
-#> Number of studies             : 5 
-#> Number of Monte Carlo samples : 100,000 
-#> Confidence level              : 95% 
+#> Number of studies: 5 
+#> Number of Monte Carlo samples: 100,000 
 #> 
-#> Average effect                : 0.632 
-#> Confidence interval           : [ -0.903, 2.133 ]
+#> Average effect: 0.635 
+#> 95% Confidence interval from -0.890 to 2.133 
 #> 
-#> Summary of confidence distribution of average effect
-#>        2.5%     25.0%    Median      Mean   75.0% 97.5%
-#>  -0.9033486 0.1768678 0.6374315 0.6315653 1.09519 2.133
-#> 
-#> ===================================================================
+#> Summary of confidence distribution of the average effect:
+#>        2.5%     25.0%    Median      Mean    75.0%    97.5%
+#>  -0.8901761 0.1794269 0.6429719 0.6354832 1.096782 2.133462
 me$estimate
-#> [1] 0.6315653
+#> [1] 0.6354832
 me$CI
 #>       2.5%      97.5% 
-#> -0.9033486  2.1330003
+#> -0.8901761  2.1334618
 
-# Further information: 'help(metaeffect)'
+# Further information: 'help(remaeffect)'
 ```
