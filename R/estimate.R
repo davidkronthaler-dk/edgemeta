@@ -90,17 +90,13 @@ metaeffect <-
                       na.rm = T)
     
     # Visual output
-    cat("\n===== Random-Effects Meta-Analysis (Confidence Distributions) =====\n\n")
-    cat("Number of studies             :", length(es), "\n")
-    cat("Number of Monte Carlo samples :",
-        format(n_samples, big.mark = ","),
-        "\n")
-    cat("Confidence level              :", paste0(level.ci * 100, "%"), "\n\n")
-    cat("Average effect                :", sprintf("%.3f", hmu), "\n")
-    cat("Confidence interval           : [",
-        paste(sprintf("%.3f", ci), collapse = ", "),
-        "]\n\n")
-    cat("Summary of confidence distribution of average effect\n")
+    cat("\nRandom-Effects Meta-Analysis using Confidence Distributions\n\n")
+    cat("Number of studies:", length(es), "\n")
+    cat("Number of Monte Carlo samples:", format(n_samples, big.mark = ","),"\n\n")
+    cat("Average effect:", sprintf("%.3f", hmu), "\n")
+    cat(paste0(level.ci * 100, "%"), "Confidence interval from",
+        paste(sprintf("%.3f", ci), collapse = " to "), "\n\n")
+    cat("Summary of confidence distribution of the average effect:\n")
     probs <- c(0.025, 0.25, 0.5, 0.75, 0.975)
     qs <- stats::quantile(s_mu, probs, na.rm = TRUE)
     m <- mean(s_mu, na.rm = TRUE)
@@ -114,8 +110,7 @@ metaeffect <-
       sprintf("%.1f%%", probs[5] * 100)
     )
     print(as.data.frame(t(stats)), row.names = FALSE)
-    cat("\n===================================================================\n\n")
-    
+
     # Return
     invisible(list(
       estimate = hmu,

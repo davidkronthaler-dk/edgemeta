@@ -115,7 +115,7 @@ conf.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
   p <- base::mean(obj$samples[,"theta_new"] <= upper &
               obj$samples[,"theta_new"] >= lower,
             na.rm = TRUE)
-  base::cat("Confidence of `theta_new` lying between", lower, "and", upper, ":\n")
+  base::cat("Confidence of `theta_new` lying between ", lower, " and ", upper, ":\n", sep = "")
   base::cat(sprintf("%s\n", p))
   invisible(p)
 }
@@ -128,26 +128,29 @@ print.metaprediction <- function(obj, lower = NULL, upper = NULL, ...) {
     param_labels <- base::colnames(obj$samples)
     base::rownames(s) <- rev(base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels))
     
-    base::cat("\n=================== MetaPrediction Summary ==================\n\n")
+    base::cat("\nPredictive & Confidence Distributions for Random-Effects Meta-Analysis\n\n")
     
     base::cat("Number of studies:", attr(obj, "k"), "\n")
-    base::cat("Method: ", attr(obj, "method"), "\n")
-    base::cat("Number of Monte Carlo samples:", attr(obj, "n_samples"), "\n\n")
-    base::cat(attr(obj, "level_pi") * 100, "% prediction interval from", round(obj$PI[1], 3),
+    base::cat("Method:", attr(obj, "method"), "\n")
+    base::cat("Number of Monte Carlo samples:", 
+              format(attr(obj, "n_samples"), big.mark = ",", scientific = FALSE), "\n\n")
+    base::cat(paste0(attr(obj, "level_pi") * 100, "%"), "prediction interval from", round(obj$PI[1], 3),
               "to", round(obj$PI[2], 3), "\n")
     
-    base::cat("\nSummary of predictive distribution (PD) and confidence distributions (CD)\n")
-    base::print(s)
+    base::cat("\nSummary of predictive distribution (PD):\n")
+    base::print(round(s[1,],3))
     
     base::cat("\nConfidence calculations:\n")
     conf.metaprediction(obj, 0, Inf)
     conf.metaprediction(obj, -Inf, 0)
+              
+    base::cat("\nSummary of confidence distributions (CD):\n")
+    base::print(round(s[2:nrow(s),],3))
     
     if (!is.null(lower) || !is.null(upper)) {
       conf.metaprediction(obj, lower, upper)
     }
     
-    base::cat("\n=============================================================\n")
   }
 }
 

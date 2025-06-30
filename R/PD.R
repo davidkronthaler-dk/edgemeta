@@ -106,7 +106,7 @@ PredDist <-
     attr(rt, "k") <- length(es)
     print(rt)
     
-    return(rt)
+    invisible(rt)
   }
 
 ## Predictive distribution, fixed tau2
