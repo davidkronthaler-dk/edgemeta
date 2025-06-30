@@ -13,7 +13,7 @@ confidence distributions.
 
 The package introduces the S3 class `metaprediction`. The methods are
 implemented in the C++ programming language to ensure computational
-efficiency and are made available in the R environment using the `Rcpp
+efficiency and are made available in the R environment using the `Rcpp`
 interface.
 
 The methods assumes that future effects and effects from observed
