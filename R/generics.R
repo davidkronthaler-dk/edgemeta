@@ -128,7 +128,7 @@ print.metaprediction <- function(x, lower = NULL, upper = NULL, ...) {
     param_labels <- base::colnames(x$samples)
     base::rownames(s) <- rev(base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels))
     
-    base::cat("\nPredictive & Confidence Distributions for Random-Effects Meta-Analysis\n\n")
+    base::cat("\nPredictive and Confidence Distributions for Random-Effects Meta-Analysis\n\n")
     
     base::cat("Number of studies:", attr(x, "k"), "\n")
     base::cat("Method:", attr(x, "method"), "\n")
