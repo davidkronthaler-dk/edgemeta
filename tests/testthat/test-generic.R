@@ -31,8 +31,8 @@ test_that("Generic summary works",{
 })
 
 # Prob
-test_that("Prob works", {
-  expect_no_error(prob(p1, 0, 1))
-  expect_no_error(prob(p2, -Inf, Inf))
-  expect_error(prob(p3, a, b))
+test_that("Conf works", {
+  expect_no_error(conf(p1, 0, 1))
+  expect_no_error(conf(p2, -Inf, Inf))
+  expect_error(conf(p3, a, b))
 })

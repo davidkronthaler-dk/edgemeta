@@ -126,32 +126,3 @@ Rcpp::NumericVector ftau2(Rcpp::NumericVector es,
   
   return fd;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

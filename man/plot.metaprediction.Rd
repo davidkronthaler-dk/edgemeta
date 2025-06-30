@@ -2,24 +2,21 @@
 % Please edit documentation in R/generics.R
 \name{plot.metaprediction}
 \alias{plot.metaprediction}
-\title{Plotting Predictive and Confidence Distributions from 'metaprediction' Class Objects}
+\title{Plotting Predictive and Confidence Distributions from metaprediction Class Objects}
 \usage{
 \method{plot}{metaprediction}(obj, param = c("theta_new", "mu", "tau2"), ...)
 }
 \arguments{
-\item{obj}{Object of class 'metaprediction', obtained from the 'PredDist' function.}
+\item{obj}{An object of class \code{metaprediction}.}
 
-\item{param}{The parameter to display. One of \code{"theta_new"}, \code{"mu"}, or \code{"tau2"}.}
+\item{param}{The parameter to display. One of \code{theta_new} (predictive distribution), \code{mu} (confidence distribution), or \code{tau2} (confidence distribution).}
 
 \item{...}{Additional arguments passed to \code{graphics::hist()}, including optional \code{main}, \code{xlab}, and \code{ylab} to override default plot title and axis labels.}
 }
 \description{
-Plotting Predictive and Confidence Distributions from 'metaprediction' Class Objects
-}
-\details{
 Displays the predictive distribution for \code{param = "theta_new"} (future effect from random effects).
-For \code{"mu"} and \code{"tau2"}, the corresponding confidence distributions are shown.
-\code{"tau2"} is only valid if the estimation method was not set to \code{"FixedTau2"}.
+For \code{param = "mu"} and \code{param = "tau2"}, the corresponding confidence distributions are shown.
+The latter is only valid if the estimation method in \code{PredDist} was not set to \code{"FixedTau2"}.
 }
 \examples{
 es <- c(0.17, 1.20, 1.10, -0.0019, -2.33)

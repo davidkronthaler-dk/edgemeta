@@ -2,7 +2,7 @@
 % Please edit documentation in R/generics.R
 \name{conf}
 \alias{conf}
-\title{Confidence Probability for Future Effect in Meta-Analysis}
+\title{Confidence Probabilities for Future Effects in Meta-Analysis}
 \usage{
 conf(obj, ...)
 }
@@ -14,14 +14,16 @@ conf(obj, ...)
 \item{upper}{Upper bound of the interval (default is \code{Inf}).}
 }
 \value{
-Invisibly returns the confidence probability (a numeric value between 0 and 1).
-Prints the result to the console.
+Returns the confidence probability (a numeric value between 0 and 1).
 }
 \description{
-Computes the confidence probability that a future outcome \code{theta_new}
+Computes the confidence probability that a future effect \code{theta_new}
 lies within a specified interval, based on the predictive distribution from a
 random-effects meta-analysis.
 }
 \seealso{
 \code{\link{PredDist}}
+}
+\author{
+David Kronthaler
 }

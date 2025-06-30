@@ -1,13 +1,12 @@
-#' Plotting Predictive and Confidence Distributions from 'metaprediction' Class Objects
-#'
-#' @param obj Object of class 'metaprediction', obtained from the 'PredDist' function.
-#' @param param The parameter to display. One of \code{"theta_new"}, \code{"mu"}, or \code{"tau2"}.
-#' @param ... Additional arguments passed to \code{graphics::hist()}, including optional \code{main}, \code{xlab}, and \code{ylab} to override default plot title and axis labels.
-#'
-#' @details
+#' Plotting Predictive and Confidence Distributions from metaprediction Class Objects
+#' 
 #' Displays the predictive distribution for \code{param = "theta_new"} (future effect from random effects).
-#' For \code{"mu"} and \code{"tau2"}, the corresponding confidence distributions are shown.
-#' \code{"tau2"} is only valid if the estimation method was not set to \code{"FixedTau2"}.
+#' For \code{param = "mu"} and \code{param = "tau2"}, the corresponding confidence distributions are shown.
+#' The latter is only valid if the estimation method in \code{PredDist} was not set to \code{"FixedTau2"}.
+#'
+#' @param obj An object of class \code{metaprediction}.
+#' @param param The parameter to display. One of \code{theta_new} (predictive distribution), \code{mu} (confidence distribution), or \code{tau2} (confidence distribution).
+#' @param ... Additional arguments passed to \code{graphics::hist()}, including optional \code{main}, \code{xlab}, and \code{ylab} to override default plot title and axis labels.
 #'
 #' @author David Kronthaler
 #'
@@ -91,18 +90,19 @@ print.summary.metaprediction <- function(x, ...) {
   base::NextMethod("print")
 }
 
-#' Confidence Probability for Future Effect in Meta-Analysis
+#' Confidence Probabilities for Future Effects in Meta-Analysis
 #'
-#' Computes the confidence probability that a future outcome \code{theta_new}
+#' Computes the confidence probability that a future effect \code{theta_new}
 #' lies within a specified interval, based on the predictive distribution from a 
 #' random-effects meta-analysis.
 #'
 #' @param obj An object of class \code{metaprediction}.
 #' @param lower Lower bound of the interval (default is \code{-Inf}).
 #' @param upper Upper bound of the interval (default is \code{Inf}).
+#' 
+#' @author David Kronthaler
 #'
-#' @return Invisibly returns the confidence probability (a numeric value between 0 and 1).
-#' Prints the result to the console.
+#' @return Returns the confidence probability (a numeric value between 0 and 1).
 #'
 #' @seealso \code{\link{PredDist}}
 #' @export
@@ -115,7 +115,7 @@ conf.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
   p <- base::mean(obj$samples[,"theta_new"] <= upper &
               obj$samples[,"theta_new"] >= lower,
             na.rm = TRUE)
-  base::cat("Confidence of `theta_new` lying between", lower, "and", upper, ":")
+  base::cat("Confidence of `theta_new` lying between", lower, "and", upper, ":\n")
   base::cat(sprintf("%s\n", p))
   invisible(p)
 }

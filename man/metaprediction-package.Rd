@@ -3,17 +3,18 @@
 \alias{metaprediction}
 \docType{package}
 \title{
-  Frequentist Predictive Distributions and Intervals for Meta-Analysis
+  Frequentist Predictive Distributions and Intervals for Random-Effects Meta-Analysis
 }
 \description{
-  Computation of Predictive Distributions and Prediction Intervals utilizing
-  the Edgington combined p-value function inducing a confidence distribution of 
-  the average effect and accounting for uncertainty about the between-study heterogeneity
-  estimate by use of the generalized heterogeneity statistic.
+  Provides methods to compute predictive distributions and prediction intervals in random-effects meta-analysis using confidence distributions. The confidence distribution for the average effect is derived from the Edgington combined p-value function (Held et al., 2025), while the confidence distribution for the heterogeneity parameter is based on the generalized heterogeneity statistic (Viechtbauer, 2007). The methods return the full predictive distribution as Monte Carlo samples, enabling the computation of any summary statistic.
+
+  The package also includes an estimator for the average effect based on the Edgington combined p-value function, which accounts for the uncertainty in the estimation of heterogeneity. This estimator is obtained by repeatedly constructing the confidence distribution of the average effect across values of the heterogeneity parameter, sampled according to its own confidence distribution.
+  
 }
 \details{
-  PredDist can be used to compute both predictive distributions as well as prediction intervals
-  in a fully Frequentist framework.
+  \code{PredDist} can be used to compute predictive distributions as well as prediction intervals in a fully frequentist framework.
+  
+  \code{metaeffect} can be used to estimate the average effect.
 }
 \author{
 David Kronthaler
@@ -21,15 +22,12 @@ David Kronthaler
 Maintainer: David Kronthaler <david.kronthaler@uzh.ch>
 }
 \references{
-  This optional section can contain literature or other references for
-  background information.
+Viechtbauer, W. (2007). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysis}. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
+
+Held, L., Hofmann, F., & Pawel, S. (2025). \emph{A comparison of combined p-value functions for meta-analysis}. doi:10.1017/rsm.2025.26
 }
 \keyword{ package }
 \seealso{
-  Optional links to other man pages
-}
-\examples{
-es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
-se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-PredDist(es = es, se = se, method = "FullCD")
+ \code{\link{PredDist}}
+  \code{\link{metaeffect}}
 }

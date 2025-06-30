@@ -50,7 +50,3 @@ double crps(const std::vector<double>& s, const std::vector<double>& tn) {
   // return average CRPS across all observations
   return crps_sum / tn.size();
 }
-
-
-
-

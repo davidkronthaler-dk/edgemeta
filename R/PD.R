@@ -1,4 +1,4 @@
-#' Frequentist Predictive Distributions for Random-Effects Meta-Analysis
+#' Frequentist Predictive Distributions and Intervals for Random-Effects Meta-Analysis
 #' 
 #' This function computes frequentist predictive distributions and prediction intervals for a future effect \eqn{\theta_{new}} in random-effects meta-analysis. Predictive distributions are constructed from confidence distributions of the average effect (\eqn{\mu}) and the between-study heterogeneity (\eqn{\tau^2}), using a Monte Carlo sampling algorithm. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
 #'
@@ -19,7 +19,12 @@
 #' 
 #' @details
 #' Predictive distributions are constructed from the confidence distribution of the average effect 
-#' \eqn{\mu}. The function supports three methods:
+#' \eqn{\mu} and from the confidence distribution of heterogeneity parameter \eqn{\tau^2}. The confidence distribution of the 
+#' average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function (Held et al., 2025).
+#' The confidence distribution of the between-study heterogeneity parameter \eqn{\tau^2} is 
+#' derived from the generalized heterogeneity statistic (Viechtbauer, 2006).
+#' 
+#'  The function supports three methods:
 #' 
 #' - **"FullCD"**: This method generates samples from the confidence distribution of 
 #'   \eqn{\tau^2}, and for each sampled \eqn{\tau^2}, it computes the corresponding confidence 
@@ -37,9 +42,6 @@
 #'   the confidence distribution of \eqn{\mu}. It does 
 #'   not account for uncertainty in the estimation of \eqn{\tau^2}.
 #' 
-#' The confidence distribution of the between-study heterogeneity parameter \eqn{\tau^2} is 
-#' derived from the generalized heterogeneity statistic (Viechtbauer, 2006). The confidence distribution of the 
-#' average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function (Held et al., 2025).
 #' 
 #' The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the estimated predictive 
 #' distribution of future effects. This distribution can be used to compute prediction intervals, 
@@ -102,6 +104,7 @@ PredDist <-
     attr(rt, "n_samples") <- n_samples
     attr(rt, "level_pi") <- level.pi
     attr(rt, "k") <- length(es)
+    print(rt)
     
     return(rt)
   }
