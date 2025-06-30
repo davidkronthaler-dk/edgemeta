@@ -7,15 +7,9 @@ S3method(plot, metaprediction)
 S3method(print, metaprediction)
 S3method(summary, metaprediction)
 S3method(print, summary.metaprediction)
-S3method(prob, metaprediction)
+S3method(conf, metaprediction)
 
 export(plot.metaprediction)
-export(print.metaprediction)
-export(summary.metaprediction)
-export(print.summary.metaprediction)
-export(prob)
-
-export(opti_num)
-export(crps)
+export(conf)
 
 

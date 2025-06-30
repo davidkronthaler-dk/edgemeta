@@ -1,4 +1,3 @@
-# Validate input
 validate_input <- function(es, se, method = c("FixedTau2", "SimplifiedCD", "FullCD", "estimate"),
                            lpi, ns, 
                            mtau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB", "estimate")) {

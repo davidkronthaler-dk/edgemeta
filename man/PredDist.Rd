@@ -2,7 +2,7 @@
 % Please edit documentation in R/PD.R
 \name{PredDist}
 \alias{PredDist}
-\title{Frequentist Predictive Distributions and Prediction Intervals for Meta-Analysis}
+\title{Frequentist Predictive Distributions for Random-Effects Meta-Analysis}
 \usage{
 PredDist(
   es,
@@ -23,7 +23,7 @@ PredDist(
 
 \item{level.pi}{Coverage level of the prediction interval computed (numeric, between 0 and 1).}
 
-\item{n_samples}{Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).}
+\item{n_samples}{Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).}
 
 \item{method.tau2}{In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity. Check 'help(meta)' for information on estimation methods (default is "REML").}
 
@@ -37,32 +37,32 @@ A list containing:
 }
 }
 \description{
-This function computes the frequentist predictive distribution and prediction interval for a future effect \eqn{\theta_{new}} based on the confidence distributions of the average effect and the between-study heterogeneity. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
+This function computes frequentist predictive distributions and prediction intervals for a future effect \eqn{\theta_{new}} in random-effects meta-analysis. Predictive distributions are constructed from confidence distributions of the average effect (\eqn{\mu}) and the between-study heterogeneity (\eqn{\tau^2}), using a Monte Carlo sampling algorithm. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
 }
 \details{
-The predictive distributions are based on the confidence distribution of the average effect
+Predictive distributions are constructed from the confidence distribution of the average effect
 \eqn{\mu}. The function supports three methods:
 \itemize{
 \item \strong{"FullCD"}: This method generates samples from the confidence distribution of
 \eqn{\tau^2}, and for each sampled \eqn{\tau^2}, it computes the corresponding confidence
 distribution of \eqn{\mu}. It then generates a sample of the future effect \eqn{\theta_{new}}
 for each (\eqn{\tau^2}, \eqn{\mu}) pair. This is the most comprehensive method, as it fully
-accounts for uncertainty in both parameters.
+accounts for uncertainty in both parameters and the dependence of the Edgington combined \eqn{p}-value function on the heterogeneity parameter.
 \item \strong{"SimplifiedCD"}: This method generates samples from the confidence distribution of
 \eqn{\tau^2}, but computes the confidence distribution of \eqn{\mu} using a simplified
 approach. Specifically, it uses a fixed \eqn{\tau^2} to compute the Edgington combined
-\eqn{p}-value function, from which samples of \eqn{\mu} are drawn. This method is
-computationally efficient but may be less accurate.
+\eqn{p}-value function, from which samples of \eqn{\mu} are drawn. It then generates a sample of
+the future effect \eqn{\theta_{new}} for each (\eqn{\tau^2}, \eqn{\mu}) pair
 \item \strong{"FixedTau2"}: This method assumes a fixed value for \eqn{\tau^2}, and uses it to compute
 the confidence distribution of \eqn{\mu}. It does
 not account for uncertainty in the estimation of \eqn{\tau^2}.
 }
 
 The confidence distribution of the between-study heterogeneity parameter \eqn{\tau^2} is
-derived from the generalized heterogeneity statistic. The confidence distribution of the
-average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function.
+derived from the generalized heterogeneity statistic (Viechtbauer, 2006). The confidence distribution of the
+average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function (Held et al., 2025).
 
-The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the predictive
+The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the estimated predictive
 distribution of future effects. This distribution can be used to compute prediction intervals,
 summarize predictive uncertainty, or generate visualizations.
 }
@@ -70,4 +70,12 @@ summarize predictive uncertainty, or generate visualizations.
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 PredDist(es = es, se = se, method = "FullCD")
+}
+\references{
+Viechtbauer, W. (2007). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysis}. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
+
+Held, L., Hofmann, F., & Pawel, S. (2025). \emph{A comparison of combined p-value functions for meta-analysis}. doi:10.1017/rsm.2025.26
+}
+\author{
+David Kronthaler
 }

@@ -1,4 +1,4 @@
-#' Plotting Predictive and Confidence Distributions of 'metaprediction' Class Objects
+#' Plotting Predictive and Confidence Distributions from 'metaprediction' Class Objects
 #'
 #' @param obj Object of class 'metaprediction', obtained from the 'PredDist' function.
 #' @param param The parameter to display. One of \code{"theta_new"}, \code{"mu"}, or \code{"tau2"}.
@@ -6,8 +6,10 @@
 #'
 #' @details
 #' Displays the predictive distribution for \code{param = "theta_new"} (future effect from random effects).
-#' For \code{"mu"} and \code{"tau2"}, the corresponding confidence distributions (CDs) are shown.
+#' For \code{"mu"} and \code{"tau2"}, the corresponding confidence distributions are shown.
 #' \code{"tau2"} is only valid if the estimation method was not set to \code{"FixedTau2"}.
+#'
+#' @author David Kronthaler
 #'
 #' @export
 #'
@@ -89,17 +91,31 @@ print.summary.metaprediction <- function(x, ...) {
   base::NextMethod("print")
 }
 
+#' Confidence Probability for Future Effect in Meta-Analysis
+#'
+#' Computes the confidence probability that a future outcome \code{theta_new}
+#' lies within a specified interval, based on the predictive distribution from a 
+#' random-effects meta-analysis.
+#'
+#' @param obj An object of class \code{metaprediction}.
+#' @param lower Lower bound of the interval (default is \code{-Inf}).
+#' @param upper Upper bound of the interval (default is \code{Inf}).
+#'
+#' @return Invisibly returns the confidence probability (a numeric value between 0 and 1).
+#' Prints the result to the console.
+#'
+#' @seealso \code{\link{PredDist}}
 #' @export
-prob <- function(obj, ...) {
-  base::UseMethod("prob")
+conf <- function(obj, ...) {
+  base::UseMethod("conf")
 }
 
 #' @export
-prob.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
+conf.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
   p <- base::mean(obj$samples[,"theta_new"] <= upper &
               obj$samples[,"theta_new"] >= lower,
             na.rm = TRUE)
-  base::cat("Probability of `theta_new` lying between", lower, "and", upper, ":\n")
+  base::cat("Confidence of `theta_new` lying between", lower, "and", upper, ":")
   base::cat(sprintf("%s\n", p))
   invisible(p)
 }
@@ -110,19 +126,25 @@ print.metaprediction <- function(obj, lower = NULL, upper = NULL, ...) {
     s <- summary.metaprediction(obj)
     base::class(s) <- "data.frame"
     param_labels <- base::colnames(obj$samples)
-    base::rownames(s) <- base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels)
+    base::rownames(s) <- rev(base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels))
     
-    base::cat("\n=================== MetaPrediction Summary ==================\n")
-    base::cat("\nSummary of predictive distribution (PD) and confidence distributions (CD)\n\n")
+    base::cat("\n=================== MetaPrediction Summary ==================\n\n")
+    
+    base::cat("Number of studies:", attr(obj, "k"), "\n")
+    base::cat("Method: ", attr(obj, "method"), "\n")
+    base::cat("Number of Monte Carlo samples:", attr(obj, "n_samples"), "\n\n")
+    base::cat(attr(obj, "level_pi") * 100, "% prediction interval from", round(obj$PI[1], 3),
+              "to", round(obj$PI[2], 3), "\n")
+    
+    base::cat("\nSummary of predictive distribution (PD) and confidence distributions (CD)\n")
     base::print(s)
     
-    base::cat("\nProbability calculations:\n")
-    prob.metaprediction(obj, 0, Inf)
-    base::cat("\n")
-    prob.metaprediction(obj, -Inf, 0)
+    base::cat("\nConfidence calculations:\n")
+    conf.metaprediction(obj, 0, Inf)
+    conf.metaprediction(obj, -Inf, 0)
     
     if (!is.null(lower) || !is.null(upper)) {
-      prob.metaprediction(obj, lower, upper)
+      conf.metaprediction(obj, lower, upper)
     }
     
     base::cat("\n=============================================================\n")

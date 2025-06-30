@@ -18,13 +18,15 @@
 #'   \item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}.}
 #'   \item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}.}
 #' }
+#' 
+#' @author David Kronthaler
 #'
 #' @details 
 #' This function performs a random-effects meta-analysis using confidence distributions. 
 #' It generates samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2},
-#' derived from the generalized heterogeneity statistic. For each sampled value of \eqn{\tau^2}, 
+#' derived from the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled value of \eqn{\tau^2}, 
 #' the function then computes a corresponding confidence distribution for the average 
-#' effect \eqn{\mu}, induced by the Edgington combined p-value function, and generates a sample from
+#' effect \eqn{\mu}, induced by the Edgington combined p-value function (Held et al., 2025), and generates a sample from
 #' this distribution.
 #' 
 #' By repeatedly sampling \eqn{\tau^2} and recalculating the confidence distribution of \eqn{\mu}, 
@@ -35,6 +37,11 @@
 #' Since the method accounts for the uncertainty in \eqn{\tau^2}, it always returns a
 #' confidence interval that adjusts for potential between-study heterogeneity,
 #' that is, the framework of a fixed-effects meta-analysis is not applicable.
+#' 
+#' @references
+#' Viechtbauer, W. (2007). *Confidence intervals for the amount of heterogeneity in meta‐analysi*s. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
+#' 
+#' Held, L., Hofmann, F., & Pawel, S. (2025). *A comparison of combined p-value functions for meta-analysis*. doi:10.1017/rsm.2025.26
 
 #' 
 #' @examples
@@ -83,18 +90,31 @@ metaeffect <-
                       na.rm = T)
     
     # Visual output
-    cat("\n===== Random-Effects Meta-Analysis (Confidence Distributions) =====\n")
+    cat("\n===== Random-Effects Meta-Analysis (Confidence Distributions) =====\n\n")
     cat("Number of studies             :", length(es), "\n")
     cat("Number of Monte Carlo samples :",
         format(n_samples, big.mark = ","),
         "\n")
-    cat("Confidence level              :", paste0(level.ci * 100, "%"), "\n")
-    cat("-------------------------------------------------------------------\n")
-    cat("Average effect estimate       :", sprintf("%.3f", hmu), "\n")
+    cat("Confidence level              :", paste0(level.ci * 100, "%"), "\n\n")
+    cat("Average effect                :", sprintf("%.3f", hmu), "\n")
     cat("Confidence interval           : [",
         paste(sprintf("%.3f", ci), collapse = ", "),
-        "]\n")
-    cat("===================================================================\n\n")
+        "]\n\n")
+    cat("Summary of confidence distribution of average effect\n")
+    probs <- c(0.025, 0.25, 0.5, 0.75, 0.975)
+    qs <- stats::quantile(s_mu, probs, na.rm = TRUE)
+    m <- mean(s_mu, na.rm = TRUE)
+    stats <- c(qs[1:2], Median = qs[3], Mean = m, qs[4:5])
+    names(stats) <- c(
+      sprintf("%.1f%%", probs[1] * 100),
+      sprintf("%.1f%%", probs[2] * 100),
+      "Median",
+      "Mean",
+      sprintf("%.1f%%", probs[4] * 100),
+      sprintf("%.1f%%", probs[5] * 100)
+    )
+    print(as.data.frame(t(stats)), row.names = FALSE)
+    cat("\n===================================================================\n\n")
     
     # Return
     invisible(list(

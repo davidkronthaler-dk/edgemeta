@@ -2,7 +2,7 @@
 % Please edit documentation in R/generics.R
 \name{plot.metaprediction}
 \alias{plot.metaprediction}
-\title{Plotting Predictive and Confidence Distributions of 'metaprediction' Class Objects}
+\title{Plotting Predictive and Confidence Distributions from 'metaprediction' Class Objects}
 \usage{
 \method{plot}{metaprediction}(obj, param = c("theta_new", "mu", "tau2"), ...)
 }
@@ -14,11 +14,11 @@
 \item{...}{Additional arguments passed to \code{graphics::hist()}, including optional \code{main}, \code{xlab}, and \code{ylab} to override default plot title and axis labels.}
 }
 \description{
-Plotting Predictive and Confidence Distributions of 'metaprediction' Class Objects
+Plotting Predictive and Confidence Distributions from 'metaprediction' Class Objects
 }
 \details{
 Displays the predictive distribution for \code{param = "theta_new"} (future effect from random effects).
-For \code{"mu"} and \code{"tau2"}, the corresponding confidence distributions (CDs) are shown.
+For \code{"mu"} and \code{"tau2"}, the corresponding confidence distributions are shown.
 \code{"tau2"} is only valid if the estimation method was not set to \code{"FixedTau2"}.
 }
 \examples{
@@ -27,4 +27,7 @@ se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 pd <- PredDist(es = es, se = se, method = "FullCD")
 plot(pd, param = "theta_new", breaks = 100)
 plot(pd, param = "mu", main = "CD for Mu", xlab = "Mu values", ylab = "Density")
+}
+\author{
+David Kronthaler
 }

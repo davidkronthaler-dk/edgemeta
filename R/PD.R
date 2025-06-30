@@ -1,12 +1,12 @@
-#' Frequentist Predictive Distributions and Prediction Intervals for Meta-Analysis
+#' Frequentist Predictive Distributions for Random-Effects Meta-Analysis
 #' 
-#' This function computes the frequentist predictive distribution and prediction interval for a future effect \eqn{\theta_{new}} based on the confidence distributions of the average effect and the between-study heterogeneity. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
+#' This function computes frequentist predictive distributions and prediction intervals for a future effect \eqn{\theta_{new}} in random-effects meta-analysis. Predictive distributions are constructed from confidence distributions of the average effect (\eqn{\mu}) and the between-study heterogeneity (\eqn{\tau^2}), using a Monte Carlo sampling algorithm. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
 #'
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
 #' @param method Either "FullCD" (recommended for practical application), "SimplifiedCD" or "FixedTau2". Check details for information. 
 #' @param level.pi Coverage level of the prediction interval computed (numeric, between 0 and 1).
-#' @param n_samples Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).
+#' @param n_samples Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).
 #' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity. Check 'help(meta)' for information on estimation methods (default is "REML").
 #' @param seed Optional integer to ensure reproducibility of the random sampling.
 #' @return A list containing:
@@ -14,34 +14,41 @@
 #'   \item{PI}{Prediction interval for a future effect \eqn{\theta_{new}}.}
 #'   \item{samples}{A matrix containing samples \eqn{\theta_{new}} from the predictive distribution ('theta_new'), samples \eqn{\mu} from the confidence distribution of the average effect ('mu') and samples \eqn{\tau^2} from the confidence distribution of the between-study heterogeneity ('tau2').}
 #' }
-#'
+
+#' @author David Kronthaler
+#' 
 #' @details
-#' The predictive distributions are based on the confidence distribution of the average effect 
+#' Predictive distributions are constructed from the confidence distribution of the average effect 
 #' \eqn{\mu}. The function supports three methods:
 #' 
 #' - **"FullCD"**: This method generates samples from the confidence distribution of 
 #'   \eqn{\tau^2}, and for each sampled \eqn{\tau^2}, it computes the corresponding confidence 
 #'   distribution of \eqn{\mu}. It then generates a sample of the future effect \eqn{\theta_{new}} 
 #'   for each (\eqn{\tau^2}, \eqn{\mu}) pair. This is the most comprehensive method, as it fully 
-#'   accounts for uncertainty in both parameters.
+#'   accounts for uncertainty in both parameters and the dependence of the Edgington combined \eqn{p}-value function on the heterogeneity parameter.
 #' 
 #' - **"SimplifiedCD"**: This method generates samples from the confidence distribution of 
 #'   \eqn{\tau^2}, but computes the confidence distribution of \eqn{\mu} using a simplified 
 #'   approach. Specifically, it uses a fixed \eqn{\tau^2} to compute the Edgington combined 
-#'   \eqn{p}-value function, from which samples of \eqn{\mu} are drawn. This method is 
-#'   computationally efficient but may be less accurate.
+#'   \eqn{p}-value function, from which samples of \eqn{\mu} are drawn. It then generates a sample of
+#'    the future effect \eqn{\theta_{new}} for each (\eqn{\tau^2}, \eqn{\mu}) pair
 #' 
 #' - **"FixedTau2"**: This method assumes a fixed value for \eqn{\tau^2}, and uses it to compute 
 #'   the confidence distribution of \eqn{\mu}. It does 
 #'   not account for uncertainty in the estimation of \eqn{\tau^2}.
 #' 
 #' The confidence distribution of the between-study heterogeneity parameter \eqn{\tau^2} is 
-#' derived from the generalized heterogeneity statistic. The confidence distribution of the 
-#' average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function.
+#' derived from the generalized heterogeneity statistic (Viechtbauer, 2006). The confidence distribution of the 
+#' average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function (Held et al., 2025).
 #' 
-#' The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the predictive 
+#' The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the estimated predictive 
 #' distribution of future effects. This distribution can be used to compute prediction intervals, 
 #' summarize predictive uncertainty, or generate visualizations.
+#' 
+#' @references
+#' Viechtbauer, W. (2007). *Confidence intervals for the amount of heterogeneity in meta‐analysis*. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
+#' 
+#' Held, L., Hofmann, F., & Pawel, S. (2025). *A comparison of combined p-value functions for meta-analysis*. doi:10.1017/rsm.2025.26
 
 #' @export
 #'
@@ -90,25 +97,22 @@ PredDist <-
       )
     }
     
-    # Assign class
     class(rt) <- "metaprediction"
     attr(rt, "method") <- method
+    attr(rt, "n_samples") <- n_samples
+    attr(rt, "level_pi") <- level.pi
+    attr(rt, "k") <- length(es)
     
-    # Print output
-    print(rt)
-    
-    # Return
-    invisible(rt)
-    
+    return(rt)
   }
 
-## PD and PI based on confidence density, fixed tau2
+## Predictive distribution, fixed tau2
 ##------------------------------------------------------------------------------
 pd_cd <- function(es, se, mtau2 = "REML", lpi = 0.95, ns = 100000L){
 
   # Estimate tau2
   ma <- run_metagen(es = es, se = se, mtau2 = mtau2)
-  tau2 = ma$tau2
+  tau2 <- ma$tau2
 
   # If estimated tau2 is zero, return the confidence interval for mu
   if (tau2 == 0L) {
@@ -138,7 +142,7 @@ The confidence interval and confidence density for the pooled effect are returne
 }
 
 
-## Predictive distribution generated using sampling algorithm
+## Predictive distribution, adjusted for uncertainty in tau2
 ##------------------------------------------------------------------------------
 pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
                        ns = 100000L, mtau2 = "REML") {
@@ -156,7 +160,7 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
   }
   
-  # Samples of tn
+  # Samples of theta_new
   s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
 
   # Combine 
@@ -168,7 +172,6 @@ pd_cd_tau2 <- function(es, se, lpi = 0.95, method = c("SimplifiedCD", "FullCD"),
   
   # Return
   return(list(PI = PI, samples = s))
-
 }
 
 ## Estimation of between-study heterogeneity
@@ -218,5 +221,3 @@ run_metagen <- function(es, se, mtau2 = "REML") {
   
   return(result)
 }
-
-

@@ -35,9 +35,9 @@ between-study heterogeneity.
 \details{
 This function performs a random-effects meta-analysis using confidence distributions.
 It generates samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2},
-derived from the generalized heterogeneity statistic. For each sampled value of \eqn{\tau^2},
+derived from the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled value of \eqn{\tau^2},
 the function then computes a corresponding confidence distribution for the average
-effect \eqn{\mu}, induced by the Edgington combined p-value function, and generates a sample from
+effect \eqn{\mu}, induced by the Edgington combined p-value function (Held et al., 2025), and generates a sample from
 this distribution.
 
 By repeatedly sampling \eqn{\tau^2} and recalculating the confidence distribution of \eqn{\mu},
@@ -53,4 +53,12 @@ that is, the framework of a fixed-effects meta-analysis is not applicable.
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 metaeffect(es = es, se = se)
+}
+\references{
+Viechtbauer, W. (2007). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysi}s. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
+
+Held, L., Hofmann, F., & Pawel, S. (2025). \emph{A comparison of combined p-value functions for meta-analysis}. doi:10.1017/rsm.2025.26
+}
+\author{
+David Kronthaler
 }
