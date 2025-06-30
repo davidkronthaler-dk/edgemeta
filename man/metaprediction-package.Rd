@@ -29,5 +29,5 @@ Held, L., Hofmann, F., & Pawel, S. (2025). \emph{A comparison of combined p-valu
 \keyword{ package }
 \seealso{
  \code{\link{PredDist}}
-  \code{\link{metaeffect}}
+  \code{\link{remaeffect}}
 }
