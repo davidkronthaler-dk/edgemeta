@@ -39,14 +39,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // crps
-double crps(const std::vector<double>& s, const std::vector<double>& tn);
-RcppExport SEXP _metaprediction_crps(SEXP sSEXP, SEXP tnSEXP) {
+double crps(NumericVector s, NumericVector t);
+RcppExport SEXP _metaprediction_crps(SEXP sSEXP, SEXP tSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<double>& >::type s(sSEXP);
-    Rcpp::traits::input_parameter< const std::vector<double>& >::type tn(tnSEXP);
-    rcpp_result_gen = Rcpp::wrap(crps(s, tn));
+    Rcpp::traits::input_parameter< NumericVector >::type s(sSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type t(tSEXP);
+    rcpp_result_gen = Rcpp::wrap(crps(s, t));
     return rcpp_result_gen;
 END_RCPP
 }
