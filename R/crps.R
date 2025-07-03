@@ -1,7 +1,10 @@
 #' Continuous Ranked Probability Score (CRPS)
 #'
-#' This function computes the Continuous Ranked Probability Score (CRPS) for a predictive distribution,
-#' following the definition by Gneiting et al. (2008). It uses a C++ backend for computational efficiency.
+#' Computes the Continuous Ranked Probability Score (CRPS) for a predictive distribution using a Monte Carlo (MC) approximation.
+#' The MC approximation follows the approach for the computation of the *energy score* proposed by Gneiting et al. (2008).
+#' To ensure computational efficiency, especially when handling large numbers of predictive samples or multiple future effect samples,
+#' the Monte Carlo approximation is implemented with a C++ backend.
+#' If multiple future effects are provided, the function returns the mean CRPS across all provided samples.
 #'
 #' @param s A numeric vector of samples from the predictive distribution.
 #' @param tn A numeric vector of values from the true distribution of future effects.
