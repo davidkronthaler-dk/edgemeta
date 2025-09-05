@@ -3,6 +3,8 @@ importFrom(Rcpp, evalCpp)
 export(PredDist)
 export(remaeffect)
 export(crps)
+export(marCD)
+export(opti_num)
 
 S3method(plot, metaprediction)
 S3method(print, metaprediction)

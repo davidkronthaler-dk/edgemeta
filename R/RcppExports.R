@@ -33,7 +33,7 @@ Q_cpp <- function(es, se, tau2) {
     .Call(`_metaprediction_Q_cpp`, es, se, tau2)
 }
 
-dQ_cpp <- function(es, se, tau2, h = 1e-4) {
+dQ_cpp <- function(es, se, tau2, h = 1e-8) {
     .Call(`_metaprediction_dQ_cpp`, es, se, tau2, h)
 }
 
@@ -43,6 +43,30 @@ dQIVWE <- function(es, se, tau2) {
 
 ftau2 <- function(es, se, tau2) {
     .Call(`_metaprediction_ftau2`, es, se, tau2)
+}
+
+norftau2 <- function(es, se, utau2) {
+    .Call(`_metaprediction_norftau2`, es, se, utau2)
+}
+
+ftauzero <- function(es, se, step = 1e-4) {
+    .Call(`_metaprediction_ftauzero`, es, se, step)
+}
+
+jointCD <- function(mu, tau2, es, se, C) {
+    .Call(`_metaprediction_jointCD`, mu, tau2, es, se, C)
+}
+
+marCDsingle <- function(mu, es, se, utau2) {
+    .Call(`_metaprediction_marCDsingle`, mu, es, se, utau2)
+}
+
+marCD <- function(mu, es, se, utau2) {
+    .Call(`_metaprediction_marCD`, mu, es, se, utau2)
+}
+
+reff <- function(es, se, utau2, grid_step = 1e-2) {
+    .Call(`_metaprediction_reff`, es, se, utau2, grid_step)
 }
 
 samponemu <- function(s_tau2, es, se) {

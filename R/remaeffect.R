@@ -7,6 +7,7 @@
 #'
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
+#' @param method Either "MC" for Monte Carlo sampling algorithm, or "GAQ" for global adaptive quadrature integration.
 #' @param level.ci Confidence level for the interval estimate (default is 0.95).
 #' @param n_samples Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).
 #' @param seed Optional integer to ensure reproducibility of the random sampling.
@@ -48,7 +49,49 @@
 #' es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 #' se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 #' remaeffect(es = es, se = se)
-remaeffect <-
+#' 
+#' 
+#' 
+remaeffect <- function(
+    es,
+    se,
+    method = c("MC", "GAQ"),
+    level.ci = 0.95,
+    n_samples = 100000L,
+    seed = NULL
+) {
+  method <- match.arg(method) 
+  
+  validate_input(
+    es = es,
+    se = se,
+    method = "estimate",
+    lpi = level.ci,
+    ns = n_samples,
+    mtau2 = "estimate"
+  )
+  
+  if (method == "MC") {
+    r <- reffMC(
+      es = es,
+      se = se,
+      level.ci = level.ci,
+      n_samples = n_samples,
+      seed = seed
+    )
+  } else if (method == "GAQ") {
+    r <- reffAQ(
+      es = es,
+      se = se,
+      level.ci = level.ci
+    )
+  }
+  
+  invisible(r)
+}
+
+
+reffMC <-
   function(es,
            se,
            level.ci = 0.95,
@@ -58,16 +101,6 @@ remaeffect <-
     if (!is.null(seed)) {
       set.seed(seed)
     }
-    
-    # validate
-    validate_input(
-      es = es,
-      se = se,
-      method = "estimate",
-      lpi = level.ci,
-      ns = n_samples,
-      mtau2 = "estimate"
-    )
     
     # Initial guess for tau2
     ma <- run_metagen(es = es, se = se, mtau2 = "REML")
@@ -81,7 +114,7 @@ remaeffect <-
     )
     # Samples of mu
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
-    
+
     # Point estimate and confidence interval
     hmu <- base::mean(s_mu, na.rm = T)
     ci <-
@@ -119,3 +152,40 @@ remaeffect <-
       cd_tau2 = s_tau2
     ))
   }
+
+# Using integration
+reffAQ <- function(es,
+                   se,
+                   level.ci = 0.95) {
+  
+  # Upper bound tau2
+  ma <- meta::metagen(es, se, method.tau = "REML")
+  utau2 <- ma$tau2 + 100 * ma$se.tau2
+
+  # Confidence interval (by inversion of CDF)
+  cdfmu <- reff(es, se, utau2)
+  quant <- function(p) approx(cdfmu[,2], cdfmu[,1], xout = p, rule = 2)$y
+  ci <- quant(c((1 - level.ci)/2, (1 + level.ci)/2))
+
+  # Confidence density
+  fcd <- function(mu) marCD(mu = mu, es = es, se = se, utau2 = utau2)
+  
+  # Mean effect estimate
+  dx <- diff(cdfmu[,1]) # equi-spaced distance
+  df <- diff(cdfmu[,2]) # diff in F() from i to i+1
+  x_mid <- cdfmu[,1][-length(cdfmu[,1])] + dx / 2 #((x_[i] + (x_[i + 1])) / 2
+  hmu <-  sum(x_mid * df) # Numerical approximation
+  
+  # Visual output
+  cat("\nRandom-Effects Meta-Analysis using Confidence Distributions\n\n")
+  cat("Number of studies:", length(es), "\n")
+  cat("Average effect:", sprintf("%.3f", hmu), "\n")
+  cat(paste0(level.ci * 100, "%"), "Confidence interval from",
+      paste(sprintf("%.3f", ci), collapse = " to "), "\n\n")
+
+  # Return
+  invisible(list(estimate = hmu, CI = ci, fcd = fcd))
+}
+  
+  
+  

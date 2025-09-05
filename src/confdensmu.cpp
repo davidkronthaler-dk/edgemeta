@@ -15,17 +15,16 @@ double cd_single(Rcpp::NumericVector h0,
                  Rcpp::NumericVector se,
                  double h = 1e-4) {
   
-  // Function for which derivative is computed
   fntl::dfv f = [&](Rcpp::NumericVector x) {
     return pfctedge(x, es, se)[0];
   };
   
-  // Compute and return the numerical derivative
   return fntl::fd_deriv(f, h0, 0, h);
 }
 
 // Confidence density of mu (evaluates multiple mu's)
 // [[Rcpp::export]]
+
 Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0,
                            Rcpp::NumericVector es,
                            Rcpp::NumericVector se,
@@ -38,7 +37,6 @@ Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0,
   }
   
   return dv;
-  
 }
   
   

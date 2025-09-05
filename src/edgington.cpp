@@ -7,7 +7,7 @@
 using namespace Rcpp;
 using namespace std;
 
-// One-sided Wald p-value function
+// One-sided Wald p-value function ("greater" alternative)
 // [[Rcpp::export]]
 Rcpp::NumericVector p_wald(double x,
                            Rcpp::NumericVector es,

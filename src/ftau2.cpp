@@ -21,26 +21,24 @@ double Q_cpp(Rcpp::NumericVector es,
     sea[ii] = (se[ii] * se[ii] + tau2);
   }
   
-  // IVWE for computation of Q
+  // IVWE
   double sumw = 0.0;
   for (int ii = 0; ii < se.size(); ++ii) {
     sumw += 1.0 / sea[ii];
   }
-  
   double opt = 0.0;
   for (int ll = 0; ll < es.size(); ++ll) {
     opt += (1 / sea[ll]) * es[ll];
   }
   opt = opt / sumw;
   
+  // Compute Q(tau2)
   double Q = 0.0;
-  
   for (int ll = 0; ll < es.size(); ++ll) {
-    Q += std::pow(tau2 + std::pow(se[ll], 2), -1) * std::pow(es[ll] - opt, 2);
+    Q += std::pow(sea[ll], -1) * std::pow(es[ll] - opt, 2);
   }
   
   return Q;
-  
 }
 
 // F: numerical derivative of generalized Q-statistic 
@@ -48,7 +46,7 @@ double Q_cpp(Rcpp::NumericVector es,
 double dQ_cpp(Rcpp::NumericVector es,
               Rcpp::NumericVector se,
               double tau2,
-              double h = 1e-4) {
+              double h = 1e-8) {
   
   fntl::dfv f = [=](Rcpp::NumericVector x) {
     return Q_cpp(es, se, x[0]);  
@@ -59,20 +57,18 @@ double dQ_cpp(Rcpp::NumericVector es,
   return fntl::fd_deriv(f, x0, 0, h);
 }
 
-// F: analytic derivative of generalized Q-statistic for ivwe
+// F: analytic derivative of generalized Q-statistic
 // [[Rcpp::export]]
 double dQIVWE(NumericVector es,
               NumericVector se,
               double tau2) {
   
-  int k = es.size(); // Number of studies
-  
+  int k = es.size();   // Number of studies
   double sw = 0.0;     // sum of weights
   double swe = 0.0;    // sum of weights * effect sizes
   double da = 0.0;     // derivative numerator 
   double db = 0.0;     // derivative denominator
   
-  // Compute weights, their derivatives, and derivative of hmu
   std::vector<double> w(k), dw(k);
   for (int i = 0; i < k; ++i) {
     double vi = se[i] * se[i];
@@ -91,7 +87,6 @@ double dQIVWE(NumericVector es,
   double hmu = swe / sw;
   double dhmu = (sw * da - swe * db) / (sw * sw);
   
-  // Compute derivative of Q
   double dQ = 0.0;
   for (int i = 0; i < k; ++i) {
     double diff = es[i] - hmu;
@@ -112,17 +107,17 @@ Rcpp::NumericVector ftau2(Rcpp::NumericVector es,
   for (int ll = 0; ll < tau2.size(); ++ll) {
     double tau = tau2[ll];
     
-    if (tau < 0.0) {
-      fd[ll] = 0.0;
-      continue;
-    }
+    // if (tau < 0.0) {
+    //   fd[ll] = 0.0;
+    //   continue;
+    // }
     
     double Q = Q_cpp(es, se, tau);
     double dQ = dQIVWE(es, se, tau);
-    // double dQ = dQ_cpp(es, se, tau);
-    
+
     fd[ll] = R::dchisq(Q, es.size() - 1, false) * std::abs(dQ);
   }
   
   return fd;
 }
+
