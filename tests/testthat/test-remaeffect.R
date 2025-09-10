@@ -40,5 +40,5 @@ test_that("n_samples must be positive integer for FullCD", {
 # Return
 test_that("returned object has expected structure", {
   result1 <- remaeffect(es = es, se = se)
-  expect_named(result1, c("estimate", "CI", "cd_mu", "cd_tau2"))
+  expect_named(result1, c("estimate", "CI", "pval", "cd_mu", "cd_tau2"))
 })

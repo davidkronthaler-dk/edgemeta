@@ -12,7 +12,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // cd_single
 double cd_single(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, double h);
-RcppExport SEXP _metaprediction_cd_single(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
+RcppExport SEXP _edgemeta_cd_single(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -26,7 +26,7 @@ END_RCPP
 }
 // CD_cpp
 Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, double h);
-RcppExport SEXP _metaprediction_CD_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
+RcppExport SEXP _edgemeta_CD_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,7 +40,7 @@ END_RCPP
 }
 // crps
 double crps(NumericVector s, NumericVector t);
-RcppExport SEXP _metaprediction_crps(SEXP sSEXP, SEXP tSEXP) {
+RcppExport SEXP _edgemeta_crps(SEXP sSEXP, SEXP tSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -52,7 +52,7 @@ END_RCPP
 }
 // p_wald
 Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
+RcppExport SEXP _edgemeta_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -65,7 +65,7 @@ END_RCPP
 }
 // pfctedge
 Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_pfctedge(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
+RcppExport SEXP _edgemeta_pfctedge(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -78,7 +78,7 @@ END_RCPP
 }
 // opti_edge
 double opti_edge(Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_opti_edge(SEXP esSEXP, SEXP seSEXP) {
+RcppExport SEXP _edgemeta_opti_edge(SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -90,7 +90,7 @@ END_RCPP
 }
 // opti_num
 Rcpp::List opti_num(NumericVector es, NumericVector se, bool point, bool ci, double levelci);
-RcppExport SEXP _metaprediction_opti_num(SEXP esSEXP, SEXP seSEXP, SEXP pointSEXP, SEXP ciSEXP, SEXP levelciSEXP) {
+RcppExport SEXP _edgemeta_opti_num(SEXP esSEXP, SEXP seSEXP, SEXP pointSEXP, SEXP ciSEXP, SEXP levelciSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -105,7 +105,7 @@ END_RCPP
 }
 // Q_cpp
 double Q_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2);
-RcppExport SEXP _metaprediction_Q_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
+RcppExport SEXP _edgemeta_Q_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -118,7 +118,7 @@ END_RCPP
 }
 // dQ_cpp
 double dQ_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2, double h);
-RcppExport SEXP _metaprediction_dQ_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP, SEXP hSEXP) {
+RcppExport SEXP _edgemeta_dQ_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP, SEXP hSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -132,7 +132,7 @@ END_RCPP
 }
 // dQIVWE
 double dQIVWE(NumericVector es, NumericVector se, double tau2);
-RcppExport SEXP _metaprediction_dQIVWE(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
+RcppExport SEXP _edgemeta_dQIVWE(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -145,7 +145,7 @@ END_RCPP
 }
 // ftau2
 Rcpp::NumericVector ftau2(Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector tau2);
-RcppExport SEXP _metaprediction_ftau2(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
+RcppExport SEXP _edgemeta_ftau2(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -158,7 +158,7 @@ END_RCPP
 }
 // norftau2
 double norftau2(NumericVector es, NumericVector se, double utau2);
-RcppExport SEXP _metaprediction_norftau2(SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
+RcppExport SEXP _edgemeta_norftau2(SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -171,7 +171,7 @@ END_RCPP
 }
 // ftauzero
 double ftauzero(NumericVector es, NumericVector se, double step);
-RcppExport SEXP _metaprediction_ftauzero(SEXP esSEXP, SEXP seSEXP, SEXP stepSEXP) {
+RcppExport SEXP _edgemeta_ftauzero(SEXP esSEXP, SEXP seSEXP, SEXP stepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -184,7 +184,7 @@ END_RCPP
 }
 // jointCD
 double jointCD(Rcpp::NumericVector mu, Rcpp::NumericVector tau2, Rcpp::NumericVector es, Rcpp::NumericVector se, double C);
-RcppExport SEXP _metaprediction_jointCD(SEXP muSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP, SEXP CSEXP) {
+RcppExport SEXP _edgemeta_jointCD(SEXP muSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -199,7 +199,7 @@ END_RCPP
 }
 // marCDsingle
 double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se, double utau2);
-RcppExport SEXP _metaprediction_marCDsingle(SEXP muSEXP, SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
+RcppExport SEXP _edgemeta_marCDsingle(SEXP muSEXP, SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -213,7 +213,7 @@ END_RCPP
 }
 // marCD
 Rcpp::NumericVector marCD(Rcpp::NumericVector mu, Rcpp::NumericVector es, Rcpp::NumericVector se, double utau2);
-RcppExport SEXP _metaprediction_marCD(SEXP muSEXP, SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
+RcppExport SEXP _edgemeta_marCD(SEXP muSEXP, SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -227,7 +227,7 @@ END_RCPP
 }
 // reff
 NumericMatrix reff(NumericVector es, NumericVector se, double utau2, double grid_step);
-RcppExport SEXP _metaprediction_reff(SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP, SEXP grid_stepSEXP) {
+RcppExport SEXP _edgemeta_reff(SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP, SEXP grid_stepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -241,7 +241,7 @@ END_RCPP
 }
 // samponemu
 double samponemu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_samponemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+RcppExport SEXP _edgemeta_samponemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -254,7 +254,7 @@ END_RCPP
 }
 // samplemu
 Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_samplemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+RcppExport SEXP _edgemeta_samplemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -267,7 +267,7 @@ END_RCPP
 }
 // samponetau2
 double samponetau2(Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
-RcppExport SEXP _metaprediction_samponetau2(SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
+RcppExport SEXP _edgemeta_samponetau2(SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -280,7 +280,7 @@ END_RCPP
 }
 // samptau2
 Rcpp::NumericVector samptau2(int ns, Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
-RcppExport SEXP _metaprediction_samptau2(SEXP nsSEXP, SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
+RcppExport SEXP _edgemeta_samptau2(SEXP nsSEXP, SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -294,7 +294,7 @@ END_RCPP
 }
 // samplemusimple
 Rcpp::NumericVector samplemusimple(int n_samples, double tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _metaprediction_samplemusimple(SEXP n_samplesSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+RcppExport SEXP _edgemeta_samplemusimple(SEXP n_samplesSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -308,32 +308,32 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_metaprediction_cd_single", (DL_FUNC) &_metaprediction_cd_single, 4},
-    {"_metaprediction_CD_cpp", (DL_FUNC) &_metaprediction_CD_cpp, 4},
-    {"_metaprediction_crps", (DL_FUNC) &_metaprediction_crps, 2},
-    {"_metaprediction_p_wald", (DL_FUNC) &_metaprediction_p_wald, 3},
-    {"_metaprediction_pfctedge", (DL_FUNC) &_metaprediction_pfctedge, 3},
-    {"_metaprediction_opti_edge", (DL_FUNC) &_metaprediction_opti_edge, 2},
-    {"_metaprediction_opti_num", (DL_FUNC) &_metaprediction_opti_num, 5},
-    {"_metaprediction_Q_cpp", (DL_FUNC) &_metaprediction_Q_cpp, 3},
-    {"_metaprediction_dQ_cpp", (DL_FUNC) &_metaprediction_dQ_cpp, 4},
-    {"_metaprediction_dQIVWE", (DL_FUNC) &_metaprediction_dQIVWE, 3},
-    {"_metaprediction_ftau2", (DL_FUNC) &_metaprediction_ftau2, 3},
-    {"_metaprediction_norftau2", (DL_FUNC) &_metaprediction_norftau2, 3},
-    {"_metaprediction_ftauzero", (DL_FUNC) &_metaprediction_ftauzero, 3},
-    {"_metaprediction_jointCD", (DL_FUNC) &_metaprediction_jointCD, 5},
-    {"_metaprediction_marCDsingle", (DL_FUNC) &_metaprediction_marCDsingle, 4},
-    {"_metaprediction_marCD", (DL_FUNC) &_metaprediction_marCD, 4},
-    {"_metaprediction_reff", (DL_FUNC) &_metaprediction_reff, 4},
-    {"_metaprediction_samponemu", (DL_FUNC) &_metaprediction_samponemu, 3},
-    {"_metaprediction_samplemu", (DL_FUNC) &_metaprediction_samplemu, 3},
-    {"_metaprediction_samponetau2", (DL_FUNC) &_metaprediction_samponetau2, 3},
-    {"_metaprediction_samptau2", (DL_FUNC) &_metaprediction_samptau2, 4},
-    {"_metaprediction_samplemusimple", (DL_FUNC) &_metaprediction_samplemusimple, 4},
+    {"_edgemeta_cd_single", (DL_FUNC) &_edgemeta_cd_single, 4},
+    {"_edgemeta_CD_cpp", (DL_FUNC) &_edgemeta_CD_cpp, 4},
+    {"_edgemeta_crps", (DL_FUNC) &_edgemeta_crps, 2},
+    {"_edgemeta_p_wald", (DL_FUNC) &_edgemeta_p_wald, 3},
+    {"_edgemeta_pfctedge", (DL_FUNC) &_edgemeta_pfctedge, 3},
+    {"_edgemeta_opti_edge", (DL_FUNC) &_edgemeta_opti_edge, 2},
+    {"_edgemeta_opti_num", (DL_FUNC) &_edgemeta_opti_num, 5},
+    {"_edgemeta_Q_cpp", (DL_FUNC) &_edgemeta_Q_cpp, 3},
+    {"_edgemeta_dQ_cpp", (DL_FUNC) &_edgemeta_dQ_cpp, 4},
+    {"_edgemeta_dQIVWE", (DL_FUNC) &_edgemeta_dQIVWE, 3},
+    {"_edgemeta_ftau2", (DL_FUNC) &_edgemeta_ftau2, 3},
+    {"_edgemeta_norftau2", (DL_FUNC) &_edgemeta_norftau2, 3},
+    {"_edgemeta_ftauzero", (DL_FUNC) &_edgemeta_ftauzero, 3},
+    {"_edgemeta_jointCD", (DL_FUNC) &_edgemeta_jointCD, 5},
+    {"_edgemeta_marCDsingle", (DL_FUNC) &_edgemeta_marCDsingle, 4},
+    {"_edgemeta_marCD", (DL_FUNC) &_edgemeta_marCD, 4},
+    {"_edgemeta_reff", (DL_FUNC) &_edgemeta_reff, 4},
+    {"_edgemeta_samponemu", (DL_FUNC) &_edgemeta_samponemu, 3},
+    {"_edgemeta_samplemu", (DL_FUNC) &_edgemeta_samplemu, 3},
+    {"_edgemeta_samponetau2", (DL_FUNC) &_edgemeta_samponetau2, 3},
+    {"_edgemeta_samptau2", (DL_FUNC) &_edgemeta_samptau2, 4},
+    {"_edgemeta_samplemusimple", (DL_FUNC) &_edgemeta_samplemusimple, 4},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_metaprediction(DllInfo *dll) {
+RcppExport void R_init_edgemeta(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

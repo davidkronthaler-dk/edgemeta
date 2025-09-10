@@ -4,12 +4,22 @@
 \alias{remaeffect}
 \title{Estimate the Average Effect in Random-Effects Meta-Analysis via Confidence Distributions}
 \usage{
-remaeffect(es, se, level.ci = 0.95, n_samples = 100000L, seed = NULL)
+remaeffect(
+  es,
+  se,
+  method = c("MC", "GAQ"),
+  level.ci = 0.95,
+  n_samples = 100000L,
+  seed = NULL,
+  mu0 = 0
+)
 }
 \arguments{
 \item{es}{Numeric vector of effect estimates from individual studies (length >= 2).}
 
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
+
+\item{method}{Either "MC" for Monte Carlo sampling algorithm, or "GAQ" for global adaptive quadrature integration.}
 
 \item{level.ci}{Confidence level for the interval estimate (default is 0.95).}
 
@@ -53,6 +63,9 @@ that is, the framework of a fixed-effects meta-analysis is not applicable.
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 remaeffect(es = es, se = se)
+
+
+
 }
 \references{
 Viechtbauer, W. (2007). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysi}s. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514

@@ -58,7 +58,8 @@ remaeffect <- function(
     method = c("MC", "GAQ"),
     level.ci = 0.95,
     n_samples = 100000L,
-    seed = NULL
+    seed = NULL,
+    mu0 = 0
 ) {
   method <- match.arg(method) 
   
@@ -77,13 +78,15 @@ remaeffect <- function(
       se = se,
       level.ci = level.ci,
       n_samples = n_samples,
-      seed = seed
+      seed = seed,
+      mu0 = mu0
     )
   } else if (method == "GAQ") {
     r <- reffAQ(
       es = es,
       se = se,
-      level.ci = level.ci
+      level.ci = level.ci,
+      mu0 = mu0
     )
   }
   
@@ -96,7 +99,8 @@ reffMC <-
            se,
            level.ci = 0.95,
            n_samples = 100000L,
-           seed = NULL) {
+           seed = NULL,
+           mu0) {
     # reproducibility
     if (!is.null(seed)) {
       set.seed(seed)
@@ -122,13 +126,22 @@ reffMC <-
                       p = (1 + level.ci * c(-1, 1)) / 2,
                       na.rm = T)
     
+    # P-value at mu = mu0
+    p1s <- mean(s_mu < mu0)
+    p2s <- if (p1s <= 0.5) {
+      p1s * 2
+    } else if (p1s > 0.5) {
+      2 * (1 - p1s)
+    }
+    
     # Visual output
     cat("\nRandom-Effects Meta-Analysis using Confidence Distributions\n\n")
     cat("Number of studies:", length(es), "\n")
     cat("Number of Monte Carlo samples:", format(n_samples, big.mark = ","),"\n\n")
     cat("Average effect:", sprintf("%.3f", hmu), "\n")
     cat(paste0(level.ci * 100, "%"), "Confidence interval from",
-        paste(sprintf("%.3f", ci), collapse = " to "), "\n\n")
+        paste(sprintf("%.3f", ci), collapse = " to "), "\n")
+    cat("Two-sided p-value against H0: mu =", mu0, "is", round(p2s,5), "\n\n")
     cat("Summary of confidence distribution of the average effect:\n")
     probs <- c(0.025, 0.25, 0.5, 0.75, 0.975)
     qs <- stats::quantile(s_mu, probs, na.rm = TRUE)
@@ -148,6 +161,7 @@ reffMC <-
     invisible(list(
       estimate = hmu,
       CI = ci,
+      pval = p2s,
       cd_mu = s_mu,
       cd_tau2 = s_tau2
     ))
@@ -156,7 +170,8 @@ reffMC <-
 # Using integration
 reffAQ <- function(es,
                    se,
-                   level.ci = 0.95) {
+                   level.ci = 0.95,
+                   mu0) {
   
   # Upper bound tau2
   ma <- meta::metagen(es, se, method.tau = "REML")
@@ -164,7 +179,7 @@ reffAQ <- function(es,
 
   # Confidence interval (by inversion of CDF)
   cdfmu <- reff(es, se, utau2)
-  quant <- function(p) approx(cdfmu[,2], cdfmu[,1], xout = p, rule = 2)$y
+  quant <- function(p) stats::approx(cdfmu[,2], cdfmu[,1], xout = p, rule = 2)$y
   ci <- quant(c((1 - level.ci)/2, (1 + level.ci)/2))
 
   # Confidence density
@@ -176,15 +191,25 @@ reffAQ <- function(es,
   x_mid <- cdfmu[,1][-length(cdfmu[,1])] + dx / 2 #((x_[i] + (x_[i + 1])) / 2
   hmu <-  sum(x_mid * df) # Numerical approximation
   
+  # P-value against H0: mu = 0
+  p1sf <- stats::approxfun(cdfmu[,1], cdfmu[,2])
+  p1s <- p1sf(mu0)
+  p2s <- if (p1s <= 0.5) {
+    p1s * 2
+  } else if (p1s > 0.5) {
+    2 * (1 - p1s)
+  }
+  
   # Visual output
   cat("\nRandom-Effects Meta-Analysis using Confidence Distributions\n\n")
   cat("Number of studies:", length(es), "\n")
   cat("Average effect:", sprintf("%.3f", hmu), "\n")
   cat(paste0(level.ci * 100, "%"), "Confidence interval from",
-      paste(sprintf("%.3f", ci), collapse = " to "), "\n\n")
+      paste(sprintf("%.3f", ci), collapse = " to "), "\n")
+  cat("Two-sided p-value against H0: mu =", mu0, "is", round(p2s,5), "\n\n")
 
   # Return
-  invisible(list(estimate = hmu, CI = ci, fcd = fcd))
+  invisible(list(estimate = hmu, CI = ci, pval = p2s, fcd = fcd))
 }
   
   

@@ -1,4 +1,4 @@
-useDynLib(metaprediction, .registration=TRUE)
+useDynLib(edgemeta, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 export(PredDist)
 export(remaeffect)

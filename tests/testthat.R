@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(metaprediction)
+library(edgemeta)
 
-test_check("metaprediction")
+test_check("edgemeta")
