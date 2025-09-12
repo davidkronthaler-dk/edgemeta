@@ -2,12 +2,12 @@
 % Please edit documentation in R/remaeffect.R
 \name{remaeffect}
 \alias{remaeffect}
-\title{Estimate the Average Effect in Random-Effects Meta-Analysis via Confidence Distributions}
+\title{Estimate the Average Effect in Random-Effects Meta-Analysis via Edgington's Confidence Distribution}
 \usage{
 remaeffect(
   es,
   se,
-  method = c("MC", "GAQ"),
+  method = c("MC", "GAQ", "NHEU"),
   level.ci = 0.95,
   n_samples = 100000L,
   seed = NULL,
@@ -19,28 +19,34 @@ remaeffect(
 
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
 
-\item{method}{Either "MC" for Monte Carlo sampling algorithm, or "GAQ" for global adaptive quadrature integration.}
+\item{method}{Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach.}
 
 \item{level.ci}{Confidence level for the interval estimate (default is 0.95).}
 
 \item{n_samples}{Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).}
 
-\item{seed}{Optional integer to ensure reproducibility of the random sampling.}
+\item{seed}{Optional integer to ensure reproducibility of the random sampling, relevant in case method 'MC' is chosen.}
+
+\item{mu0}{Parameter value under the null-hypothesis against which two-sided p-value is computed.}
 }
 \value{
-A list containing:
+A list, including not all, but some of these, depending on the method:
 \describe{
 \item{estimate}{Point estimate of the average effect \eqn{\mu}.}
 \item{CI}{Confidence interval for the average effect \eqn{\mu}.}
+\item{pval}{Two-sided p-value against H0: \eqn{\mu} = \eqn{\mu_0}.}
 \item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}.}
 \item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}.}
+\item{fcd}{Obtained for method 'GAQ': Marginalized confidence density function of \eqn{\mu}.}
 }
 }
 \description{
-Estimates the average effect in random-effects meta-analysis by generating samples
-from the confidence distribution of the average effect \eqn{\mu}. The confidence
-distribution of \eqn{\mu} is adjusted for the uncertainty in the estimation of the
-between-study heterogeneity.
+Estimates the average effect in random-effects meta-analysis using Edgingtons Confidence Distribution.
+Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
+are combined using Edgington's approach. The resulting combined confidence distribution of \eqn{\mu},
+which is conditional on the heterogeneity parameter \eqn{\tau^2}, is marginalized over a confidence distribution of the latter
+to account for estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
+heterogeneity estimate.
 }
 \details{
 This function performs a random-effects meta-analysis using confidence distributions.

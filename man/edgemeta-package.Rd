@@ -3,7 +3,7 @@
 \alias{edgemeta}
 \docType{package}
 \title{
-  Edgington's Method for Random-Effects Meta-Analysis
+  Edgington's Method for Random-Effects Meta-Analysis: Estimation and Prediction
 }
 \description{
   Provides methods for estimation and prediction in random-effects meta-analysis using Edgington's method
@@ -12,7 +12,11 @@
 \details{
   \code{remaeffect} can be used to estimate the average effect.
 
-  \code{PredDist} can be used to compute predictive distributions as well as prediction intervals in a fully frequentist framework.
+  \code{PredDist} can be used to compute predictive distributions as well as prediction intervals.
+
+  \code{crps} provides a Monte Carlo approximation to compute continuous ranked probability scores for computational efficiency.
+  
+  \code{cdtau2} provides a confidence density of the heterogeneity paramter \eqn{\tau^2} derived from the generalized heterogeneity statistic.
 }
 \author{
 David Kronthaler
