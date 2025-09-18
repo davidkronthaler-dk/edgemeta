@@ -10,7 +10,11 @@ vd_PredDist <- function(es,
     stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
   } 
   
+  if (is.null(method) || is.na(method) || is.nan(method)) stop("'method' must not be NULL or NA.")
+  if (!is.character(method)) stop("'method' must be a character")
   method <- match.arg(method)
+  if (is.null(mtau2) || is.na(mtau2) || is.nan(mtau2)) stop("'method.tau2' must not be NULL or NA.")
+  if (!is.character(mtau2)) stop("'method.tau2' must be a character")
   mtau2 <- match.arg(mtau2)
   vd_es_se(es = es, se = se)
   vd_l(lpi)
@@ -24,13 +28,17 @@ vd_remaeffect <- function(
   level.ci,
   n_samples,
   mu0,
-  method.tau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB", "estimate")) {
+  method.tau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")) {
   
   if (!requireNamespace("meta", quietly = TRUE)) {
     stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
   } 
   
+  if (is.null(method) || is.na(method) || is.nan(method)) stop("'method' must not be NULL or NA.")
+  if (!is.character(method)) stop("'method' must be a character")
   method <- match.arg(method)
+  if (is.null(method.tau2) || is.na(method.tau2) || is.na(method.tau2)) stop("'method.tau2' must not be NULL or NA.")
+  if (!is.character(method.tau2)) stop("'method.tau2' must be a character")
   method.tau2 <- match.arg(method.tau2)
   vd_es_se(es = es, se = se)
   vd_l(level.ci)
@@ -68,12 +76,12 @@ vd_es_se <- function(es, se) {
     stop("Estimates ('es') and standard errors ('se') must be numeric vectors of the same length (at least 2).", call. = FALSE)
   }
   
-  if (!is.numeric(es) || !is.vector(es) || anyNA(es)) {
-    stop("Estimates ('es') must be a numeric vector without missing values.", call. = FALSE)
+  if (!is.numeric(es) || !is.vector(es) || anyNA(es) || any(!is.finite(es)) ) {
+    stop("Estimates ('es') must be a numeric, finite vector without missing values.", call. = FALSE)
   }
   
-  if (!is.numeric(se) || !is.vector(se) || anyNA(se)) {
-    stop("Standard errors ('se') must be a numeric vector without missing values.", call. = FALSE)
+  if (!is.numeric(se) || !is.vector(se) || anyNA(se) || any(!is.finite(se))) {
+    stop("Standard errors ('se') must be a numeric, finite vector without missing values.", call. = FALSE)
   } else if (any(se <= 0)) {
     stop("All standard errors ('se') must be greater than 0.", call. = FALSE)
   }
@@ -86,24 +94,24 @@ vd_l <- function(l){
 }
 
 vd_ns <- function(ns) {
-  if (!is.numeric(ns) || length(ns) != 1 || ns %% 1 != 0 || ns <= 0) {
-    stop("Number of samples ('n_samples') must be a positive integer.", call. = FALSE)
+  if (!is.numeric(ns) || length(ns) != 1 || ns %% 1 != 0 || ns <= 0 || !is.finite(ns)) {
+    stop("Number of samples ('n_samples') must be a finite, positive integer.", call. = FALSE)
   }
+  if (ns > 1e7 & ns < 1e8) cat("\n'n_samples' is set very high. Are you sure you require that many samples? Proceeding anyway:\n\n")
+  if (ns > 1e8) cat("\nThat many samples may be computationally stressful. Proceeding anyway:\n\n")
 }
 
 vd_tau2 <- function(tau2) {
   if (missing(tau2)) stop("tau2 must be provided.")
-  if (!is.numeric(tau2)) stop("tau2 must be numeric.")
-  if (any(is.na(tau2))) stop("tau2 cannot contain NA values.")
-  if (any(is.nan(tau2))) stop("tau2 cannot contain NaN values.")
-  if (any(is.infinite(tau2))) stop("tau2 cannot contain Inf values.")
+  if (!is.numeric(tau2) || !is.vector(tau2)) stop("tau2 must be numeric vector or scalar.")
+  if (any(is.na(tau2)) || any(is.nan(tau2)) || any(is.infinite(tau2))) stop("tau2 cannot contain NA, NaN or Inf values.")
 }
 
 vd_mu0 <- function(mu0) {
+  if (length(mu0) != 1) stop("mu0 must be a scalar.")
   if (!is.numeric(mu0)) stop("mu0 must be numeric.")
   if (is.na(mu0)) stop("mu0 cannot contain NA values.")
   if (is.nan(mu0)) stop("mu0 cannot contain NaN values.")
-  if (length(mu0) != 1) stop("mu0 must be a scalar.")
 }
 
 

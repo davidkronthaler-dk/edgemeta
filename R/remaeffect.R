@@ -64,7 +64,7 @@
 #'
 remaeffect <- function(es,
                        se,
-                       method = c("MC", "GAQ", "NHEU"),
+                       method = "MC",
                        level.ci = 0.95,
                        n_samples = 100000L,
                        seed = NULL,
@@ -123,6 +123,9 @@ reffMC <-
     
     # Reproducibility under MC
     if (!is.null(seed)) {
+      if (!is.wholepositivenumber(seed)) {
+        warning("Seed must be a valid scalar integer.")
+      }
       set.seed(seed)
     }
     
@@ -317,7 +320,11 @@ p1tp2 <- function(p1) {
   }
 }
 
-
+# For RNG seeds
+is.wholepositivenumber <- function(x, tol = .Machine$double.eps^0.5) {
+  if (!is.numeric(x)) return(FALSE)
+  return(is.finite(x) & abs(x - round(x)) < tol & x > 0)
+}
 
 
 

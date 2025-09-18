@@ -7,7 +7,7 @@
 remaeffect(
   es,
   se,
-  method = c("MC", "GAQ", "NHEU"),
+  method = "MC",
   level.ci = 0.95,
   n_samples = 100000L,
   seed = NULL,

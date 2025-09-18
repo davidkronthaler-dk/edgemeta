@@ -65,7 +65,7 @@
 PredDist <-
   function(es,
            se,
-           method = c("FullCD", "SimplifiedCD", "FixedTau2"),
+           method = "FullCD",
            level.pi = 0.95,
            n_samples = 100000L,
            method.tau2 = "REML",
@@ -79,8 +79,13 @@ PredDist <-
                 ns = n_samples,
                 mtau2 = method.tau2)
     
-    # reproducibility, if required
-    if (!is.null(seed)) set.seed(seed)
+    # Reproducibility under MC
+    if (!is.null(seed)) {
+      if (!is.wholepositivenumber(seed)) {
+        warning("Seed must be a valid scalar integer.")
+      }
+      set.seed(seed)
+    }
     
     # computation
     if (method == "FixedTau2") {

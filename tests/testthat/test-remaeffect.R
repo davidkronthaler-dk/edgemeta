@@ -24,6 +24,10 @@ test_that("correct execution for key configurations", {
       )
     )
   }
+  
+  r1id <- remaeffect(es = es, se = se, method = "MC", seed = 999)
+  r2id <- remaeffect(es = es, se = se, method = "MC", seed = 999)
+  expect_identical(r1id, r2id)
 })
 
 test_that("handles invalid input types", {
@@ -33,6 +37,19 @@ test_that("handles invalid input types", {
   expect_error(remaeffect(es = 1:5, se = 1:5, method = "GAQ", method.tau2 = "INVALID"))
   expect_error(remaeffect(es = numeric(0), se = 1:5))
   expect_error(remaeffect(es = 1:5, se = numeric(0)))
+  expect_error(remaeffect(c(1, NA), c(1, 0.5), "MC"))
+  expect_error(remaeffect(c(1, "a"), c(1,1), "MC"))
+  expect_error(remaeffect(es, se, NULL))
+  expect_error(remaeffect(es, se, NA))
+  expect_error(remaeffect(es, se, "NHEU", method.tau2 = NA))
+  expect_error(remaeffect(es, se, "NHEU", method.tau2 = NULL))
+  expect_error(remaeffect(es, se, "MC", n_samples = 1.5))
+  expect_error(remaeffect(es, se, "MC", n_samples = -Inf))
+  expect_warning(remaeffect(es, se, "MC", seed = -100))
+  expect_warning(expect_warning(expect_error(remaeffect(es, se, "MC", seed = Inf))))
+  expect_warning(expect_warning(expect_error(remaeffect(es, se, "MC", seed = "hundred"))))
+  expect_error(remaeffect(es = c(0.1, Inf, 0.3), se = c(0.1, 0.2, 0.3)))
+  expect_error(remaeffect(es = c(0.1, 0.2, 0.3), se = c(0.1, Inf, 0.3)))
 })
 
 test_that("handles mu0 at boundary values", {

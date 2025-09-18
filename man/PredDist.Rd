@@ -7,7 +7,7 @@
 PredDist(
   es,
   se,
-  method = c("FullCD", "SimplifiedCD", "FixedTau2"),
+  method = "FullCD",
   level.pi = 0.95,
   n_samples = 100000L,
   method.tau2 = "REML",
