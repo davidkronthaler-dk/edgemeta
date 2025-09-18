@@ -5,6 +5,7 @@ export(remaeffect)
 export(crps)
 export(marCD)
 export(opti_num)
+export(cdtau2)
 
 S3method(plot, metaprediction)
 S3method(print, metaprediction)

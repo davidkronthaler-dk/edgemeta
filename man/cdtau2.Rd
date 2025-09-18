@@ -2,7 +2,7 @@
 % Please edit documentation in R/cdtau2.R
 \name{cdtau2}
 \alias{cdtau2}
-\title{Confidence density of heterogeneity paramter in random-effects meta-analysis}
+\title{Confidence density (approximate) of heterogeneity parameter in random-effects meta-analysis}
 \usage{
 cdtau2(tau2, es, se)
 }
@@ -17,9 +17,9 @@ cdtau2(tau2, es, se)
 The value of the confidence density.
 }
 \description{
-The generalized heterogeneity statistic \eqn{Q(\tau^2)} (Viechtbauer, 2006) implies a confidence
-distribution of the heterogeneity paramter \eqn{\tau^2} under the normal random-effects model.
-Applying change of variables to \eqn{Q(\tau^2)} the confidence density is obtained.
+The generalized heterogeneity statistic \eqn{Q(\tau^2)} (Viechtbauer, 2006) implies an approximate confidence
+distribution of the heterogeneity parameter \eqn{\tau^2} under the normal random-effects model.
+Applying change of variables to \eqn{Q(\tau^2)} the approximate confidence density is obtained.
 }
 \examples{
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33, -1.1, -0.98)
@@ -27,7 +27,7 @@ se <- c(0.52, 0.93, 0.63, 0.3, 0.28, 0.45, 0.6)
 curve(cdtau2(x, es, se), 0, 7.5)
 }
 \references{
-Viechtbauer, W. (2006). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysi}s. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
+Viechtbauer, W. (2006). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysis}. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
 }
 \author{
 David Kronthaler

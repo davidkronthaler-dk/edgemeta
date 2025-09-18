@@ -70,8 +70,8 @@ specifying the desired method. In case exact reproducibility of the
 result is required, a seed can be additionally set to ensure the latter.
 
 Assume observed data (estimates and standard errors) from *k = 5*
-independent studies. A frequentist predictive distribution can be
-computed using:
+independent studies. The average effect can be estimated using the
+`remaeffect` function:
 
 ``` r
 library(edgemeta)
@@ -80,6 +80,33 @@ library(edgemeta)
 es <- c(1.17,  2.20,  1.10, -0.0019, -1.33) 
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 
+# Average effect and confidence interval
+me <- remaeffect(es = es, se = se, method = "MC") 
+#> 
+#> CD-Edgington Random-Effects Meta-Analysis
+#> 
+#> Details:
+#> Monte Carlo Algorithm (stochastic, independent samples)
+#> Number of Monte Carlo samples: 100,000 
+#> 
+#> Number of studies: 5 
+#> Average effect: 0.637 
+#> 95% Confidence interval from -0.902 to 2.165 
+#> Two-sided p-value against H0: mu = 0 is 0.35686 
+#> 
+#> Summary of confidence distribution of the average effect:
+#>        2.5%     25.0%    Median      Mean   75.0%    97.5%
+#>  -0.9020023 0.1783121 0.6423458 0.6370906 1.09678 2.164598
+
+# or me <- remaeffect(es = es, se = se, method = "GAQ")
+# or me <- remaeffect(es = es, se = se, method = "MHEU")
+
+# Further information: 'help(remaeffect)'
+```
+
+A frequentist predictive distribution can be computed using:
+
+``` r
 # Computation of predictive distribution
 pd <- PredDist(es = es, se = se, method = "FullCD")
 #> 
@@ -89,27 +116,27 @@ pd <- PredDist(es = es, se = se, method = "FullCD")
 #> Method: FullCD 
 #> Number of Monte Carlo samples: 100,000 
 #> 
-#> 95% prediction interval from -3.182 to 4.519 
+#> 95% prediction interval from -3.239 to 4.501 
 #> 
 #> Summary of predictive distribution (PD):
 #>                2.5%  25.0% Median  Mean 75.0% 97.5%
-#> PD theta_new -3.182 -0.387  0.633 0.638  1.64 4.519
+#> PD theta_new -3.239 -0.374   0.64 0.633 1.641 4.501
 #> 
 #> Confidence calculations:
 #> Confidence of `theta_new` lying between 0 and Inf:
-#> 0.66671
+#> 0.66758
 #> Confidence of `theta_new` lying between -Inf and 0:
-#> 0.33329
+#> 0.33242
 #> 
 #> Summary of confidence distributions (CD):
 #>           2.5% 25.0% Median  Mean 75.0%  97.5%
-#> CD mu   -0.884 0.176  0.637 0.634 1.093  2.146
-#> CD tau2  0.363 1.018  1.811 3.196 3.380 14.313
+#> CD mu   -0.901 0.179  0.643 0.636 1.094  2.142
+#> CD tau2  0.365 1.027  1.815 3.226 3.409 14.593
 
 # 95% prediction interval
 pd$PI
 #>      2.5%     97.5% 
-#> -3.181997  4.519150
+#> -3.239477  4.500845
 
 # Plot the predictive distribution
 plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
@@ -120,33 +147,4 @@ plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
 ``` r
 
 # Futher information: 'help(PredDist)'
-```
-
-The `remaeffect` function can be used to estimate the average effect
-$\mu$ and its confidence interval:
-
-``` r
-# Average effect and confidence interval
-me <- remaeffect(es = es, se = se, method = "MC") 
-#> 
-#> Random-Effects Meta-Analysis using Confidence Distributions
-#> 
-#> Number of studies: 5 
-#> Number of Monte Carlo samples: 100,000 
-#> 
-#> Average effect: 0.629 
-#> 95% Confidence interval from -0.898 to 2.131 
-#> Two-sided p-value against H0: mu = 0 is 0.362 
-#> 
-#> Summary of confidence distribution of the average effect:
-#>        2.5%     25.0%    Median      Mean    75.0%    97.5%
-#>  -0.8979564 0.1695904 0.6365824 0.6291007 1.090233 2.130937
-# or me <- remaeffect(es = es, se = se, method = "GAQ")
-me$estimate
-#> [1] 0.6291007
-me$CI
-#>       2.5%      97.5% 
-#> -0.8979564  2.1309373
-
-# Further information: 'help(remaeffect)'
 ```

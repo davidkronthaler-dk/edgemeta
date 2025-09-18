@@ -2,7 +2,7 @@
 % Please edit documentation in R/PD.R
 \name{PredDist}
 \alias{PredDist}
-\title{Frequentist Predictive Distributions and Intervals for Random-Effects Meta-Analysis}
+\title{Frequentist Predictive Distributions and Intervals for Random-Effects Meta-Analysis using Edgington's Method}
 \usage{
 PredDist(
   es,
@@ -21,11 +21,12 @@ PredDist(
 
 \item{method}{Either "FullCD" (recommended for practical application), "SimplifiedCD" or "FixedTau2". Check details for information.}
 
-\item{level.pi}{Coverage level of the prediction interval computed (numeric, between 0 and 1).}
+\item{level.pi}{Coverage level of the equi-tailed prediction interval (numeric, between 0 and 1).}
 
 \item{n_samples}{Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).}
 
-\item{method.tau2}{In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity. Check 'help(meta)' for information on estimation methods (default is "REML").}
+\item{method.tau2}{In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity.
+Check 'help(meta)' for information on estimation methods (default is "REML").}
 
 \item{seed}{Optional integer to ensure reproducibility of the random sampling.}
 }
@@ -33,37 +34,39 @@ PredDist(
 A list containing:
 \describe{
 \item{PI}{Prediction interval for a future effect \eqn{\theta_{new}}.}
-\item{samples}{A matrix containing samples \eqn{\theta_{new}} from the predictive distribution ('theta_new'), samples \eqn{\mu} from the confidence distribution of the average effect ('mu') and samples \eqn{\tau^2} from the confidence distribution of the between-study heterogeneity ('tau2').}
+\item{samples}{A matrix containing samples \eqn{\theta_{new}^*} from the predictive distribution ('theta_new'), samples \eqn{\mu^*} from the confidence distribution of the average effect ('mu') and samples \eqn{\tau^{2*}} from the confidence distribution of the between-study heterogeneity ('tau2').
+The latter are not included in case \code{method = "FixedTau2"} is selected.}
 }
 }
 \description{
-This function computes frequentist predictive distributions and prediction intervals for a future effect \eqn{\theta_{new}} in random-effects meta-analysis. Predictive distributions are constructed from confidence distributions of the average effect (\eqn{\mu}) and the between-study heterogeneity (\eqn{\tau^2}), using a Monte Carlo sampling algorithm. It supports three methods: "FullCD" (recommended), "SimplifiedCD", and "FixedTau2".
+Computes frequentist predictive distributions and prediction intervals for future effects
+\eqn{\theta_{new}} in random-effects meta-analysis. Predictive distributions are adjusted for estimation uncertainty
+through Edgington's confidence distributions of the average effect (\eqn{\mu}) and through an approximate confidence distribution of
+the between-study heterogeneity (\eqn{\tau^2}).
+Computation is performed using a Monte Carlo sampling algorithm generating independent samples.
 }
 \details{
-Predictive distributions are constructed from the confidence distribution of the average effect
-\eqn{\mu} and from the confidence distribution of heterogeneity parameter \eqn{\tau^2}. The confidence distribution of the
-average effect \eqn{\mu} is obtained from the Edgington combined \eqn{p}-value function (Held et al., 2025).
-The confidence distribution of the between-study heterogeneity parameter \eqn{\tau^2} is
-derived from the generalized heterogeneity statistic (Viechtbauer, 2006).
+Predictive distributions are constructed by integrating the assumed normal effect distribution \eqn{\theta_{new}} ~ N(\eqn{\mu}, \eqn{\tau^2}) over Edgington's confidence distribution
+to account for uncertainty in \eqn{\mu} and over an approximate confidence distribution of the heterogeneity parameter to account for uncertainty in \eqn{\tau^2}.
+The approximate confidence distribution of \eqn{\tau^2} is implied by the generalized heterogeneity statistic (Viechtbauer, 2006).
 
 The function supports three methods:
 \itemize{
-\item \strong{"FullCD"}: This method generates samples from the confidence distribution of
-\eqn{\tau^2}, and for each sampled \eqn{\tau^2}, it computes the corresponding confidence
-distribution of \eqn{\mu}. It then generates a sample of the future effect \eqn{\theta_{new}}
-for each (\eqn{\tau^2}, \eqn{\mu}) pair. This is the most comprehensive method, as it fully
-accounts for uncertainty in both parameters and the dependence of the Edgington combined \eqn{p}-value function on the heterogeneity parameter.
-\item \strong{"SimplifiedCD"}: This method generates samples from the confidence distribution of
-\eqn{\tau^2}, but computes the confidence distribution of \eqn{\mu} using a simplified
-approach. Specifically, it uses a fixed \eqn{\tau^2} to compute the Edgington combined
-\eqn{p}-value function, from which samples of \eqn{\mu} are drawn. It then generates a sample of
-the future effect \eqn{\theta_{new}} for each (\eqn{\tau^2}, \eqn{\mu}) pair
-\item \strong{"FixedTau2"}: This method assumes a fixed value for \eqn{\tau^2}, and uses it to compute
-the confidence distribution of \eqn{\mu}. It does
-not account for uncertainty in the estimation of \eqn{\tau^2}.
+\item \strong{"FullCD"}: Samples \eqn{\tau^{2*}} are drawn from the approximate confidence distribution of \eqn{\tau^2}. For each drawn
+\eqn{\tau^{2*} }, a corresponding \eqn{\mu^*} is conditionally drawn from Edgington's confidence distribution (, which is conditional
+on the heterogeneity parameter). For each pair (\eqn{\mu^*}, \eqn{\tau^{2*}}), a future effect \eqn{\theta_{new}^*} is drawn from
+a N(\eqn{\mu^*}, \eqn{\tau^{2*}}). This method fully accounts for uncertainty in both parameters and the dependence of Edgington's
+confidence distribution on the heterogeneity parameter.
+\item \strong{"SimplifiedCD"}: This method generates samples \eqn{\tau^{2*}} from the confidence distribution of
+\eqn{\tau^2}, but generates samples \eqn{\mu^*} using a simplified
+approach. Specifically, samples \eqn{\mu^*} are drawn conditional on a fixed \eqn{\hat{\tau}^2}.
+For each pair (\eqn{\mu^*}, \eqn{\tau^{2*}}), a future effect \eqn{\theta_{new}^*} is drawn from
+a N(\eqn{\mu^*}, \eqn{\tau^{2*}}).
+\item \strong{"FixedTau2"}: This method used a fixed estimate \eqn{\hat{\tau}^2}, and generates samples \eqn{\mu^*}
+conditional on this fixed estimate. Samples \eqn{\theta_{new}^*} are generated from a N(\eqn{\mu^*}, \eqn{\hat{\tau}^2}).
 }
 
-The empirical distribution of the sampled \eqn{\theta_{new}} values serves as the estimated predictive
+The empirical distribution of the sampled \eqn{\theta_{new}^*} values serves as the estimated predictive
 distribution of future effects. This distribution can be used to compute prediction intervals,
 summarize predictive uncertainty, or generate visualizations.
 }

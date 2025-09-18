@@ -50,15 +50,27 @@ devtools::install_github("davidkronthaler-dk/edgemeta")
 
 The `PredDist` function constructs an object of class `metaprediction`. Generic S3 methods (such as print, summary, or plot) are applicable. The function `PredDist` requires minimal input: a numeric vector of effect estimates, a corresponding vector of standard errors, and a string specifying the desired method. In case exact reproducibility of the result is required, a seed can be additionally set to ensure the latter.
 
-Assume observed data (estimates and standard errors) from *k = 5* independent studies. A frequentist predictive distribution can be computed using:
+Assume observed data (estimates and standard errors) from *k = 5* independent studies. The average effect can be estimated using the `remaeffect` function:
 
-```{r example predictive distribution}
+```{r example average effect}
 library(edgemeta)
 
 # Estimates and standard errors from 5 studies
 es <- c(1.17,  2.20,  1.10, -0.0019, -1.33) 
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 
+# Average effect and confidence interval
+me <- remaeffect(es = es, se = se, method = "MC") 
+
+# or me <- remaeffect(es = es, se = se, method = "GAQ")
+# or me <- remaeffect(es = es, se = se, method = "MHEU")
+
+# Further information: 'help(remaeffect)'
+```
+
+A frequentist predictive distribution can be computed using:
+
+```{r example predictive distribution}
 # Computation of predictive distribution
 pd <- PredDist(es = es, se = se, method = "FullCD")
 
@@ -69,17 +81,5 @@ pd$PI
 plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
 
 # Futher information: 'help(PredDist)'
-```
-
-The `remaeffect` function can be used to estimate the average effect $\mu$ and its confidence interval:
-
-```{r example average effect}
-# Average effect and confidence interval
-me <- remaeffect(es = es, se = se, method = "MC") 
-# or me <- remaeffect(es = es, se = se, method = "GAQ")
-me$estimate
-me$CI
-
-# Further information: 'help(remaeffect)'
 ```
 

@@ -12,8 +12,8 @@ Description: Frequentist estimation and prediction for random-effects meta-analy
     for through confidence distributions from Edgington's method and from the
     generalized heterogeneity statistic.
 License: MIT + file LICENSE
-URL: https://github.com/davidkronthaler-dk/metaprediction
-BugReports: https://github.com/davidkronthaler-dk/metaprediction/issues
+URL: https://github.com/davidkronthaler-dk/edgemeta
+BugReports: https://github.com/davidkronthaler-dk/edgemeta/issues
 Imports: 
     meta,
     Rcpp (>= 1.0.14)

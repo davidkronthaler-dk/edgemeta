@@ -11,7 +11,8 @@ remaeffect(
   level.ci = 0.95,
   n_samples = 100000L,
   seed = NULL,
-  mu0 = 0
+  mu0 = 0,
+  method.tau2 = "REML"
 )
 }
 \arguments{
@@ -19,15 +20,17 @@ remaeffect(
 
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
 
-\item{method}{Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach.}
+\item{method}{Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach (compare details).}
 
 \item{level.ci}{Confidence level for the interval estimate (default is 0.95).}
 
-\item{n_samples}{Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).}
+\item{n_samples}{Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.}
 
-\item{seed}{Optional integer to ensure reproducibility of the random sampling, relevant in case method 'MC' is chosen.}
+\item{seed}{Optional integer to ensure reproducibility of the random sampling. Relevant when selecting \code{method = "MC"}.}
 
 \item{mu0}{Parameter value under the null-hypothesis against which two-sided p-value is computed.}
+
+\item{method.tau2}{Method to compute the heterogeneity estimate. Relevant when selecting \code{method = "NHEU"}.}
 }
 \value{
 A list, including not all, but some of these, depending on the method:
@@ -35,40 +38,44 @@ A list, including not all, but some of these, depending on the method:
 \item{estimate}{Point estimate of the average effect \eqn{\mu}.}
 \item{CI}{Confidence interval for the average effect \eqn{\mu}.}
 \item{pval}{Two-sided p-value against H0: \eqn{\mu} = \eqn{\mu_0}.}
-\item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}.}
-\item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}.}
-\item{fcd}{Obtained for method 'GAQ': Marginalized confidence density function of \eqn{\mu}.}
+\item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}. Obtained for method \code{MC}}
+\item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}. Obtained for method \code{MC}}
+\item{fcd}{Marginalized confidence density function of \eqn{\mu}. Obtained for method \code{GAQ}.}
 }
 }
 \description{
-Estimates the average effect in random-effects meta-analysis using Edgingtons Confidence Distribution.
 Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
 are combined using Edgington's approach. The resulting combined confidence distribution of \eqn{\mu},
-which is conditional on the heterogeneity parameter \eqn{\tau^2}, is marginalized over a confidence distribution of the latter
-to account for estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
+which is conditional on the heterogeneity parameter \eqn{\tau^2}, is integrated over an approximate confidence distribution of the latter
+to account for heterogeneity estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
 heterogeneity estimate.
 }
 \details{
-This function performs a random-effects meta-analysis using confidence distributions.
-It generates samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2},
-derived from the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled value of \eqn{\tau^2},
-the function then computes a corresponding confidence distribution for the average
-effect \eqn{\mu}, induced by the Edgington combined p-value function (Held et al., 2025), and generates a sample from
-this distribution.
+This function performs a random-effects meta-analysis using Edgington's confidence distribution: study-specific confidence distributions, respectively,
+one-sided p-value functions for the alternative "greater" are constructed from normal pivots unter the normal random-effects model. These
+are then combined using Edgington's method, yielding a combined confidence distribution, respectively
+combined p-value function, of the average effect \eqn{\mu}. Then, the three approaches proceed as:
+\describe{
+\item{\code{MC}:}{Generate samples from the approximate confidence distribution of the heterogeneity parameter \eqn{\tau^2},
+implied by the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled \eqn{\tau^{2*}},
+generate one \eqn{\mu^*} from Edgington's confidence distribution. Repeatedly sampling heterogeneity  \eqn{\tau^{2*}} and
+conditional sampling \eqn{\mu^*}, a confidence distribution of \eqn{\mu}, incorporating uncertainty about the
+heterogeneity parameter, is constructed, from which point estimates and confidence intervals are computed.}
+\item{\code{GAQ}:}{The confidence density of \eqn{\tau^2}, implied by the generalized heterogeneity statistic,
+is constructed by change of variables. Global adaptive quadrature integration is used to integrate Edgington's confidence density
+over the confidence density of \eqn{\tau^2}. This typically corresponds to the MC confidence distribution, except if very few
+studies are available. In this case, GAQ integration may produce slightly too wide confidence distributions and intervals.}
+\item{\code{NHEU}:}{Derives point estimates and intervals directly from Edgington's approach wihtout adjusting for uncertainty
+in the heterogeneity estimate (Held et al, 2025).}
+}
 
-By repeatedly sampling \eqn{\tau^2} and recalculating the confidence distribution of \eqn{\mu},
-the method incorporates the uncertainty in heterogeneity estimation into the final
-average effect estimate. The function returns the point estimate, its confidence
-interval, and the full sample of values drawn from the confidence distributions.
-
-Since the method accounts for the uncertainty in \eqn{\tau^2}, it always returns a
-confidence interval that adjusts for potential between-study heterogeneity,
-that is, the framework of a fixed-effects meta-analysis is not applicable.
+The methods \code{MC} and \code{GAQ} always produces confidence intervals reflecting potential heterogeneity, and are applicable only
+under a random-effects framework.
 }
 \examples{
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-remaeffect(es = es, se = se)
+remaeffect(es = es, se = se, method = "MC")
 
 
 

@@ -40,26 +40,24 @@ double norftau2(NumericVector es, NumericVector se, double utau2) {
 //   return out.par;
 // }
 
-// We need to marginalize over entire support where ftau2 is non-zero, 
-// including zero values -> otherwise confidence itnervals too wide
+
 // F: leftest non-zero point of ftau2(tau2)
-// [[Rcpp::export]]
-double ftauzero(NumericVector es, NumericVector se, double step = 1e-4) {
-  for (double tau = -1; tau <= 1e-1; tau += step) {
-    double val = ftau2(es, se, Rcpp::NumericVector::create(tau))[0];
-    if (val != 0.0) {
-      return tau;  
-    }
-  }
-  return 0;
-}
+//  //[[Rcpp::export]]
+// double ftauzero(NumericVector es, NumericVector se, double step = 1e-4) {
+//   for (double tau = -1; tau <= 1e-1; tau += step) {
+//     double val = ftau2(es, se, Rcpp::NumericVector::create(tau))[0];
+//     if (val != 0.0) {
+//       return tau;  
+//     }
+//   }
+//   return 0;
+// }
 
 // F: Joint conf. density of mu, tau2
 // [[Rcpp::export]]
 double jointCD(Rcpp::NumericVector mu, Rcpp::NumericVector tau2, 
                Rcpp::NumericVector es, Rcpp::NumericVector se,
                double C) {
-  // adjust standard errors
   int n = se.size();
   Rcpp::NumericVector se_adjusted(n);
   for (int i = 0; i < n; ++i) {
@@ -80,7 +78,6 @@ double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se,
   // normalization of tau2
   double C = norftau2(es, se, utau2);
   
-  // lower integration bound (account for mass below zero in marginalization)
   double ltau2 = 0; //ftauzero(es, se, 1e-4);
   
   // marginal confidence density

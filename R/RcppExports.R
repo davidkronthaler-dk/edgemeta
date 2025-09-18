@@ -9,8 +9,8 @@ CD_cpp <- function(h0, es, se, h = 1e-4) {
     .Call(`_edgemeta_CD_cpp`, h0, es, se, h)
 }
 
-crps <- function(s, t) {
-    .Call(`_edgemeta_crps`, s, t)
+crpsCPP <- function(s, t) {
+    .Call(`_edgemeta_crpsCPP`, s, t)
 }
 
 p_wald <- function(x, es, se) {
@@ -47,10 +47,6 @@ ftau2 <- function(es, se, tau2) {
 
 norftau2 <- function(es, se, utau2) {
     .Call(`_edgemeta_norftau2`, es, se, utau2)
-}
-
-ftauzero <- function(es, se, step = 1e-4) {
-    .Call(`_edgemeta_ftauzero`, es, se, step)
 }
 
 jointCD <- function(mu, tau2, es, se, C) {

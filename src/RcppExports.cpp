@@ -38,15 +38,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// crps
-double crps(NumericVector s, NumericVector t);
-RcppExport SEXP _edgemeta_crps(SEXP sSEXP, SEXP tSEXP) {
+// crpsCPP
+double crpsCPP(NumericVector s, NumericVector t);
+RcppExport SEXP _edgemeta_crpsCPP(SEXP sSEXP, SEXP tSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type s(sSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type t(tSEXP);
-    rcpp_result_gen = Rcpp::wrap(crps(s, t));
+    rcpp_result_gen = Rcpp::wrap(crpsCPP(s, t));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -166,19 +166,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< double >::type utau2(utau2SEXP);
     rcpp_result_gen = Rcpp::wrap(norftau2(es, se, utau2));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ftauzero
-double ftauzero(NumericVector es, NumericVector se, double step);
-RcppExport SEXP _edgemeta_ftauzero(SEXP esSEXP, SEXP seSEXP, SEXP stepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
-    Rcpp::traits::input_parameter< double >::type step(stepSEXP);
-    rcpp_result_gen = Rcpp::wrap(ftauzero(es, se, step));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -310,7 +297,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_edgemeta_cd_single", (DL_FUNC) &_edgemeta_cd_single, 4},
     {"_edgemeta_CD_cpp", (DL_FUNC) &_edgemeta_CD_cpp, 4},
-    {"_edgemeta_crps", (DL_FUNC) &_edgemeta_crps, 2},
+    {"_edgemeta_crpsCPP", (DL_FUNC) &_edgemeta_crpsCPP, 2},
     {"_edgemeta_p_wald", (DL_FUNC) &_edgemeta_p_wald, 3},
     {"_edgemeta_pfctedge", (DL_FUNC) &_edgemeta_pfctedge, 3},
     {"_edgemeta_opti_edge", (DL_FUNC) &_edgemeta_opti_edge, 2},
@@ -320,7 +307,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_edgemeta_dQIVWE", (DL_FUNC) &_edgemeta_dQIVWE, 3},
     {"_edgemeta_ftau2", (DL_FUNC) &_edgemeta_ftau2, 3},
     {"_edgemeta_norftau2", (DL_FUNC) &_edgemeta_norftau2, 3},
-    {"_edgemeta_ftauzero", (DL_FUNC) &_edgemeta_ftauzero, 3},
     {"_edgemeta_jointCD", (DL_FUNC) &_edgemeta_jointCD, 5},
     {"_edgemeta_marCDsingle", (DL_FUNC) &_edgemeta_marCDsingle, 4},
     {"_edgemeta_marCD", (DL_FUNC) &_edgemeta_marCD, 4},

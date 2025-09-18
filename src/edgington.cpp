@@ -27,30 +27,22 @@ Rcpp::NumericVector p_wald(double x,
 Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
                                   Rcpp::NumericVector es,
                                   Rcpp::NumericVector se) {
-  // Number of studies
   int k = es.size();
-  
-  // Evaluated h0
   int Lh0 = h0.size();
   
-  // Matrix to store individual study p-values
+  // Individual study p-value functions
   NumericMatrix ps(Lh0, k);
-  
-  // For each study, compute one-sided Wald p-values
   for (int j = 0; j < k; ++j) {
     for (int i = 0; i < Lh0; ++i) {
       ps(i, j) = 1.0 - R::pnorm(es[j], h0[i], se[j], 1, 0);
     }
   }
   
-  // Vector to store Edgington combined p-values
-  Rcpp::NumericVector pcombined(Lh0);
-  
   // Compute Edgington combined p-values
+  Rcpp::NumericVector pcombined(Lh0);
   for (int i = 0; i < Lh0; ++i) {
     Rcpp::NumericVector row(k);
     
-    // P-value of each study for a specific H0
     for (int j = 0; j < k; ++j) {
       row[j] = ps(i, j);
     }
@@ -76,7 +68,7 @@ Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
   return pcombined;
 }
 
-// Optimize Edgington p-value function (point estimator)
+// Point estimate from Edgington combined p-value function
 // [[Rcpp::export]]
 double opti_edge(Rcpp::NumericVector es,
                  Rcpp::NumericVector se) {
@@ -112,7 +104,6 @@ double opti_edge(Rcpp::NumericVector es,
   // Find the root using Brent algorithm
   auto out = fntl::findroot_brent(f, min_es, max_es, args);
   
-  // Return
   return out.root;
   
 }

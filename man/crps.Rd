@@ -3,20 +3,31 @@
 \name{crps}
 \alias{crps}
 \title{Continuous Ranked Probability Score (CRPS)}
+\usage{
+crps(s, tn)
+}
 \arguments{
 \item{s}{A numeric vector of samples from the predictive distribution.}
 
-\item{tn}{A numeric vector of values from the true distribution of future effects.}
+\item{tn}{A numeric vector of future truths.}
 }
 \value{
-A single numeric value representing the mean CRPS across all observations.
+A single numeric value representing the mean CRPS across all future truths.
 }
 \description{
 Computes the Continuous Ranked Probability Score (CRPS) for a predictive distribution using a Monte Carlo (MC) approximation.
 The MC approximation follows the approach for the computation of the \emph{energy score} proposed by Gneiting et al. (2008).
-To ensure computational efficiency, especially when handling large numbers of predictive samples or multiple future effect samples,
+To ensure computational efficiency, especially when handling large numbers of predictive samples or multiple future truths,
 the Monte Carlo approximation is implemented with a C++ backend.
-If multiple future effects are provided, the function returns the mean CRPS across all provided samples.
+If multiple future truths are provided, the function returns the mean CRPS across all provided future truths.
+}
+\details{
+A likely misconception is that supplying the same vector for both the predictive samples
+\code{s} and the truths \code{tn} should result in a CRPS of zero. This is not the case,
+unless the vector contains only a single unique element. The reason is that each observed
+value in \code{tn} is evaluated against the \emph{entire} predictive distribution in \code{s}.
+By contrast, if a truth value is evaluated against a predictive distribution that
+places all of its mass at that same value (i.e., a point mass), the CRPS is indeed zero.
 }
 \examples{
 # True data-generating distribution

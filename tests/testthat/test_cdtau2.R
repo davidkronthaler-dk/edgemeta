@@ -1,0 +1,35 @@
+# Valid estimates and standard errors
+es = c(0.17,  1.20,  1.10, -0.0019, -2.33)
+se = c(0.52, 0.93, 0.63, 0.3, 0.28)
+tau2 = seq(0, 1, l = 1000)
+
+# Correct run
+expect_no_error(cdtau2(tau2 = 0.5, es = es, se = se))
+expect_no_error(cdtau2(tau2 = tau2, es = es, se = se))
+expect_no_error(cdtau2(tau2 = 0, es = es, se = se))
+expect_no_error(cdtau2(tau2 = 1e6, es = es, se = se))
+expect_no_error(cdtau2(tau2 = c(0, 1e-10, 1e6), es = es, se = se))
+
+
+# Test missing argument
+expect_error(cdtau2())                      
+expect_error(cdtau2(tau2 = tau2))           
+expect_error(cdtau2(es = es))               
+expect_error(cdtau2(se = se))               
+expect_error(cdtau2(tau2 = tau2, es = es))  
+expect_error(cdtau2(tau2 = tau2, se = se))  
+
+# Test wrong input
+expect_error(cdtau2(tau2 = "tau2", es = es, se = se))  
+expect_error(cdtau2(tau2 = tau2, es = "es", se = se))   
+expect_error(cdtau2(tau2 = tau2, es = es, se = "se"))   
+expect_error(cdtau2(tau2 = list(1,2), es = es, se = se)) 
+expect_error(cdtau2(tau2 = tau2, es = es[1:3], se = se))  
+expect_error(cdtau2(tau2 = tau2, es = es, se = se[1:3]))  
+expect_error(cdtau2(tau2 = tau2, es = 1, se = se))        
+expect_error(cdtau2(tau2 = tau2, es = es, se = 1))      
+expect_error(cdtau2(tau2 = NA, es = es, se = se))
+expect_error(cdtau2(tau2 = tau2, es = c(es, NA), se = c(se, 0.1)))
+expect_error(cdtau2(tau2 = tau2, es = es, se = c(se, Inf)))
+expect_error(cdtau2(tau2 = NaN, es = es, se = se))
+

@@ -65,15 +65,3 @@ test_that("returned object has expected structure", {
   result3 <- PredDist(es = es, se = se, method = "FixedTau2")
   expect_named(result3, c("PI", "samples"))
 })
-
-
-
-
-
-
-
-
-
-
-
-

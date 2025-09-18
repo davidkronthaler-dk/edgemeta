@@ -1,48 +1,53 @@
 #' Estimate the Average Effect in Random-Effects Meta-Analysis via Edgington's Confidence Distribution
 #'
-#' Estimates the average effect in random-effects meta-analysis using Edgingtons Confidence Distribution.
 #' Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
 #' are combined using Edgington's approach. The resulting combined confidence distribution of \eqn{\mu}, 
-#' which is conditional on the heterogeneity parameter \eqn{\tau^2}, is marginalized over a confidence distribution of the latter
-#' to account for estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
+#' which is conditional on the heterogeneity parameter \eqn{\tau^2}, is integrated over an approximate confidence distribution of the latter
+#' to account for heterogeneity estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
 #' heterogeneity estimate.
 #'
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
-#' @param method Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach.
+#' @param method Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach (compare details).
 #' @param level.ci Confidence level for the interval estimate (default is 0.95).
-#' @param n_samples Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000).
-#' @param seed Optional integer to ensure reproducibility of the random sampling, relevant in case method 'MC' is chosen.
+#' @param n_samples Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.
+#' @param seed Optional integer to ensure reproducibility of the random sampling. Relevant when selecting \code{method = "MC"}.
 #' @param mu0 Parameter value under the null-hypothesis against which two-sided p-value is computed.
+#' @param method.tau2 Method to compute the heterogeneity estimate. Relevant when selecting \code{method = "NHEU"}.
 #'
 #' @return A list, including not all, but some of these, depending on the method:
 #' \describe{
 #'   \item{estimate}{Point estimate of the average effect \eqn{\mu}.}
 #'   \item{CI}{Confidence interval for the average effect \eqn{\mu}.}
 #'   \item{pval}{Two-sided p-value against H0: \eqn{\mu} = \eqn{\mu_0}.}
-#'   \item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}.}
-#'   \item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}.}
-#'   \item{fcd}{Obtained for method 'GAQ': Marginalized confidence density function of \eqn{\mu}.}
+#'   \item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}. Obtained for method \code{MC}}
+#'   \item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}. Obtained for method \code{MC}}
+#'   \item{fcd}{Marginalized confidence density function of \eqn{\mu}. Obtained for method \code{GAQ}.}
 #' }
 #'
 #' @author David Kronthaler
 #'
 #' @details
-#' This function performs a random-effects meta-analysis using confidence distributions.
-#' It generates samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2},
-#' derived from the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled value of \eqn{\tau^2},
-#' the function then computes a corresponding confidence distribution for the average
-#' effect \eqn{\mu}, induced by the Edgington combined p-value function (Held et al., 2025), and generates a sample from
-#' this distribution.
-#'
-#' By repeatedly sampling \eqn{\tau^2} and recalculating the confidence distribution of \eqn{\mu},
-#' the method incorporates the uncertainty in heterogeneity estimation into the final
-#' average effect estimate. The function returns the point estimate, its confidence
-#' interval, and the full sample of values drawn from the confidence distributions.
-#'
-#' Since the method accounts for the uncertainty in \eqn{\tau^2}, it always returns a
-#' confidence interval that adjusts for potential between-study heterogeneity,
-#' that is, the framework of a fixed-effects meta-analysis is not applicable.
+#' This function performs a random-effects meta-analysis using Edgington's confidence distribution: study-specific confidence distributions, respectively, 
+#' one-sided p-value functions for the alternative "greater" are constructed from normal pivots unter the normal random-effects model. These 
+#' are then combined using Edgington's method, yielding a combined confidence distribution, respectively  
+#' combined p-value function, of the average effect \eqn{\mu}. Then, the three approaches proceed as:
+#' \describe{
+#'      \item{\code{MC}:}{Generate samples from the approximate confidence distribution of the heterogeneity parameter \eqn{\tau^2},
+#'      implied by the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled \eqn{\tau^{2*}},
+#'      generate one \eqn{\mu^*} from Edgington's confidence distribution. Repeatedly sampling heterogeneity  \eqn{\tau^{2*}} and
+#'      conditional sampling \eqn{\mu^*}, a confidence distribution of \eqn{\mu}, incorporating uncertainty about the
+#'      heterogeneity parameter, is constructed, from which point estimates and confidence intervals are computed.}
+#'      \item{\code{GAQ}:}{The confidence density of \eqn{\tau^2}, implied by the generalized heterogeneity statistic,
+#'      is constructed by change of variables. Global adaptive quadrature integration is used to integrate Edgington's confidence density
+#'      over the confidence density of \eqn{\tau^2}. This typically corresponds to the MC confidence distribution, except if very few
+#'      studies are available. In this case, GAQ integration may produce slightly too wide confidence distributions and intervals.}
+#'      \item{\code{NHEU}:}{Derives point estimates and intervals directly from Edgington's approach wihtout adjusting for uncertainty
+#'      in the heterogeneity estimate (Held et al, 2025).}
+#' }
+#' 
+#' The methods \code{MC} and \code{GAQ} always produces confidence intervals reflecting potential heterogeneity, and are applicable only 
+#' under a random-effects framework.
 #'
 #' @references
 #' Viechtbauer, W. (2007). *Confidence intervals for the amount of heterogeneity in meta‐analysi*s. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
@@ -53,7 +58,7 @@
 #' @examples
 #' es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 #' se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-#' remaeffect(es = es, se = se)
+#' remaeffect(es = es, se = se, method = "MC")
 #'
 #'
 #'
@@ -63,16 +68,18 @@ remaeffect <- function(es,
                        level.ci = 0.95,
                        n_samples = 100000L,
                        seed = NULL,
-                       mu0 = 0) {
-  method <- match.arg(method)
+                       mu0 = 0,
+                       method.tau2 = "REML") {
   
-  validate_input(
+  # validate input
+  vd_remaeffect(
     es = es,
     se = se,
-    method = "estimate",
-    lpi = level.ci,
-    ns = n_samples,
-    mtau2 = "estimate"
+    method = method,
+    level.ci = level.ci,
+    n_samples = n_samples,
+    mu0 = mu0,
+    method.tau2 = method.tau2
   )
   
   if (method == "MC") {
@@ -96,7 +103,8 @@ remaeffect <- function(es,
       es = es,
       se = se,
       level.ci = level.ci,
-      mu0 = mu0
+      mu0 = mu0,
+      mtau2 = method.tau2
     )
   }
   
@@ -108,9 +116,9 @@ remaeffect <- function(es,
 reffMC <-
   function(es,
            se,
-           level.ci = 0.95,
-           n_samples = 100000L,
-           seed = NULL,
+           level.ci,
+           n_samples,
+           seed,
            mu0) {
     
     # Reproducibility under MC
@@ -129,7 +137,13 @@ reffMC <-
       upper = ma$tau2 + 100 * ma$se.tau2
     )
     
-    # Sampling mu from Edgingtons confidence distribution
+    # -------------------------------------------------------------------
+    # could include alternatively
+    # pimeta::pima(y = es, se = se, method = "boot", B = n_samples)$rnd
+    # to sample from the exact distribution of tau2 (also for 'PredDist')
+    # -------------------------------------------------------------------
+    
+    # Sampling from Edgingtons confidence distribution
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
     
     # Point estimate
@@ -138,16 +152,20 @@ reffMC <-
                           p = (1 + level.ci * c(-1, 1)) / 2,
                           na.rm = T)
     
-    # P-value at mu = mu0
-    p1s <- mean(s_mu < mu0) # one-sided
-    p2s <- p1tp2(p1s)       # two-sided
+    # ---------------------------
+    # could include HCD intervals
+    # ---------------------------
+    
+    # Two-sided p-value at mu = mu0
+    p2s <- 2 * min(mean(s_mu <= mu0), mean(s_mu >= mu0))
     
     # Visual output
-    cat("\nRandom-Effects Meta-Analysis using Confidence Distributions\n\n")
-    cat("Number of studies:", length(es), "\n")
+    cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
+    cat("Details:\nMonte Carlo Algorithm (stochastic, independent samples)\n")
     cat("Number of Monte Carlo samples:",
         format(n_samples, big.mark = ","),
         "\n\n")
+    cat("Number of studies:", length(es), "\n")
     cat("Average effect:", sprintf("%.3f", hmu), "\n")
     cat(
       paste0(level.ci * 100, "%"),
@@ -186,18 +204,22 @@ reffMC <-
   }
 
 # Estimate 'mu' using deterministic global adaptive quadrature integration
-reffAQ <- function(es, se, level.ci = 0.95, mu0) {
+reffAQ <- function(es,
+                   se, 
+                   level.ci, 
+                   mu0) {
   
   # Upper integration bound of tau2
-  ma <- meta::metagen(es, se, method.tau = "REML")
+  ma <- run_metagen(es = es, se = se, mtau2 = "REML")
   utau2 <- ma$tau2 + 100 * ma$se.tau2
   
-  # Marginal confidence distribution function of mu
+  # Marginal confidence distribution function of mu 
   cdfmu <- reff(es, se, utau2) 
   
   # Confidence interval (by inversion of CDF)
-  quant <- function(p)
+  quant <- function(p) {
     stats::approx(cdfmu[, 2], cdfmu[, 1], xout = p, rule = 2)$y
+  }
   ci <- quant(c((1 - level.ci) / 2, (1 + level.ci) / 2))
   
   # Confidence density function
@@ -216,12 +238,13 @@ reffAQ <- function(es, se, level.ci = 0.95, mu0) {
   hmu <-  sum(x_mid * df) # Numerical approximation
   
   # P-value against H0: mu = 0
-  p1sf <- stats::approxfun(cdfmu[, 1], cdfmu[, 2])
+  p1sf <- stats::approxfun(cdfmu[, 1], cdfmu[, 2], yleft = 0, yright = 1)
   p1s <- p1sf(mu0)    # one-sided p-value
   p2s <- p1tp2(p1s)   # two-sided p-value
   
   # Visual output
-  cat("\nRandom-Effects Meta-Analysis using Confidence Distributions\n\n")
+  cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
+  cat("Details: Global Adaptive Quadrature Integration\n\n")
   cat("Number of studies:", length(es), "\n")
   cat("Average effect:", sprintf("%.3f", hmu), "\n")
   cat(
@@ -245,15 +268,21 @@ reffAQ <- function(es, se, level.ci = 0.95, mu0) {
   ))
 }
 
-# Estimate 'mu' without adjustment for heterogenetiy estimation uncertainty
-reffNHEU <- function(es, se, level.ci, mu0) {
-  hmu <- opti_num(es = es, se = se, point = TRUE, ci = TRUE, levelci = level.ci)
+# Estimate 'mu' without adjustment for heterogeneity estimation uncertainty
+reffNHEU <- function(es,
+                     se, 
+                     level.ci,
+                     mu0, 
+                     mtau2) {
+  
+  tau2 <- run_metagen(es = es, se = se, mtau2 = mtau2)$tau2
+  hmu <- opti_num(es = es, se = sqrt( se ^ 2 + tau2), 
+                  point = TRUE, ci = TRUE, levelci = level.ci)
   ci <- c(hmu$cilower, hmu$ciupper)
   p1s <- pfctedge(h0 = mu0, es = es, se = se)
   p2s <- p1tp2(p1s)
   
-  # Visual output
-  cat("\nRandom-Effects Meta-Analysis using Edgington's Confidence Distribution\n\n")
+  cat("\nRandom-Effects Meta-Analysis using Edgington's Method\n\n")
   cat("Details: Heterogenetiy estimation uncertainty is NOT accounted for.\n")
   cat("Consider method = 'MC' or 'GAQ' to incorporate this.\n\n")
   cat("Number of studies:", length(es), "\n")
