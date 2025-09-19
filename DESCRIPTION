@@ -16,7 +16,8 @@ URL: https://github.com/davidkronthaler-dk/edgemeta
 BugReports: https://github.com/davidkronthaler-dk/edgemeta/issues
 Imports: 
     meta (>= 6.0),
-    Rcpp (>= 1.0.14)
+    Rcpp (>= 1.0.14),
+    fntl
 Suggests: 
     testthat (>= 3.0.0)
 LinkingTo: 
