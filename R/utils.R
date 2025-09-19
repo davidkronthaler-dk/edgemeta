@@ -6,9 +6,9 @@ vd_PredDist <- function(es,
                         mtau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")
                         ) {
   
-  if (!requireNamespace("meta", quietly = TRUE)) {
-    stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
-  } 
+  # if (!requireNamespace("meta", quietly = TRUE)) {
+  #   stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
+  # } 
   
   if (is.null(method) || is.na(method) || is.nan(method)) stop("'method' must not be NULL or NA.")
   if (!is.character(method)) stop("'method' must be a character")
@@ -30,9 +30,9 @@ vd_remaeffect <- function(
   mu0,
   method.tau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")) {
   
-  if (!requireNamespace("meta", quietly = TRUE)) {
-    stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
-  } 
+  # if (!requireNamespace("meta", quietly = TRUE)) {
+  #   stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
+  # } 
   
   if (is.null(method) || is.na(method) || is.nan(method)) stop("'method' must not be NULL or NA.")
   if (!is.character(method)) stop("'method' must be a character")
