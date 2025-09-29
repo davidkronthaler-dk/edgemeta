@@ -90,13 +90,13 @@ me <- remaeffect(es = es, se = se, method = "MC")
 #> Number of Monte Carlo samples: 100,000 
 #> 
 #> Number of studies: 5 
-#> Average effect: 0.637 
-#> 95% Confidence interval from -0.902 to 2.165 
-#> Two-sided p-value against H0: mu = 0 is 0.35686 
+#> Average effect: 0.632 
+#> 95% Confidence interval from -0.908 to 2.155 
+#> Two-sided p-value against H0: mu = 0 is 0.36118 
 #> 
 #> Summary of confidence distribution of the average effect:
-#>        2.5%     25.0%    Median      Mean   75.0%    97.5%
-#>  -0.9020023 0.1783121 0.6423458 0.6370906 1.09678 2.164598
+#>        2.5%    25.0%    Median      Mean    75.0%    97.5%
+#>  -0.9077253 0.175469 0.6398807 0.6318003 1.094872 2.155126
 
 # or me <- remaeffect(es = es, se = se, method = "GAQ")
 # or me <- remaeffect(es = es, se = se, method = "MHEU")
@@ -116,27 +116,27 @@ pd <- PredDist(es = es, se = se, method = "FullCD")
 #> Method: FullCD 
 #> Number of Monte Carlo samples: 100,000 
 #> 
-#> 95% prediction interval from -3.239 to 4.501 
+#> 95% prediction interval from -3.239 to 4.575 
 #> 
 #> Summary of predictive distribution (PD):
 #>                2.5%  25.0% Median  Mean 75.0% 97.5%
-#> PD theta_new -3.239 -0.374   0.64 0.633 1.641 4.501
+#> PD theta_new -3.239 -0.375  0.645 0.639 1.646 4.575
 #> 
 #> Confidence calculations:
 #> Confidence of `theta_new` lying between 0 and Inf:
-#> 0.66758
+#> 0.66718
 #> Confidence of `theta_new` lying between -Inf and 0:
-#> 0.33242
+#> 0.33282
 #> 
 #> Summary of confidence distributions (CD):
 #>           2.5% 25.0% Median  Mean 75.0%  97.5%
-#> CD mu   -0.901 0.179  0.643 0.636 1.094  2.142
-#> CD tau2  0.365 1.027  1.815 3.226 3.409 14.593
+#> CD mu   -0.908 0.177  0.639 0.631 1.091  2.146
+#> CD tau2  0.361 1.018  1.813 3.251 3.413 14.732
 
 # 95% prediction interval
 pd$PI
 #>      2.5%     97.5% 
-#> -3.239477  4.500845
+#> -3.238599  4.575498
 
 # Plot the predictive distribution
 plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
