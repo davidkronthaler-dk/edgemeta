@@ -28,7 +28,7 @@ parameter to account for heterogeneity estimation uncertainty.
 Computation can be performed using a Monte Carlo algorithm generating
 independent samples, or using deterministic global adaptive quadrature
 integration. The latter is not recommended for few studies (3-5), since
-under these marginal distributions are slightly too wide. For mote than
+under these marginal distributions are slightly too wide. For more than
 five studies, both methods typically produce very similar results.
 
 ## Prediction
@@ -40,12 +40,10 @@ confidence distribution from Edgington’s method and over the confidence
 distribution of the heterogeneity parameter, thereby incorporating
 uncertainty about parameter estimation in both parameters. The
 predictive distributions are computed using a Monte Carlo sampling
-algorithm. Implemented are three forms of the predictive distribution: -
-Full CD: Uses the full marginalization scheme and is therein the most
-accurate (recommended). - Simplified CD: Uses a simplified approach, but
-accounts for uncertainty about both parameters. - Fixed $\hat{\tau^2}$:
-Does not account for heterogeneity estimation uncertainty and is
-typically too narrow except for a large number of studies.
+algorithm. Implemented are three forms of the predictive distribution: 
+- Full CD: Uses the full marginalization scheme and is therein the most accurate (recommended).
+- Simplified CD: Uses a simplified approach, but accounts for uncertainty about both parameters.
+- Fixed $\hat{\tau^2}$: Does not account for heterogeneity estimation uncertainty and is typically too narrow except for a large number of studies.
 
 ## Installation
 
