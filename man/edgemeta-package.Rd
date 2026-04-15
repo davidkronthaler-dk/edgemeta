@@ -14,7 +14,7 @@
 
   \code{PredDist} can be used to compute predictive distributions as well as prediction intervals.
 
-  \code{crps} provides a Monte Carlo approximation to compute continuous ranked probability scores for computational efficiency.
+  \code{crps} provides a computationally efficient Monte Carlo approximation to compute continuous ranked probability scores.
   
   \code{cdtau2} provides a confidence density of the heterogeneity paramter \eqn{\tau^2} derived from the generalized heterogeneity statistic.
 }
@@ -32,4 +32,6 @@ Held, L., Hofmann, F., & Pawel, S. (2025). \emph{A comparison of combined p-valu
 \seealso{
  \code{\link{PredDist}}
   \code{\link{remaeffect}}
+  \code{\link{crps}}
+  \code{\link{cdtau2}}
 }

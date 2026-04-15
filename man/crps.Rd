@@ -4,12 +4,12 @@
 \alias{crps}
 \title{Continuous Ranked Probability Score (CRPS)}
 \usage{
-crps(s, tn)
+crps(samples_pd, truth)
 }
 \arguments{
-\item{s}{A numeric vector of samples from the predictive distribution.}
+\item{samples_pd}{A numeric vector of samples from the predictive distribution.}
 
-\item{tn}{A numeric vector of future truths.}
+\item{truth}{A numeric vector of future truths.}
 }
 \value{
 A single numeric value representing the mean CRPS across all future truths.
@@ -23,15 +23,17 @@ If multiple future truths are provided, the function returns the mean CRPS acros
 }
 \details{
 A likely misconception is that supplying the same vector for both the predictive samples
-\code{s} and the truths \code{tn} should result in a CRPS of zero. This is not the case,
+\code{samples_pd} and the truths \code{truth} should result in a CRPS of zero. This is not the case,
 unless the vector contains only a single unique element. The reason is that each observed
-value in \code{tn} is evaluated against the \emph{entire} predictive distribution in \code{s}.
+value in \code{truth} is evaluated against the \emph{entire} predictive distribution in \code{samples_pd}.
 By contrast, if a truth value is evaluated against a predictive distribution that
 places all of its mass at that same value (i.e., a point mass), the CRPS is indeed zero.
 }
 \examples{
 # True data-generating distribution
 truth <- rnorm(100, 0, 3)
+
+# Predictive distribution
 pd <- rnorm(1000, 0.2, 2.8)
 
 # Compute CRPS

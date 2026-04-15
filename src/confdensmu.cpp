@@ -7,36 +7,22 @@
 using namespace Rcpp;
 using namespace std;
 
-// Confidence density of mu (evaluated for one mu)
+// Confidence density of mu; numeric derivative of Edgington's p-value function
 // [[Rcpp::export]]
-
-double cd_single(Rcpp::NumericVector h0,
-                 Rcpp::NumericVector es,
-                 Rcpp::NumericVector se,
-                 double h = 1e-4) {
+Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0,
+                           Rcpp::NumericVector es,
+                           Rcpp::NumericVector se,
+                           double h = 1e-4) {
   
   fntl::dfv f = [&](Rcpp::NumericVector x) {
     return pfctedge(x, es, se)[0];
   };
   
-  return fntl::fd_deriv(f, h0, 0, h);
-}
-
-// Confidence density of mu (evaluates multiple mu's)
-// [[Rcpp::export]]
-
-Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0,
-                           Rcpp::NumericVector es,
-                           Rcpp::NumericVector se,
-                           double h = 1e-4) { // same as in numDeriv::grad
-  
   Rcpp::NumericVector dv(h0.size());
   
   for (int ii = 0; ii < h0.size(); ++ii) {
-    dv[ii] = cd_single(Rcpp::NumericVector::create(h0[ii]), es, se, h);
+    dv[ii] = fntl::fd_deriv(f, Rcpp::NumericVector::create(h0[ii]), 0, h);
   }
   
   return dv;
 }
-  
-  

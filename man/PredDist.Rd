@@ -7,9 +7,9 @@
 PredDist(
   es,
   se,
-  method = "FullCD",
+  method = "PCD-full",
   level.pi = 0.95,
-  n_samples = 100000L,
+  B = 100000L,
   method.tau2 = "REML",
   seed = NULL
 )
@@ -19,13 +19,13 @@ PredDist(
 
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
 
-\item{method}{Either "FullCD" (recommended for practical application), "SimplifiedCD" or "FixedTau2". Check details for information.}
+\item{method}{Either "PCD-full" (recommended for practical application), "PCD-simplified" or "PCD-fixed". Check details for information.}
 
 \item{level.pi}{Coverage level of the equi-tailed prediction interval (numeric, between 0 and 1).}
 
-\item{n_samples}{Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).}
+\item{B}{Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).}
 
-\item{method.tau2}{In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity.
+\item{method.tau2}{In case method is "PCD-fixed" or "PCD-simplified", this determines the method of estimating the between-study heterogeneity.
 Check 'help(meta)' for information on estimation methods (default is "REML").}
 
 \item{seed}{Optional integer to ensure reproducibility of the random sampling.}
@@ -35,7 +35,7 @@ A list containing:
 \describe{
 \item{PI}{Prediction interval for a future effect \eqn{\theta_{new}}.}
 \item{samples}{A matrix containing samples \eqn{\theta_{new}^*} from the predictive distribution ('theta_new'), samples \eqn{\mu^*} from the confidence distribution of the average effect ('mu') and samples \eqn{\tau^{2*}} from the confidence distribution of the between-study heterogeneity ('tau2').
-The latter are not included in case \code{method = "FixedTau2"} is selected.}
+The latter are not included in case \code{method = "PCD-fixed"} is selected.}
 }
 }
 \description{
@@ -52,17 +52,17 @@ The approximate confidence distribution of \eqn{\tau^2} is implied by the genera
 
 The function supports three methods:
 \itemize{
-\item \strong{"FullCD"}: Samples \eqn{\tau^{2*}} are drawn from the approximate confidence distribution of \eqn{\tau^2}. For each drawn
+\item \strong{"PCD-full"}: Samples \eqn{\tau^{2*}} are drawn from the approximate confidence distribution of \eqn{\tau^2}. For each drawn
 \eqn{\tau^{2*} }, a corresponding \eqn{\mu^*} is conditionally drawn from Edgington's confidence distribution (, which is conditional
 on the heterogeneity parameter). For each pair (\eqn{\mu^*}, \eqn{\tau^{2*}}), a future effect \eqn{\theta_{new}^*} is drawn from
 a N(\eqn{\mu^*}, \eqn{\tau^{2*}}). This method fully accounts for uncertainty in both parameters and the dependence of Edgington's
 confidence distribution on the heterogeneity parameter.
-\item \strong{"SimplifiedCD"}: This method generates samples \eqn{\tau^{2*}} from the confidence distribution of
+\item \strong{"PCD-simplified"}: This method generates samples \eqn{\tau^{2*}} from the confidence distribution of
 \eqn{\tau^2}, but generates samples \eqn{\mu^*} using a simplified
 approach. Specifically, samples \eqn{\mu^*} are drawn conditional on a fixed \eqn{\hat{\tau}^2}.
 For each pair (\eqn{\mu^*}, \eqn{\tau^{2*}}), a future effect \eqn{\theta_{new}^*} is drawn from
 a N(\eqn{\mu^*}, \eqn{\tau^{2*}}).
-\item \strong{"FixedTau2"}: This method used a fixed estimate \eqn{\hat{\tau}^2}, and generates samples \eqn{\mu^*}
+\item \strong{"PCD-fixed"}: This method used a fixed estimate \eqn{\hat{\tau}^2}, and generates samples \eqn{\mu^*}
 conditional on this fixed estimate. Samples \eqn{\theta_{new}^*} are generated from a N(\eqn{\mu^*}, \eqn{\hat{\tau}^2}).
 }
 
@@ -73,7 +73,7 @@ summarize predictive uncertainty, or generate visualizations.
 \examples{
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-PredDist(es = es, se = se, method = "FullCD")
+PredDist(es = es, se = se, method = "PCD-full")
 }
 \references{
 Viechtbauer, W. (2007). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysis}. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514

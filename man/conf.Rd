@@ -2,7 +2,7 @@
 % Please edit documentation in R/generics.R
 \name{conf}
 \alias{conf}
-\title{Confidence Probabilities for Future Effects in Meta-Analysis}
+\title{Confidence Probabilities for Future Effects in Random-Effects Meta-Analysis}
 \usage{
 conf(obj, lower, upper)
 }

@@ -4,8 +4,13 @@ Title: Estimation and Prediction for Random-Effects Meta-Analysis using Edgingto
 Version: 1.0
 Date: 2025-04-29
 Authors@R: 
-    person("David", "Kronthaler", , "david.kronthaler@uzh.ch", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0004-9778-0249"))
+    person(
+        given = "David",
+        family = "Kronthaler",
+        email = "david.kronthaler@uzh.ch",
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0009-0004-9778-0249")
+    )
 Description: Frequentist estimation and prediction for random-effects meta-analysis
     using Edgington's method for combining p-value functions, or equivalently, 
     confidence distributions. Uncertainty about parameter estimates is accounted

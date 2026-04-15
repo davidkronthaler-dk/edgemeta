@@ -7,9 +7,9 @@
 using namespace Rcpp;
 using namespace std;
 
-// F: normalizing constant for c(tau2)
+// Normalizing constant: int c(tau2) dtau2
 // [[Rcpp::export]]
-double norftau2(NumericVector es, NumericVector se, double utau2) {
+double nor_ctau2(NumericVector es, NumericVector se, double utau2) {
   
   fntl::integrate_args args;
   args.subdivisions = 1000L; 
@@ -26,61 +26,31 @@ double norftau2(NumericVector es, NumericVector se, double utau2) {
   return out.value; 
 }
 
-// // Optimize ftau2
-// // [[Rcpp::export]]
-// double optftau2(NumericVector es, NumericVector se, double utau2) {
-//   fntl::optimize_args args;
-//   args.fnscale = -1;
-//   fntl::dfd f = [&](double x) -> double {
-//     Rcpp::NumericVector xx(1);
-//     xx[0] = x;
-//     return ftau2(es, se, xx)[0];
-//   };
-//   auto out = fntl::goldensection(f, -1, utau2, args);
-//   return out.par;
-// }
-
-
-// F: leftest non-zero point of ftau2(tau2)
-//  //[[Rcpp::export]]
-// double ftauzero(NumericVector es, NumericVector se, double step = 1e-4) {
-//   for (double tau = -1; tau <= 1e-1; tau += step) {
-//     double val = ftau2(es, se, Rcpp::NumericVector::create(tau))[0];
-//     if (val != 0.0) {
-//       return tau;  
-//     }
-//   }
-//   return 0;
-// }
-
-// F: Joint conf. density of mu, tau2
+// Joint confidence density: c(mu | tau2) * c(tau2)
 // [[Rcpp::export]]
 double jointCD(Rcpp::NumericVector mu, Rcpp::NumericVector tau2, 
                Rcpp::NumericVector es, Rcpp::NumericVector se,
                double C) {
-  int n = se.size();
-  Rcpp::NumericVector se_adjusted(n);
-  for (int i = 0; i < n; ++i) {
-    se_adjusted[i] = std::sqrt(se[i] * se[i] + tau2[0]);
+  int k = se.size();
+  Rcpp::NumericVector adj_se(k);
+  for (int i = 0; i < k; ++i) {
+    adj_se[i] = std::sqrt(se[i] * se[i] + tau2[0]);
   }
   
-  Rcpp::NumericVector cdmu = CD_cpp(mu, es, se_adjusted, 1e-4);
+  Rcpp::NumericVector cdmu = CD_cpp(mu, es, adj_se, 1e-4);
   Rcpp::NumericVector cdtau2 = ftau2(es, se, tau2) / C; // divide by normalizing constant    
   
   return cdmu[0] * cdtau2[0];
 }
 
-// F: marginal confidence density of mu (marginalized over tau2)
+// Marginal confidence density: c(mu) = int c(mu |tau2) * c(tau2) dtau2
 // [[Rcpp::export]]
 double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se,
                    double utau2) {
   
-  // normalization of tau2
-  double C = norftau2(es, se, utau2);
+  double C = nor_ctau2(es, se, utau2);
+  double ltau2 = 0;
   
-  double ltau2 = 0; //ftauzero(es, se, 1e-4);
-  
-  // marginal confidence density
   fntl::integrate_args args;
   args.subdivisions = 1000L;
   
@@ -98,7 +68,6 @@ double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se,
   return out.value;
 }
 
-// F: marginal confidence density of mu (marginalized over tau2, vector evaluation)
 // [[Rcpp::export]]
 Rcpp::NumericVector marCD(Rcpp::NumericVector mu, Rcpp::NumericVector es,
                           Rcpp::NumericVector se, double utau2) {
@@ -109,10 +78,9 @@ Rcpp::NumericVector marCD(Rcpp::NumericVector mu, Rcpp::NumericVector es,
   }
   
   return inter;
-  
 }
 
-// F: Confidence interval finding
+// Find confidence intervals from c(mu)
 // [[Rcpp::export]]
 NumericMatrix reff(NumericVector es,
                    NumericVector se,

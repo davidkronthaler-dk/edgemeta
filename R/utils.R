@@ -1,8 +1,8 @@
 vd_PredDist <- function(es, 
                         se, 
-                        method = c("FullCD", "SimplifiedCD", "FixedTau2"),
+                        method = c("PCD-full", "PCD-simplified", "PCD-fixed"),
                         lpi, 
-                        ns, 
+                        B, 
                         mtau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")
                         ) {
   
@@ -18,7 +18,7 @@ vd_PredDist <- function(es,
   mtau2 <- match.arg(mtau2)
   vd_es_se(es = es, se = se)
   vd_l(lpi)
-  vd_ns(ns)
+  vd_B(B)
 }
 
 vd_remaeffect <- function(
@@ -26,7 +26,7 @@ vd_remaeffect <- function(
   se,
   method = c("MC", "GAQ", "NHEU"),
   level.ci,
-  n_samples,
+  B,
   mu0,
   method.tau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")) {
   
@@ -42,7 +42,7 @@ vd_remaeffect <- function(
   method.tau2 <- match.arg(method.tau2)
   vd_es_se(es = es, se = se)
   vd_l(level.ci)
-  vd_ns(n_samples)
+  vd_B(B)
   vd_mu0(mu0)
 }
 
@@ -93,12 +93,12 @@ vd_l <- function(l){
   }
 }
 
-vd_ns <- function(ns) {
-  if (!is.numeric(ns) || length(ns) != 1 || ns %% 1 != 0 || ns <= 0 || !is.finite(ns)) {
-    stop("Number of samples ('n_samples') must be a finite, positive integer.", call. = FALSE)
+vd_B <- function(B) {
+  if (!is.numeric(B) || length(B) != 1 || B %% 1 != 0 || B <= 0 || !is.finite(B)) {
+    stop("Number of samples ('B') must be a finite, positive integer.", call. = FALSE)
   }
-  if (ns > 1e7 & ns < 1e8) cat("\n'n_samples' is set very high. Are you sure you require that many samples? Proceeding anyway:\n\n")
-  if (ns > 1e8) cat("\nThat many samples may be computationally stressful. Proceeding anyway:\n\n")
+  if (B > 1e7 & B < 1e8) cat("\n'B' is set very high. Are you sure you require that many samples? Proceeding anyway:\n\n")
+  if (B > 1e8) cat("\nThat many samples may be computationally stressful. Proceeding anyway:\n\n")
 }
 
 vd_tau2 <- function(tau2) {

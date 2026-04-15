@@ -8,17 +8,17 @@
 #'
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
-#' @param method Either "FullCD" (recommended for practical application), "SimplifiedCD" or "FixedTau2". Check details for information. 
+#' @param method Either "PCD-full" (recommended for practical application), "PCD-simplified" or "PCD-fixed". Check details for information. 
 #' @param level.pi Coverage level of the equi-tailed prediction interval (numeric, between 0 and 1).
-#' @param n_samples Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).
-#' @param method.tau2 In case method is "FixedTau2" or "SimplifiedCD", this determines the method of estimating the between-study heterogeneity. 
+#' @param B Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).
+#' @param method.tau2 In case method is "PCD-fixed" or "PCD-simplified", this determines the method of estimating the between-study heterogeneity. 
 #' Check 'help(meta)' for information on estimation methods (default is "REML").
 #' @param seed Optional integer to ensure reproducibility of the random sampling.
 #' @return A list containing:
 #' \describe{
 #'   \item{PI}{Prediction interval for a future effect \eqn{\theta_{new}}.}
 #'   \item{samples}{A matrix containing samples \eqn{\theta_{new}^*} from the predictive distribution ('theta_new'), samples \eqn{\mu^*} from the confidence distribution of the average effect ('mu') and samples \eqn{\tau^{2*}} from the confidence distribution of the between-study heterogeneity ('tau2').
-#'   The latter are not included in case \code{method = "FixedTau2"} is selected.}
+#'   The latter are not included in case \code{method = "PCD-fixed"} is selected.}
 #' }
 
 #' @author David Kronthaler
@@ -30,20 +30,20 @@
 #' 
 #'  The function supports three methods:
 #' 
-#' - **"FullCD"**: Samples \eqn{\tau^{2*}} are drawn from the approximate confidence distribution of \eqn{\tau^2}. For each drawn
+#' - **"PCD-full"**: Samples \eqn{\tau^{2*}} are drawn from the approximate confidence distribution of \eqn{\tau^2}. For each drawn
 #'  \eqn{\tau^{2*} }, a corresponding \eqn{\mu^*} is conditionally drawn from Edgington's confidence distribution (, which is conditional
 #'  on the heterogeneity parameter). For each pair (\eqn{\mu^*}, \eqn{\tau^{2*}}), a future effect \eqn{\theta_{new}^*} is drawn from
 #'  a N(\eqn{\mu^*}, \eqn{\tau^{2*}}). This method fully accounts for uncertainty in both parameters and the dependence of Edgington's
 #'  confidence distribution on the heterogeneity parameter.
 #' 
-#' - **"SimplifiedCD"**: This method generates samples \eqn{\tau^{2*}} from the confidence distribution of 
+#' - **"PCD-simplified"**: This method generates samples \eqn{\tau^{2*}} from the confidence distribution of 
 #'   \eqn{\tau^2}, but generates samples \eqn{\mu^*} using a simplified
 #'   approach. Specifically, samples \eqn{\mu^*} are drawn conditional on a fixed \eqn{\hat{\tau}^2}.
 #'   For each pair (\eqn{\mu^*}, \eqn{\tau^{2*}}), a future effect \eqn{\theta_{new}^*} is drawn from
 #'   a N(\eqn{\mu^*}, \eqn{\tau^{2*}}).
 #'   
 #' 
-#' - **"FixedTau2"**: This method used a fixed estimate \eqn{\hat{\tau}^2}, and generates samples \eqn{\mu^*}
+#' - **"PCD-fixed"**: This method used a fixed estimate \eqn{\hat{\tau}^2}, and generates samples \eqn{\mu^*}
 #'   conditional on this fixed estimate. Samples \eqn{\theta_{new}^*} are generated from a N(\eqn{\mu^*}, \eqn{\hat{\tau}^2}).
 #' 
 #' 
@@ -61,13 +61,13 @@
 #' @examples
 #' es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
 #' se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-#' PredDist(es = es, se = se, method = "FullCD")
+#' PredDist(es = es, se = se, method = "PCD-full")
 PredDist <-
   function(es,
            se,
-           method = "FullCD",
+           method = "PCD-full",
            level.pi = 0.95,
-           n_samples = 100000L,
+           B = 100000L,
            method.tau2 = "REML",
            seed = NULL) {
     
@@ -76,7 +76,7 @@ PredDist <-
                 se = se,
                 method = method,
                 lpi = level.pi,
-                ns = n_samples,
+                B = B,
                 mtau2 = method.tau2)
     
     # Reproducibility under MC
@@ -88,28 +88,28 @@ PredDist <-
     }
     
     # computation
-    if (method == "FixedTau2") {
+    if (method == "PCD-fixed") {
       rt = pd_cd(
         es = es,
         se = se,
         mtau2 = method.tau2,
         lpi = level.pi,
-        ns = n_samples
+        B = B
       )
-    } else if (method == "SimplifiedCD" | method == "FullCD") {
+    } else if (method == "PCD-simplified" | method == "PCD-full") {
       rt = pd_cd_tau2(
         es = es,
         se = se,
         lpi = level.pi,
         method = method,
-        ns = n_samples,
+        B = B,
         mtau2 = method.tau2
       )
     }
     
     class(rt) <- "metaprediction"
     attr(rt, "method") <- method
-    attr(rt, "n_samples") <- n_samples
+    attr(rt, "B") <- B
     attr(rt, "level_pi") <- level.pi
     attr(rt, "k") <- length(es)
     print(rt)
@@ -122,7 +122,7 @@ pd_cd <- function(es,
                   se, 
                   mtau2, 
                   lpi, 
-                  ns){
+                  B){
 
   # Estimate tau2
   ma <- run_metagen(es = es, se = se, mtau2 = mtau2)
@@ -137,10 +137,10 @@ pd_cd <- function(es,
   }
   
   # Generate samples of mu
-  s_mu <- samplemusimple(n_samples = ns, tau2 = tau2, es = es, se = se)
-  
+  s_mu <- samplemusimple(B = B, tau2 = tau2, es = es, se = se)
+
   # Generate samples of theta_new
-  s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(tau2)))
+  s_tn <- base::suppressWarnings(stats::rnorm(n = B, mean = s_mu, sd = sqrt(tau2)))
   
   # Combine
   s <- base::cbind(s_mu, s_tn)
@@ -158,24 +158,24 @@ pd_cd_tau2 <- function(es,
                        se, 
                        lpi, 
                        method,
-                       ns,
+                       B,
                        mtau2) {
 
   # Initial tau2
   ma <- run_metagen(es = es, se = se, mtau2 = mtau2)
 
   # Samples of tau2
-  s_tau2 <- samptau2(ns = ns, es = es, se = se, 
+  s_tau2 <- samptau2(B = B, es = es, se = se, 
                      upper = ma$tau2 + 100 * ma$se.tau2)
   # Samples of mu 
-  if (method == "SimplifiedCD") {
-    s_mu <- samplemusimple(n_samples = ns, tau2 = ma$tau2, es = es, se = se)
-  } else if (method == "FullCD") {
+  if (method == "PCD-simplified") {
+    s_mu <- samplemusimple(B = B, tau2 = ma$tau2, es = es, se = se)
+  } else if (method == "PCD-full") {
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
   }
   
   # Samples of theta_new
-  s_tn <- base::suppressWarnings(stats::rnorm(n = ns, mean = s_mu, sd = sqrt(s_tau2)))
+  s_tn <- base::suppressWarnings(stats::rnorm(n = B, mean = s_mu, sd = sqrt(s_tau2)))
 
   # Combine 
   s <- base::cbind(s_tau2, s_mu, s_tn)

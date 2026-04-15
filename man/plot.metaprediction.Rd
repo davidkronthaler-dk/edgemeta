@@ -2,7 +2,7 @@
 % Please edit documentation in R/generics.R
 \name{plot.metaprediction}
 \alias{plot.metaprediction}
-\title{Plotting Predictive and Confidence Distributions from metaprediction Class Objects}
+\title{Plot Predictive and Confidence Distributions from metaprediction Class Objects}
 \usage{
 \method{plot}{metaprediction}(x, param = c("theta_new", "mu", "tau2"), ...)
 }
@@ -16,14 +16,20 @@
 \description{
 Displays the predictive distribution for \code{param = "theta_new"} (future effect from random effects).
 For \code{param = "mu"} and \code{param = "tau2"}, the corresponding confidence distributions are shown.
-The latter is only valid if the estimation method in \code{PredDist} was not set to \code{"FixedTau2"}.
+The latter is only valid if the estimation method in \code{PredDist} was not set to \code{"PCD-fixed"}.
 }
 \examples{
 es <- c(0.17, 1.20, 1.10, -0.0019, -2.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
-pd <- PredDist(es = es, se = se, method = "FullCD")
+
+# Compute predictive distribution
+pd <- PredDist(es = es, se = se, method = "PCD-full")
+
+# Plot predictive distribution
 plot(pd, param = "theta_new", breaks = 100)
-plot(pd, param = "mu", main = "CD for Mu", xlab = "Mu values", ylab = "Density")
+
+# Plot confidence distribution of mu
+plot(pd, param = "mu", xlab = "mu", ylab = "c(mu)")
 }
 \author{
 David Kronthaler

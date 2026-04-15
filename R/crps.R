@@ -6,17 +6,17 @@
 #' the Monte Carlo approximation is implemented with a C++ backend.
 #' If multiple future truths are provided, the function returns the mean CRPS across all provided future truths.
 #'
-#' @param s A numeric vector of samples from the predictive distribution.
-#' @param tn A numeric vector of future truths.
+#' @param samples_pd A numeric vector of samples from the predictive distribution.
+#' @param truth A numeric vector of future truths.
 #'
 #' @return A single numeric value representing the mean CRPS across all future truths.
 #' 
 #' 
 #' @details
 #' A likely misconception is that supplying the same vector for both the predictive samples
-#' \code{s} and the truths \code{tn} should result in a CRPS of zero. This is not the case,
+#' \code{samples_pd} and the truths \code{truth} should result in a CRPS of zero. This is not the case,
 #' unless the vector contains only a single unique element. The reason is that each observed
-#' value in \code{tn} is evaluated against the *entire* predictive distribution in \code{s}.
+#' value in \code{truth} is evaluated against the *entire* predictive distribution in \code{samples_pd}.
 #' By contrast, if a truth value is evaluated against a predictive distribution that
 #' places all of its mass at that same value (i.e., a point mass), the CRPS is indeed zero.
 #'
@@ -31,15 +31,17 @@
 #' @examples
 #' # True data-generating distribution
 #' truth <- rnorm(100, 0, 3)
+#' 
+#' # Predictive distribution
 #' pd <- rnorm(1000, 0.2, 2.8)
 #'
 #' # Compute CRPS
 #' crps(pd, truth)
 #'
 #' @export
-crps <- function(s, tn) {
-  vd_crps(s = s, tn = tn)
-  r <- crpsCPP(s = s, t = tn)
+crps <- function(samples_pd, truth) {
+  vd_crps(s = samples_pd, tn = truth)
+  r <- crpsCPP(s = samples_pd, t = truth)
   return(r)
 }
 

@@ -1,7 +1,7 @@
 #' Estimate the Average Effect in Random-Effects Meta-Analysis via Edgington's Confidence Distribution
 #'
 #' Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
-#' are combined using Edgington's approach. The resulting combined confidence distribution of \eqn{\mu}, 
+#' are combined using Edgington's method. The resulting combined confidence distribution of \eqn{\mu}, 
 #' which is conditional on the heterogeneity parameter \eqn{\tau^2}, is integrated over an approximate confidence distribution of the latter
 #' to account for heterogeneity estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
 #' heterogeneity estimate.
@@ -10,7 +10,7 @@
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
 #' @param method Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach (compare details).
 #' @param level.ci Confidence level for the interval estimate (default is 0.95).
-#' @param n_samples Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.
+#' @param B Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.
 #' @param seed Optional integer to ensure reproducibility of the random sampling. Relevant when selecting \code{method = "MC"}.
 #' @param mu0 Parameter value under the null-hypothesis against which two-sided p-value is computed.
 #' @param method.tau2 Method to compute the heterogeneity estimate. Relevant when selecting \code{method = "NHEU"}.
@@ -66,7 +66,7 @@ remaeffect <- function(es,
                        se,
                        method = "MC",
                        level.ci = 0.95,
-                       n_samples = 100000L,
+                       B = 100000L,
                        seed = NULL,
                        mu0 = 0,
                        method.tau2 = "REML") {
@@ -77,7 +77,7 @@ remaeffect <- function(es,
     se = se,
     method = method,
     level.ci = level.ci,
-    n_samples = n_samples,
+    B = B,
     mu0 = mu0,
     method.tau2 = method.tau2
   )
@@ -87,7 +87,7 @@ remaeffect <- function(es,
       es = es,
       se = se,
       level.ci = level.ci,
-      n_samples = n_samples,
+      B = B,
       seed = seed,
       mu0 = mu0
     )
@@ -117,7 +117,7 @@ reffMC <-
   function(es,
            se,
            level.ci,
-           n_samples,
+           B,
            seed,
            mu0) {
     
@@ -134,17 +134,11 @@ reffMC <-
     
     # Sampling tau2 from its confidence distribution
     s_tau2 <- samptau2(
-      ns = n_samples,
+      B = B,
       es = es,
       se = se,
       upper = ma$tau2 + 100 * ma$se.tau2
     )
-    
-    # -------------------------------------------------------------------
-    # could include alternatively
-    # pimeta::pima(y = es, se = se, method = "boot", B = n_samples)$rnd
-    # to sample from the exact distribution of tau2 (also for 'PredDist')
-    # -------------------------------------------------------------------
     
     # Sampling from Edgingtons confidence distribution
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
@@ -166,7 +160,7 @@ reffMC <-
     cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
     cat("Details:\nMonte Carlo Algorithm (stochastic, independent samples)\n")
     cat("Number of Monte Carlo samples:",
-        format(n_samples, big.mark = ","),
+        format(B, big.mark = ","),
         "\n\n")
     cat("Number of studies:", length(es), "\n")
     cat("Average effect:", sprintf("%.3f", hmu), "\n")
@@ -286,7 +280,7 @@ reffNHEU <- function(es,
   p2s <- p1tp2(p1s)
   
   cat("\nRandom-Effects Meta-Analysis using Edgington's Method\n\n")
-  cat("Details: Heterogenetiy estimation uncertainty is NOT accounted for.\n")
+  cat("Details: Heterogeneity estimation uncertainty is NOT accounted for.\n")
   cat("Consider method = 'MC' or 'GAQ' to incorporate this.\n\n")
   cat("Number of studies:", length(es), "\n")
   cat("Average effect:", sprintf("%.3f", hmu$point), "\n")

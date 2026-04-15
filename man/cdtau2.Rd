@@ -24,7 +24,7 @@ Applying change of variables to \eqn{Q(\tau^2)} the approximate confidence densi
 \examples{
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33, -1.1, -0.98)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28, 0.45, 0.6)
-curve(cdtau2(x, es, se), 0, 7.5)
+curve(cdtau2(x, es, se), 0, 7.5, xlab = "tau2", ylab = "c(tau2)")
 }
 \references{
 Viechtbauer, W. (2006). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysis}. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514

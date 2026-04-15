@@ -7,26 +7,11 @@
 using namespace Rcpp;
 using namespace std;
 
-// One-sided Wald p-value function ("greater" alternative)
-// [[Rcpp::export]]
-Rcpp::NumericVector p_wald(double x,
-                           Rcpp::NumericVector es,
-                           Rcpp::NumericVector se) {
-  
-  Rcpp::NumericVector p = es.size();
-  
-  for (int ii = 0; ii < es.size(); ++ii) {
-    p[ii] = R::pnorm(es[ii], x, se[ii], false, false);
-  }
-  
-  return p;
-}
-
 // Edgington combined p-value function
 // [[Rcpp::export]]
 Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
-                                  Rcpp::NumericVector es,
-                                  Rcpp::NumericVector se) {
+                             Rcpp::NumericVector es,
+                             Rcpp::NumericVector se) {
   int k = es.size();
   int Lh0 = h0.size();
   
@@ -38,7 +23,7 @@ Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
     }
   }
   
-  // Compute Edgington combined p-values
+  // Edgington combined p-values
   Rcpp::NumericVector pcombined(Lh0);
   for (int i = 0; i < Lh0; ++i) {
     Rcpp::NumericVector row(k);
@@ -47,7 +32,6 @@ Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
       row[j] = ps(i, j);
     }
     
-    // Edgington combination (with normal approx for k >= 12)
     double s = sum(row);
     double pE = 0.0;
     
@@ -68,6 +52,21 @@ Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0,
   return pcombined;
 }
 
+// One-sided Wald p-value function ("greater" alternative)
+// [[Rcpp::export]]
+Rcpp::NumericVector p_wald(double x,
+                           Rcpp::NumericVector es,
+                           Rcpp::NumericVector se) {
+  
+  Rcpp::NumericVector p = es.size();
+  for (int ii = 0; ii < es.size(); ++ii) {
+    p[ii] = R::pnorm(es[ii], x, se[ii], false, false);
+  }
+  
+  return p;
+}
+
+
 // Point estimate from Edgington combined p-value function
 // [[Rcpp::export]]
 double opti_edge(Rcpp::NumericVector es,
@@ -75,40 +74,29 @@ double opti_edge(Rcpp::NumericVector es,
   
   // Find mean(p) = 0.5
   fntl::dfd f = [&](double x) {
-    
-    // One-sided p-values
     Rcpp::NumericVector p = p_wald(x, es, se);
-    
-    // Sum of p-values
     double s = 0.0;
-    
     for (int ii = 0; ii < es.size(); ++ii) {
       s += p[ii];
     }
-    
-    // Mean of p-values
     s/=es.size();
-    
     return s - 0.5;
-    
   };
   
-  // Root-finding settings
+  // Bracket
+  double max_se = *std::max_element(se.begin(), se.end());
+  double min_es = *std::min_element(es.begin(), es.end()) - max_se;
+  double max_es = *std::max_element(es.begin(), es.end()) + max_se;
+  
+  // find root
   fntl::findroot_args args;
   args.action = fntl::error_action::NONE;
-  
-  // Boundaries for root-finding
-  double min_es = *std::min_element(es.begin(), es.end()) - *std::max_element(se.begin(), se.end());
-  double max_es = *std::max_element(es.begin(), es.end()) + *std::max_element(se.begin(), se.end());
-  
-  // Find the root using Brent algorithm
   auto out = fntl::findroot_brent(f, min_es, max_es, args);
   
   return out.root;
-  
 }
 
-// Optimization of Edgington combined p-value function (point + CIs)
+// Point estimate and confidence interval from Edgington's p-value function
 //[[Rcpp::export]]
 Rcpp::List opti_num(NumericVector es, 
                     NumericVector se, 
@@ -125,8 +113,10 @@ Rcpp::List opti_num(NumericVector es,
   double ciupper = NA_REAL;
   
   if (ci) {
-    double min_es = *std::min_element(es.begin(), es.end()) - *std::max_element(se.begin(), se.end());
-    double max_es = *std::max_element(es.begin(), es.end()) + *std::max_element(se.begin(), se.end());
+    double max_se = *std::max_element(se.begin(), se.end());
+    double min_es = *std::min_element(es.begin(), es.end()) - max_se;
+    double max_es = *std::max_element(es.begin(), es.end()) + max_se;
+    
     double alpha = 1.0 - levelci;
     
     fntl::dfd fl = [&](double x) {
@@ -140,7 +130,6 @@ Rcpp::List opti_num(NumericVector es,
     fntl::findroot_args args;
     args.action = fntl::error_action::NONE;
     
-    // Find roots
     auto result_lower = fntl::findroot_brent(fl, min_es, max_es, args);
     auto result_upper = fntl::findroot_brent(fu, min_es, max_es, args);
     

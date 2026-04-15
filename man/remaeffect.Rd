@@ -9,7 +9,7 @@ remaeffect(
   se,
   method = "MC",
   level.ci = 0.95,
-  n_samples = 100000L,
+  B = 100000L,
   seed = NULL,
   mu0 = 0,
   method.tau2 = "REML"
@@ -24,7 +24,7 @@ remaeffect(
 
 \item{level.ci}{Confidence level for the interval estimate (default is 0.95).}
 
-\item{n_samples}{Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.}
+\item{B}{Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.}
 
 \item{seed}{Optional integer to ensure reproducibility of the random sampling. Relevant when selecting \code{method = "MC"}.}
 
@@ -45,7 +45,7 @@ A list, including not all, but some of these, depending on the method:
 }
 \description{
 Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
-are combined using Edgington's approach. The resulting combined confidence distribution of \eqn{\mu},
+are combined using Edgington's method. The resulting combined confidence distribution of \eqn{\mu},
 which is conditional on the heterogeneity parameter \eqn{\tau^2}, is integrated over an approximate confidence distribution of the latter
 to account for heterogeneity estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
 heterogeneity estimate.

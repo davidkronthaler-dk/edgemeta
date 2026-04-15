@@ -9,55 +9,39 @@
 using namespace Rcpp;
 using namespace std;
 
-// F: generalized Q statistic
+// Generalized heterogeneity statistic Q(tau2)
 // [[Rcpp::export]]
 double Q_cpp(Rcpp::NumericVector es, 
              Rcpp::NumericVector se, 
              double tau2) {
   
-  // Adjusted standard errors
-  Rcpp::NumericVector sea(se.size());
+  // Adjusted standard errors: adj_se = sqrt(se^2 + tau2)
+  Rcpp::NumericVector adj_se(se.size());
   for (int ii = 0; ii < se.size(); ++ii) {
-    sea[ii] = (se[ii] * se[ii] + tau2);
+    adj_se[ii] = (se[ii] * se[ii] + tau2);
   }
   
-  // IVWE
+  // Classical inverse-variance weights estimator
   double sumw = 0.0;
   for (int ii = 0; ii < se.size(); ++ii) {
-    sumw += 1.0 / sea[ii];
+    sumw += 1.0 / adj_se[ii];
   }
   double opt = 0.0;
   for (int ll = 0; ll < es.size(); ++ll) {
-    opt += (1 / sea[ll]) * es[ll];
+    opt += (1 / adj_se[ll]) * es[ll];
   }
   opt = opt / sumw;
   
-  // Compute Q(tau2)
+  // Q(tau2)
   double Q = 0.0;
   for (int ll = 0; ll < es.size(); ++ll) {
-    Q += std::pow(sea[ll], -1) * std::pow(es[ll] - opt, 2);
+    Q += std::pow(adj_se[ll], -1) * std::pow(es[ll] - opt, 2);
   }
   
   return Q;
 }
 
-// F: numerical derivative of generalized Q-statistic 
-// [[Rcpp::export]]
-double dQ_cpp(Rcpp::NumericVector es,
-              Rcpp::NumericVector se,
-              double tau2,
-              double h = 1e-8) {
-  
-  fntl::dfv f = [=](Rcpp::NumericVector x) {
-    return Q_cpp(es, se, x[0]);  
-  };
-  
-  Rcpp::NumericVector x0 = Rcpp::NumericVector::create(tau2); 
-  
-  return fntl::fd_deriv(f, x0, 0, h);
-}
-
-// F: analytic derivative of generalized Q-statistic
+// Analytic derivative of Q(tau2)
 // [[Rcpp::export]]
 double dQIVWE(NumericVector es,
               NumericVector se,
@@ -96,7 +80,7 @@ double dQIVWE(NumericVector es,
   return dQ;
 }
 
-// F: density of tau2 by change of variables
+// Confidence density c(tau2) by change of variables
 // [[Rcpp::export]]
 Rcpp::NumericVector ftau2(Rcpp::NumericVector es, 
                           Rcpp::NumericVector se, 
@@ -106,11 +90,6 @@ Rcpp::NumericVector ftau2(Rcpp::NumericVector es,
   
   for (int ll = 0; ll < tau2.size(); ++ll) {
     double tau = tau2[ll];
-    
-    // if (tau < 0.0) {
-    //   fd[ll] = 0.0;
-    //   continue;
-    // }
     
     double Q = Q_cpp(es, se, tau);
     double dQ = dQIVWE(es, se, tau);

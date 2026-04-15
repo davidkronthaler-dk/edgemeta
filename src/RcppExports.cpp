@@ -10,20 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// cd_single
-double cd_single(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, double h);
-RcppExport SEXP _edgemeta_cd_single(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type h0(h0SEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    Rcpp::traits::input_parameter< double >::type h(hSEXP);
-    rcpp_result_gen = Rcpp::wrap(cd_single(h0, es, se, h));
-    return rcpp_result_gen;
-END_RCPP
-}
 // CD_cpp
 Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, double h);
 RcppExport SEXP _edgemeta_CD_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP hSEXP) {
@@ -50,19 +36,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// p_wald
-Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _edgemeta_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(p_wald(x, es, se));
-    return rcpp_result_gen;
-END_RCPP
-}
 // pfctedge
 Rcpp::NumericVector pfctedge(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se);
 RcppExport SEXP _edgemeta_pfctedge(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP) {
@@ -73,6 +46,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     rcpp_result_gen = Rcpp::wrap(pfctedge(h0, es, se));
+    return rcpp_result_gen;
+END_RCPP
+}
+// p_wald
+Rcpp::NumericVector p_wald(double x, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _edgemeta_p_wald(SEXP xSEXP, SEXP esSEXP, SEXP seSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    rcpp_result_gen = Rcpp::wrap(p_wald(x, es, se));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -116,20 +102,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dQ_cpp
-double dQ_cpp(Rcpp::NumericVector es, Rcpp::NumericVector se, double tau2, double h);
-RcppExport SEXP _edgemeta_dQ_cpp(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP, SEXP hSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    Rcpp::traits::input_parameter< double >::type tau2(tau2SEXP);
-    Rcpp::traits::input_parameter< double >::type h(hSEXP);
-    rcpp_result_gen = Rcpp::wrap(dQ_cpp(es, se, tau2, h));
-    return rcpp_result_gen;
-END_RCPP
-}
 // dQIVWE
 double dQIVWE(NumericVector es, NumericVector se, double tau2);
 RcppExport SEXP _edgemeta_dQIVWE(SEXP esSEXP, SEXP seSEXP, SEXP tau2SEXP) {
@@ -156,16 +128,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// norftau2
-double norftau2(NumericVector es, NumericVector se, double utau2);
-RcppExport SEXP _edgemeta_norftau2(SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
+// nor_ctau2
+double nor_ctau2(NumericVector es, NumericVector se, double utau2);
+RcppExport SEXP _edgemeta_nor_ctau2(SEXP esSEXP, SEXP seSEXP, SEXP utau2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< double >::type utau2(utau2SEXP);
-    rcpp_result_gen = Rcpp::wrap(norftau2(es, se, utau2));
+    rcpp_result_gen = Rcpp::wrap(nor_ctau2(es, se, utau2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -226,6 +198,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// samplemu
+Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _edgemeta_samplemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type s_tau2(s_tau2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    rcpp_result_gen = Rcpp::wrap(samplemu(s_tau2, es, se));
+    return rcpp_result_gen;
+END_RCPP
+}
 // samponemu
 double samponemu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
 RcppExport SEXP _edgemeta_samponemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
@@ -239,16 +224,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// samplemu
-Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _edgemeta_samplemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+// samptau2
+Rcpp::NumericVector samptau2(int B, Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
+RcppExport SEXP _edgemeta_samptau2(SEXP BSEXP, SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type s_tau2(s_tau2SEXP);
+    Rcpp::traits::input_parameter< int >::type B(BSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(samplemu(s_tau2, es, se));
+    Rcpp::traits::input_parameter< double >::type upper(upperSEXP);
+    rcpp_result_gen = Rcpp::wrap(samptau2(B, es, se, upper));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -265,56 +251,40 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// samptau2
-Rcpp::NumericVector samptau2(int ns, Rcpp::NumericVector es, Rcpp::NumericVector se, double upper);
-RcppExport SEXP _edgemeta_samptau2(SEXP nsSEXP, SEXP esSEXP, SEXP seSEXP, SEXP upperSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    Rcpp::traits::input_parameter< double >::type upper(upperSEXP);
-    rcpp_result_gen = Rcpp::wrap(samptau2(ns, es, se, upper));
-    return rcpp_result_gen;
-END_RCPP
-}
 // samplemusimple
-Rcpp::NumericVector samplemusimple(int n_samples, double tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
-RcppExport SEXP _edgemeta_samplemusimple(SEXP n_samplesSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
+Rcpp::NumericVector samplemusimple(int B, double tau2, Rcpp::NumericVector es, Rcpp::NumericVector se);
+RcppExport SEXP _edgemeta_samplemusimple(SEXP BSEXP, SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n_samples(n_samplesSEXP);
+    Rcpp::traits::input_parameter< int >::type B(BSEXP);
     Rcpp::traits::input_parameter< double >::type tau2(tau2SEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    rcpp_result_gen = Rcpp::wrap(samplemusimple(n_samples, tau2, es, se));
+    rcpp_result_gen = Rcpp::wrap(samplemusimple(B, tau2, es, se));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_edgemeta_cd_single", (DL_FUNC) &_edgemeta_cd_single, 4},
     {"_edgemeta_CD_cpp", (DL_FUNC) &_edgemeta_CD_cpp, 4},
     {"_edgemeta_crpsCPP", (DL_FUNC) &_edgemeta_crpsCPP, 2},
-    {"_edgemeta_p_wald", (DL_FUNC) &_edgemeta_p_wald, 3},
     {"_edgemeta_pfctedge", (DL_FUNC) &_edgemeta_pfctedge, 3},
+    {"_edgemeta_p_wald", (DL_FUNC) &_edgemeta_p_wald, 3},
     {"_edgemeta_opti_edge", (DL_FUNC) &_edgemeta_opti_edge, 2},
     {"_edgemeta_opti_num", (DL_FUNC) &_edgemeta_opti_num, 5},
     {"_edgemeta_Q_cpp", (DL_FUNC) &_edgemeta_Q_cpp, 3},
-    {"_edgemeta_dQ_cpp", (DL_FUNC) &_edgemeta_dQ_cpp, 4},
     {"_edgemeta_dQIVWE", (DL_FUNC) &_edgemeta_dQIVWE, 3},
     {"_edgemeta_ftau2", (DL_FUNC) &_edgemeta_ftau2, 3},
-    {"_edgemeta_norftau2", (DL_FUNC) &_edgemeta_norftau2, 3},
+    {"_edgemeta_nor_ctau2", (DL_FUNC) &_edgemeta_nor_ctau2, 3},
     {"_edgemeta_jointCD", (DL_FUNC) &_edgemeta_jointCD, 5},
     {"_edgemeta_marCDsingle", (DL_FUNC) &_edgemeta_marCDsingle, 4},
     {"_edgemeta_marCD", (DL_FUNC) &_edgemeta_marCD, 4},
     {"_edgemeta_reff", (DL_FUNC) &_edgemeta_reff, 4},
-    {"_edgemeta_samponemu", (DL_FUNC) &_edgemeta_samponemu, 3},
     {"_edgemeta_samplemu", (DL_FUNC) &_edgemeta_samplemu, 3},
-    {"_edgemeta_samponetau2", (DL_FUNC) &_edgemeta_samponetau2, 3},
+    {"_edgemeta_samponemu", (DL_FUNC) &_edgemeta_samponemu, 3},
     {"_edgemeta_samptau2", (DL_FUNC) &_edgemeta_samptau2, 4},
+    {"_edgemeta_samponetau2", (DL_FUNC) &_edgemeta_samponetau2, 3},
     {"_edgemeta_samplemusimple", (DL_FUNC) &_edgemeta_samplemusimple, 4},
     {NULL, NULL, 0}
 };
