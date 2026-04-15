@@ -11,7 +11,7 @@
 
 The `edgemeta` package provides methods for frequentist random-effects
 meta-analysis using Edgington’s method. It contains methods for
-estimation of the average effect and prediction of future effects,
+estimation of the average effect and prediction of future study effects,
 constructed using confidence distributions.
 
 The methods are implemented in the C++ programming language to ensure
@@ -22,14 +22,17 @@ using the Rcpp interface.
 
 A combined $p$-value function, or equivalently, confidence distribution,
 is constructed by combining one-sided $p$-value functions from
-individual studies. The confidence distribution of the average effect is
+individual studies using Edgington’s $p$-value combination method. The
+combined $p$-value function of the average effect is a confidence
+distribution of the average effect conditional on the heterogeneity
+parameter. To account for heterogeneity estimation uncertainty, it is
 then marginalized over the confidence distribution of the heterogeneity
-parameter to account for heterogeneity estimation uncertainty.
-Computation can be performed using a Monte Carlo algorithm generating
-independent samples, or using deterministic global adaptive quadrature
-integration. The latter is not recommended for few studies (3-5), since
-under these marginal distributions are slightly too wide. For more than
-five studies, both methods typically produce very similar results.
+parameter. Computation can be performed using a Monte Carlo algorithm
+generating independent samples, or using deterministic global adaptive
+quadrature integration. The latter is not recommended for few studies
+(3-5), since under these marginal distributions are slightly too wide.
+For more than five studies, both methods typically produce very similar
+results.
 
 ## Prediction
 
@@ -40,10 +43,12 @@ confidence distribution from Edgington’s method and over the confidence
 distribution of the heterogeneity parameter, thereby incorporating
 uncertainty about parameter estimation in both parameters. The
 predictive distributions are computed using a Monte Carlo sampling
-algorithm. Implemented are three forms of the predictive distribution: 
-- Full CD: Uses the full marginalization scheme and is therein the most accurate (recommended).
-- Simplified CD: Uses a simplified approach, but accounts for uncertainty about both parameters.
-- Fixed $\hat{\tau^2}$: Does not account for heterogeneity estimation uncertainty and is typically too narrow except for a large number of studies.
+algorithm. Implemented are three forms of the predictive distribution: -
+PCD-full: Uses the full marginalization scheme and is therein the most
+accurate (recommended). - PCD-simplified: Uses a simplified approach,
+but accounts for uncertainty about both parameters. - PCD-fixed: Does
+not account for heterogeneity estimation uncertainty and is typically
+too narrow except for a large number of studies.
 
 ## Installation
 
@@ -60,13 +65,6 @@ devtools::install_github("davidkronthaler-dk/edgemeta")
 
 ## Example
 
-The `PredDist` function constructs an object of class `metaprediction`.
-Generic S3 methods (such as print, summary, or plot) are applicable. The
-function `PredDist` requires minimal input: a numeric vector of effect
-estimates, a corresponding vector of standard errors, and a string
-specifying the desired method. In case exact reproducibility of the
-result is required, a seed can be additionally set to ensure the latter.
-
 Assume observed data (estimates and standard errors) from *k = 5*
 independent studies. The average effect can be estimated using the
 `remaeffect` function:
@@ -79,7 +77,7 @@ es <- c(1.17,  2.20,  1.10, -0.0019, -1.33)
 se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 
 # Average effect and confidence interval
-me <- remaeffect(es = es, se = se, method = "MC") 
+remaeffect(es = es, se = se, method = "MC") 
 #> 
 #> CD-Edgington Random-Effects Meta-Analysis
 #> 
@@ -88,16 +86,16 @@ me <- remaeffect(es = es, se = se, method = "MC")
 #> Number of Monte Carlo samples: 100,000 
 #> 
 #> Number of studies: 5 
-#> Average effect: 0.632 
-#> 95% Confidence interval from -0.908 to 2.155 
-#> Two-sided p-value against H0: mu = 0 is 0.36118 
+#> Average effect: 0.630 
+#> 95% Confidence interval from -0.901 to 2.127 
+#> Two-sided p-value against H0: mu = 0 is 0.3579 
 #> 
 #> Summary of confidence distribution of the average effect:
-#>        2.5%    25.0%    Median      Mean    75.0%    97.5%
-#>  -0.9077253 0.175469 0.6398807 0.6318003 1.094872 2.155126
+#>        2.5%     25.0%    Median      Mean    75.0%    97.5%
+#>  -0.9012554 0.1774378 0.6353253 0.6302936 1.091239 2.127029
 
-# or me <- remaeffect(es = es, se = se, method = "GAQ")
-# or me <- remaeffect(es = es, se = se, method = "MHEU")
+# or: remaeffect(es = es, se = se, method = "GAQ")
+# or: remaeffect(es = es, se = se, method = "MHEU")
 
 # Further information: 'help(remaeffect)'
 ```
@@ -106,43 +104,30 @@ A frequentist predictive distribution can be computed using:
 
 ``` r
 # Computation of predictive distribution
-pd <- PredDist(es = es, se = se, method = "FullCD")
+pd <- PredDist(es = es, se = se, method = "PCD-full")
 #> 
-#> Predictive and Confidence Distributions for Random-Effects Meta-Analysis
+#> Predictive Distribution for Random-Effects Meta-Analysis
 #> 
 #> Number of studies: 5 
-#> Method: FullCD 
+#> Method: PCD-full 
 #> Number of Monte Carlo samples: 100,000 
 #> 
-#> 95% prediction interval from -3.239 to 4.575 
+#> 95% prediction interval from -3.238 to 4.523 
 #> 
-#> Summary of predictive distribution (PD):
-#>                2.5%  25.0% Median  Mean 75.0% 97.5%
-#> PD theta_new -3.239 -0.375  0.645 0.639 1.646 4.575
-#> 
-#> Confidence calculations:
-#> Confidence of `theta_new` lying between 0 and Inf:
-#> 0.66718
-#> Confidence of `theta_new` lying between -Inf and 0:
-#> 0.33282
-#> 
-#> Summary of confidence distributions (CD):
-#>           2.5% 25.0% Median  Mean 75.0%  97.5%
-#> CD mu   -0.908 0.177  0.639 0.631 1.091  2.146
-#> CD tau2  0.361 1.018  1.813 3.251 3.413 14.732
+#> Summary of predictive distribution:
+#>    2.5%  25.0% Median  Mean 75.0% 97.5%
+#>  -3.238 -0.386  0.637 0.629 1.645 4.523
+
+# or: PredDist(es = es, se = se, method = "PCD-simplified")
+# or: PredDist(es = es, se = se, method = "PCD-fixed")
 
 # 95% prediction interval
 pd$PI
 #>      2.5%     97.5% 
-#> -3.238599  4.575498
+#> -3.238030  4.522863
 
 # Plot the predictive distribution
-plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
-```
-
-<img src="man/figures/README-example predictive distribution-1.png" width="100%" />
-
-``` r
+# plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
 
 # Futher information: 'help(PredDist)'
 ```
