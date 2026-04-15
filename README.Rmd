@@ -79,7 +79,7 @@ pd <- PredDist(es = es, se = se, method = "PCD-full")
 pd$PI
 
 # Plot the predictive distribution
-plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
+# plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
 
 # Futher information: 'help(PredDist)'
 ```
