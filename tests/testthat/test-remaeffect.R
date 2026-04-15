@@ -3,11 +3,11 @@ se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 
 test_that("correct execution for key configurations", {
   conditions <- list(
-    list(method = "MC",    level.ci = 0.05, n_samples = 50,   seed = NULL, mu0 = 0,    method.tau2 = "REML"),
-    list(method = "GAQ",   level.ci = 0.5,  n_samples = 1000, seed = 5,   mu0 = 1,    method.tau2 = "PM"),
-    list(method = "NHEU",  level.ci = 0.99, n_samples = 50,   seed = NULL, mu0 = -Inf, method.tau2 = "REML"),
-    list(method = "MC",    level.ci = 0.5,  n_samples = 1000, seed = 5,   mu0 = Inf,  method.tau2 = "PM"),
-    list(method = "GAQ",   level.ci = 0.01, n_samples = 50,   seed = NULL, mu0 = 0,    method.tau2 = "REML")
+    list(method = "MC",    level.ci = 0.05, B = 50,   seed = NULL, mu0 = 0,    method.tau2 = "REML"),
+    list(method = "GAQ",   level.ci = 0.5,  B = 1000, seed = 5,   mu0 = 1,    method.tau2 = "PM"),
+    list(method = "NHEU",  level.ci = 0.99, B = 50,   seed = NULL, mu0 = -Inf, method.tau2 = "REML"),
+    list(method = "MC",    level.ci = 0.5,  B = 1000, seed = 5,   mu0 = Inf,  method.tau2 = "PM"),
+    list(method = "GAQ",   level.ci = 0.01, B = 50,   seed = NULL, mu0 = 0,    method.tau2 = "REML")
   )
   
   for (cond in conditions) {
@@ -17,7 +17,7 @@ test_that("correct execution for key configurations", {
         se = se,
         method = cond$method,
         level.ci = cond$level.ci,
-        n_samples = cond$n_samples,
+        B = cond$B,
         seed = cond$seed,
         mu0 = cond$mu0,
         method.tau2 = cond$method.tau2
@@ -43,8 +43,8 @@ test_that("handles invalid input types", {
   expect_error(remaeffect(es, se, NA))
   expect_error(remaeffect(es, se, "NHEU", method.tau2 = NA))
   expect_error(remaeffect(es, se, "NHEU", method.tau2 = NULL))
-  expect_error(remaeffect(es, se, "MC", n_samples = 1.5))
-  expect_error(remaeffect(es, se, "MC", n_samples = -Inf))
+  expect_error(remaeffect(es, se, "MC", B = 1.5))
+  expect_error(remaeffect(es, se, "MC", B = -Inf))
   expect_warning(remaeffect(es, se, "MC", seed = -100))
   expect_warning(expect_warning(expect_error(remaeffect(es, se, "MC", seed = Inf))))
   expect_warning(expect_warning(expect_error(remaeffect(es, se, "MC", seed = "hundred"))))
@@ -63,7 +63,7 @@ test_that("handles mu0 at boundary values", {
 test_that("tolerates small sample sizes", {
   es <- rnorm(2)
   se <- runif(2, 0.1, 0.5)
-  expect_no_error(remaeffect(es, se, method = "MC", n_samples = 5))
+  expect_no_error(remaeffect(es, se, method = "MC", B = 5))
   expect_no_error(remaeffect(es, se, method = "GAQ"))
   expect_no_error(remaeffect(es, se, method = "NHEU"))
   expect_error(remaeffect(es[1], se[1], method = "MC"))

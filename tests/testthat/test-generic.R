@@ -2,9 +2,9 @@ es = c(0.17,  1.20,  1.10, -0.0019, -2.33)
 se = c(0.52, 0.93, 0.63, 0.3, 0.28)
 
 # Correct run
-p1 <- PredDist(es = es, se  = se, method = "FullCD")
-p2 <- PredDist(es = es, se  = se, method = "SimplifiedCD")
-p3 <- PredDist(es = es, se  = se, method = "FixedTau2")
+p1 <- PredDist(es = es, se  = se, method = "PCD-full")
+p2 <- PredDist(es = es, se  = se, method = "PCD-simplified")
+p3 <- PredDist(es = es, se  = se, method = "PCD-fixed")
 
 # Plot
 test_that("Generic plotting works", {
