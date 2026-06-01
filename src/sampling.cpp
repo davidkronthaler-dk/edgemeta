@@ -29,7 +29,7 @@ Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
 
 // Generate one draw mu* from C(mu*|tau2) ~ U(0,1)
 // [[Rcpp::export]]
-double samponemu(double s_tau2,
+double samponemu(double tau2,
                  Rcpp::NumericVector es,
                  Rcpp::NumericVector se,
                  Rcpp::NumericVector w) {
@@ -37,25 +37,25 @@ double samponemu(double s_tau2,
   // Adjust standard errors: adj_se = sqrt(se^2 + tau2)
   Rcpp::NumericVector adj_se = clone(se);
   for (int i = 0; i < se.size(); ++i) {
-    adj_se[i] = std::sqrt(se[i] * se[i] + s_tau2);
+    adj_se[i] = std::sqrt(se[i] * se[i] + tau2);
   }
   
   // Bracketing
   double max_se = *std::max_element(se.begin(), se.end());
-  double min_es = *std::min_element(es.begin(), es.end()) - 4 * max_se; 
-  double max_es = *std::max_element(es.begin(), es.end()) + 4 * max_se; 
+  double lo = *std::min_element(es.begin(), es.end()) - 4 * max_se; 
+  double hi = *std::max_element(es.begin(), es.end()) + 4 * max_se; 
   
   // u ~ U(0,1)
   double u = R::runif(0, 1);
   
   // find root of C(mu*|tau2) = u
-  fntl::dfd f = [&](double h0) {
-    return pfctedgew(Rcpp::NumericVector::create(h0), es, adj_se, w)[0] - u;
+  fntl::dfd f = [&](double mu) {
+    return pfctedgew(Rcpp::NumericVector::create(mu), es, adj_se, w)[0] - u;
   };
   
   fntl::findroot_args args;
   args.action = fntl::error_action::NONE;
-  auto out = fntl::findroot_brent(f, min_es, max_es, args);
+  auto out = fntl::findroot_brent(f, lo, hi, args);
   
   return out.root;
 }
@@ -118,8 +118,8 @@ Rcpp::NumericVector samplemusimple(int B,
   
   // Bracketing
   double max_se = *std::max_element(se.begin(), se.end());
-  double min_es = *std::min_element(es.begin(), es.end()) - 4 * max_se;
-  double max_es = *std::max_element(es.begin(), es.end()) + 4 * max_se;
+  double lo = *std::min_element(es.begin(), es.end()) - 4 * max_se;
+  double hi = *std::max_element(es.begin(), es.end()) + 4 * max_se;
   
   // Generate n_sample random uniform numbers
   Rcpp::NumericVector u(B);
@@ -135,11 +135,11 @@ Rcpp::NumericVector samplemusimple(int B,
   for (int ll = 0; ll < B; ++ll) {
     double u_ll = u[ll];
     
-    fntl::dfd f = [&](double h0) {
-      return pfctedgew(Rcpp::NumericVector::create(h0), es, adj_se, w)[0] - u_ll;
+    fntl::dfd f = [&](double mu) {
+      return pfctedgew(Rcpp::NumericVector::create(mu), es, adj_se, w)[0] - u_ll;
     };
     
-    auto out = fntl::findroot_brent(f, min_es, max_es, args);
+    auto out = fntl::findroot_brent(f, lo, hi, args);
     smu[ll] = out.root;
   }
   

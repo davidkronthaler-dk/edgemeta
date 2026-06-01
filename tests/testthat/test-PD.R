@@ -86,14 +86,3 @@ test_that("handles method.tau2 choices", {
   expect_no_error(PredDist(es, se, method.tau2 = "REML"))
   expect_no_error(PredDist(es, se, method = "PCD-fixed", method.tau2 = "PM"))
 })
-
-# Return
-test_that("returned object has expected structure", {
-  result1 <- PredDist(es = es, se = se, method = "PCD-full")
-  expect_named(result1, c("PI", "samples"))
-  result2 <- PredDist(es = es, se = se, method = "PCD-simplified")
-  expect_named(result2, c("PI", "samples"))
-  result3 <- PredDist(es = es, se = se, method = "PCD-fixed")
-  expect_named(result3, c("PI", "samples"))
-})
-

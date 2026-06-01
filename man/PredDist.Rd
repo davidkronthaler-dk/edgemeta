@@ -74,9 +74,15 @@ distribution of future effects. This distribution can be used to compute predict
 summarize predictive uncertainty, or generate visualizations.
 }
 \examples{
-es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)
-se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
+# Effect estimates and standard errors
+es <- c(0.69, -0.22, -0.52, -0.77,  1.38, -0.34, -0.09)
+se <- c(1.15, 0.25, 0.15, 0.42, 0.93, 0.32, 0.58)
+
+# Predictive distribution PCD-full
 PredDist(es = es, se = se, method = "PCD-full")
+
+# Predictive distribution PCD-full weighting by inverse squared standard errors
+PredDist(es = es, se = se, method = "PCD-full", w = 1/se^2)
 }
 \references{
 Viechtbauer, W. (2007). \emph{Confidence intervals for the amount of heterogeneity in meta‐analysis}. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514

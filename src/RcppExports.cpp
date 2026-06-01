@@ -10,21 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// CD_cpp
-Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector w, double h);
-RcppExport SEXP _edgemeta_CD_cpp(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP wSEXP, SEXP hSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type h0(h0SEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
-    Rcpp::traits::input_parameter< double >::type h(hSEXP);
-    rcpp_result_gen = Rcpp::wrap(CD_cpp(h0, es, se, w, h));
-    return rcpp_result_gen;
-END_RCPP
-}
 // crpsCPP
 double crpsCPP(NumericVector s, NumericVector t);
 RcppExport SEXP _edgemeta_crpsCPP(SEXP sSEXP, SEXP tSEXP) {
@@ -38,16 +23,31 @@ BEGIN_RCPP
 END_RCPP
 }
 // pfctedgew
-Rcpp::NumericVector pfctedgew(Rcpp::NumericVector h0, Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector w);
-RcppExport SEXP _edgemeta_pfctedgew(SEXP h0SEXP, SEXP esSEXP, SEXP seSEXP, SEXP wSEXP) {
+Rcpp::NumericVector pfctedgew(Rcpp::NumericVector mu, Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector w);
+RcppExport SEXP _edgemeta_pfctedgew(SEXP muSEXP, SEXP esSEXP, SEXP seSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type h0(h0SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mu(muSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(pfctedgew(h0, es, se, w));
+    rcpp_result_gen = Rcpp::wrap(pfctedgew(mu, es, se, w));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CD_cpp
+Rcpp::NumericVector CD_cpp(Rcpp::NumericVector mu, Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector w, double h);
+RcppExport SEXP _edgemeta_CD_cpp(SEXP muSEXP, SEXP esSEXP, SEXP seSEXP, SEXP wSEXP, SEXP hSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
+    Rcpp::traits::input_parameter< double >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(CD_cpp(mu, es, se, w, h));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -179,16 +179,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // samponemu
-double samponemu(double s_tau2, Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector w);
-RcppExport SEXP _edgemeta_samponemu(SEXP s_tau2SEXP, SEXP esSEXP, SEXP seSEXP, SEXP wSEXP) {
+double samponemu(double tau2, Rcpp::NumericVector es, Rcpp::NumericVector se, Rcpp::NumericVector w);
+RcppExport SEXP _edgemeta_samponemu(SEXP tau2SEXP, SEXP esSEXP, SEXP seSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type s_tau2(s_tau2SEXP);
+    Rcpp::traits::input_parameter< double >::type tau2(tau2SEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type es(esSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type se(seSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(samponemu(s_tau2, es, se, w));
+    rcpp_result_gen = Rcpp::wrap(samponemu(tau2, es, se, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -236,9 +236,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_edgemeta_CD_cpp", (DL_FUNC) &_edgemeta_CD_cpp, 5},
     {"_edgemeta_crpsCPP", (DL_FUNC) &_edgemeta_crpsCPP, 2},
     {"_edgemeta_pfctedgew", (DL_FUNC) &_edgemeta_pfctedgew, 4},
+    {"_edgemeta_CD_cpp", (DL_FUNC) &_edgemeta_CD_cpp, 5},
     {"_edgemeta_Q_cpp", (DL_FUNC) &_edgemeta_Q_cpp, 3},
     {"_edgemeta_dQIVWE", (DL_FUNC) &_edgemeta_dQIVWE, 3},
     {"_edgemeta_ftau2", (DL_FUNC) &_edgemeta_ftau2, 3},

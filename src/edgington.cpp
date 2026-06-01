@@ -7,21 +7,21 @@
 using namespace Rcpp;
 using namespace std;
 
-// Weighted Edgington combined p-value function
+// (Weighted) Edgington combined p-value function
 // [[Rcpp::export]]
-Rcpp::NumericVector pfctedgew(Rcpp::NumericVector h0,
+Rcpp::NumericVector pfctedgew(Rcpp::NumericVector mu,
                               Rcpp::NumericVector es,
                               Rcpp::NumericVector se,
                               Rcpp::NumericVector w) {
   
   int k = es.size();
-  int Lh0 = h0.size();
+  int Lmu = mu.size();
   
   // Check whether all weights are 1
-  bool all_one = true;
+  bool all_weights_one = true;
   for (int j = 0; j < k; ++j) {
     if (w[j] != 1.0) {
-      all_one = false;
+      all_weights_one = false;
       break;
     }
   }
@@ -42,25 +42,22 @@ Rcpp::NumericVector pfctedgew(Rcpp::NumericVector h0,
   double neff = (sumw2 * sumw2) / sumw4;
   
   // Individual study p-value functions
-  Rcpp::NumericMatrix ps(Lh0, k);
-  
+  Rcpp::NumericMatrix ps(Lmu, k);
   for (int j = 0; j < k; ++j) {
-    for (int i = 0; i < Lh0; ++i) {
-      ps(i, j) = 1.0 - R::pnorm(es[j], h0[i], se[j], 1, 0);
+    for (int i = 0; i < Lmu; ++i) {
+      ps(i, j) = 1.0 - R::pnorm(es[j], mu[i], se[j], 1, 0);
     }
   }
   
   // Combined p-values
-  Rcpp::NumericVector pcombined(Lh0);
+  Rcpp::NumericVector pcombined(Lmu);
   
-  for (int i = 0; i < Lh0; ++i) {
+  for (int i = 0; i < Lmu; ++i) {
     
     // Standard Edgington (all weights = 1)
-
-    if (all_one) {
+    if (all_weights_one) {
       
       double s = 0.0;
-      
       for (int j = 0; j < k; ++j) {
         s += ps(i, j);
       }
@@ -70,78 +67,87 @@ Rcpp::NumericVector pfctedgew(Rcpp::NumericVector h0,
       if (k < 12) {
         
         int upper = std::floor(s);
-        
         for (int ll = 0; ll <= upper; ++ll) {
-          pE += std::pow(-1.0, ll) *
-            R::choose(k, ll) *
-            std::pow(s - ll, k);
+          pE += std::pow(-1.0, ll) * R::choose(k, ll) * std::pow(s - ll, k);
         }
-        
         pE /= R::gammafn(k + 1.0);
-        
       } else {
         
         double z = std::sqrt(12.0 * k) * (s / k - 0.5);
-        
         pE = R::pnorm(z, 0.0, 1.0, 1, 0);
       }
       
       pcombined[i] = pE;
       
     } else {
-      
       // Weighted Edgington
-
-      double sw = 0.0;
       
+      // Sum of weighted p-values
+      double sw = 0.0;
       for (int j = 0; j < k; ++j) {
         sw += w[j] * ps(i, j);
       }
       
-      double pW = 0.0;
+      double pWE = 0.0;
       
       if (neff < 12.0) {
+      // Exact method
         
-        int nsubsets = 1 << k;
+        int v = 1 << k; //2^k bit vectors (1,0,0), (1,1,0), ...
         
-        for (int mask = 0; mask < nsubsets; ++mask) {
+        for (int mask = 0; mask < v; ++mask) {
           
           double wTv = 0.0;
-          int bits = 0;
+          int sumv = 0;
           
           for (int j = 0; j < k; ++j) {
-            
-            if (mask & (1 << j)) {
+            if (mask & (1 << j)) { // has j a 1 in mask?
               wTv += w[j];
-              ++bits;
+              ++sumv;
             }
           }
           
           double diff = sw - wTv;
-          
           if (diff >= 0.0) {
-            
-            pW += std::pow(-1.0, bits) *
-              std::pow(diff, k);
+            pWE += std::pow(-1.0, sumv) * std::pow(diff, k);
           }
         }
         
-        pW /= (R::gammafn(k + 1.0) * prodw);
+        pWE /= (R::gammafn(k + 1.0) * prodw);
         
       } else {
-        
-        double mn = sumw / 2.0;
-        double sd = std::sqrt(sumw2 / 12.0);
-        
-        pW = R::pnorm(sw, mn, sd, 1, 0);
+        // Approximation (as in confMeta)
+        pWE = R::pnorm(sw, sumw / 2.0, std::sqrt(sumw2 / 12.0), 1, 0);
       }
       
-      pcombined[i] = pW;
+      pcombined[i] = pWE;
     }
   }
   
   return pcombined;
 }
+
+// Confidence density of mu (derivative of Edgington's p-value function)
+// [[Rcpp::export]]
+Rcpp::NumericVector CD_cpp(Rcpp::NumericVector mu,
+                           Rcpp::NumericVector es,
+                           Rcpp::NumericVector se,
+                           Rcpp::NumericVector w,
+                           double h = 1e-4) {
+  
+  fntl::dfv f = [&](Rcpp::NumericVector x) {
+    return pfctedgew(x, es, se, w)[0];
+  };
+  
+  Rcpp::NumericVector dv(mu.size());
+  
+  for (int ii = 0; ii < mu.size(); ++ii) {
+    dv[ii] = fntl::fd_deriv(f, Rcpp::NumericVector::create(mu[ii]), 0, h);
+  }
+  
+  return dv;
+}
+
 
 // Edgington combined p-value function
 // // [[Rcpp::export]]
@@ -187,7 +193,7 @@ Rcpp::NumericVector pfctedgew(Rcpp::NumericVector h0,
 //   
 //   return pcombined;
 // }
-
+//
 // One-sided Wald p-value function ("greater" alternative)
 // // [[Rcpp::export]]
 // Rcpp::NumericVector p_wald(double x,
@@ -201,8 +207,7 @@ Rcpp::NumericVector pfctedgew(Rcpp::NumericVector h0,
 //   
 //   return p;
 // }
-
-
+//
 // Point estimate from Edgington combined p-value function
 // // [[Rcpp::export]]
 // double opti_edge(Rcpp::NumericVector es,

@@ -9,6 +9,8 @@ S3method(plot, edgemeta)
 S3method(print, edgemeta)
 S3method(conf, edgemeta)
 
+S3method(print, remaeffect)
+
 export(plot.edgemeta)
 export(conf)
 

@@ -70,51 +70,36 @@ remaeffect <- function(es,
                        mu0 = 0) {
   
   # validate input
-  vd_remaeffect(
-    es = es,
-    se = se,
-    w = w,
-    method = method,
-    level.ci = level.ci,
-    B = B,
-    mu0 = mu0
+  vd_remaeffect(es = es, se = se, w = w, method = method, level.ci = level.ci,
+                B = B, mu0 = mu0)
+  
+  out <- switch(
+    method,
+    "MC" = reffMC(es = es, se = se, w = w, level.ci = level.ci, B = B,
+                  seed = seed, mu0 = mu0),
+    "GAQ" = reffAQ(es = es, se = se, w = w, level.ci = level.ci, mu0 = mu0)
   )
   
+  out$method <- method
+  out$level.ci <- level.ci
+  out$k <- length(es)
+  out$weights <- w
+  out$mu0 <- mu0
+  out$es  <- es
+  out$se  <- se
   if (method == "MC") {
-    r <- reffMC(
-      es = es,
-      se = se,
-      w = w,
-      level.ci = level.ci,
-      B = B,
-      seed = seed,
-      mu0 = mu0
-    )
-  } else if (method == "GAQ") {
-    r <- reffAQ(
-      es = es,
-      se = se,
-      w = w,
-      level.ci = level.ci,
-      mu0 = mu0
-    )
+    out$B <- B
   }
+  class(out) <- "remaeffect"
   
-  invisible(r)
+  out
 }
 
 
-# Estimate 'mu' using Monte Carlo algorithm
-reffMC <-
-  function(es,
-           se,
-           w, 
-           level.ci,
-           B,
-           seed,
-           mu0) {
+# Estimate average effect (mu) using Monte Carlo algorithm
+reffMC <- function(es, se, w, level.ci, B, seed, mu0) {
     
-    # Reproducibility under MC
+    # Reproducibility
     if (!is.null(seed)) {
       if (!is.wholepositivenumber(seed)) {
         warning("Seed must be a valid scalar integer.")
@@ -122,25 +107,16 @@ reffMC <-
       set.seed(seed)
     }
     
-    # Initial tau2 for definition of grid
+    # Sample heterogeneity (tau2*) from its confidence distribution
     ma <- run_metagen(es = es, se = se, mtau2 = "REML")
+    s_tau2 <- samptau2(B = B, es = es, se = se, upper = ma$tau2+100*ma$se.tau2)
     
-    # Sampling tau2 from its confidence distribution
-    s_tau2 <- samptau2(
-      B = B,
-      es = es,
-      se = se,
-      upper = ma$tau2 + 100 * ma$se.tau2
-    )
-    
-    # Sampling from Edgingtons confidence distribution
+    # Sample average effect (mu*) from Edgingtons confidence distribution
     s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se, w = w)
     
     # Point estimate
     hmu <- base::mean(s_mu, na.rm = T)
-    ci <- stats::quantile(x = s_mu,
-                          p = (1 + level.ci * c(-1, 1)) / 2,
-                          na.rm = T)
+    ci <- stats::quantile(x = s_mu, p = (1 + level.ci * c(-1,1)) / 2, na.rm = T)
     
     # ---------------------------
     # could include HCD intervals
@@ -148,40 +124,6 @@ reffMC <-
     
     # Two-sided p-value at mu = mu0
     p2s <- 2 * min(mean(s_mu <= mu0), mean(s_mu >= mu0))
-    
-    # Visual output
-    cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
-    cat("Details:\nMonte Carlo Algorithm (stochastic, independent samples)\n")
-    cat("Number of Monte Carlo samples:",
-        format(B, big.mark = ","),
-        "\n\n")
-    cat("Number of studies:", length(es), "\n")
-    cat("Average effect:", sprintf("%.3f", hmu), "\n")
-    cat(
-      paste0(level.ci * 100, "%"),
-      "Confidence interval from",
-      paste(sprintf("%.3f", ci), collapse = " to "),
-      "\n"
-    )
-    cat("Two-sided p-value against H0: mu =",
-        mu0,
-        "is",
-        round(p2s, 5),
-        "\n\n")
-    cat("Summary of confidence distribution of the average effect:\n")
-    probs <- c(0.025, 0.25, 0.5, 0.75, 0.975)
-    qs <- stats::quantile(s_mu, probs, na.rm = TRUE)
-    m <- mean(s_mu, na.rm = TRUE)
-    stats <- c(qs[1:2], Median = qs[3], Mean = m, qs[4:5])
-    names(stats) <- c(
-      sprintf("%.1f%%", probs[1] * 100),
-      sprintf("%.1f%%", probs[2] * 100),
-      "Median",
-      "Mean",
-      sprintf("%.1f%%", probs[4] * 100),
-      sprintf("%.1f%%", probs[5] * 100)
-    )
-    print(as.data.frame(t(stats)), row.names = FALSE)
     
     # Return
     invisible(list(
@@ -193,19 +135,13 @@ reffMC <-
     ))
   }
 
-# Estimate 'mu' using deterministic global adaptive quadrature integration
-reffAQ <- function(es,
-                   se, 
-                   w,
-                   level.ci, 
-                   mu0) {
-  
-  # Upper integration bound of tau2
-  ma <- run_metagen(es = es, se = se, mtau2 = "REML")
-  utau2 <- ma$tau2 + 100 * ma$se.tau2
+# Estimate average effect (mu) with global adaptive quadrature integration
+reffAQ <- function(es, se, w, level.ci, mu0) {
   
   # Marginal confidence distribution function of mu 
-  cdfmu <- reff(es, se, w, utau2) 
+  ma <- run_metagen(es = es, se = se, mtau2 = "REML")
+  utau2 <- ma$tau2 + 100 * ma$se.tau2
+  cdfmu <- reff(es = es, se = se, w = w, utau2 = utau2, grid_step = 0.01)
   
   # Confidence interval (by inversion of CDF)
   quant <- function(p) {
@@ -214,14 +150,7 @@ reffAQ <- function(es,
   ci <- quant(c((1 - level.ci) / 2, (1 + level.ci) / 2))
   
   # Confidence density function
-  fcd <- function(mu)
-    marCD(
-      mu = mu,
-      es = es,
-      se = se,
-      w = w,
-      utau2 = utau2
-    )
+  fcd <- function(mu) marCD(mu = mu, es = es, se = se, w = w,  utau2 = utau2)
   
   # Point estimate
   dx <- diff(cdfmu[, 1]) # equi-spaced distance
@@ -231,25 +160,8 @@ reffAQ <- function(es,
   
   # P-value against H0: mu = 0
   p1sf <- stats::approxfun(cdfmu[, 1], cdfmu[, 2], yleft = 0, yright = 1)
-  p1s <- p1sf(mu0)    # one-sided p-value
-  p2s <- p1tp2(p1s)   # two-sided p-value
-  
-  # Visual output
-  cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
-  cat("Details: Global Adaptive Quadrature Integration\n\n")
-  cat("Number of studies:", length(es), "\n")
-  cat("Average effect:", sprintf("%.3f", hmu), "\n")
-  cat(
-    paste0(level.ci * 100, "%"),
-    "Confidence interval from",
-    paste(sprintf("%.3f", ci), collapse = " to "),
-    "\n"
-  )
-  cat("Two-sided p-value against H0: mu =",
-      mu0,
-      "is",
-      round(p2s, 5),
-      "\n\n")
+  p1s <- p1sf(mu0)                           # one-sided p-value
+  p2s <- ifelse(p1s <= 0.5, p1s*2, 2*(1-p1s))   # two-sided p-value
   
   # Return
   invisible(list(
@@ -260,22 +172,29 @@ reffAQ <- function(es,
   ))
 }
 
-# Transform one-sided to two-sided p-value
-p1tp2 <- function(p1) {
-  if (p1 <= 0.5) {
-    return(p1 * 2)
-  } else if (p1 > 0.5) {
-    return(2 * (1 - p1))
+print.remaeffect <- function(x, ...) {
+  cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
+  cat("Method:", x$method, "\n")
+  weight_type <- "custom"
+  if (isTRUE(all.equal(x$w, 1/x$se^2, tolerance = 1e-4, check.attributes = FALSE))) {
+    weight_type <- "inverse squared standard errors (1/se^2)"
+  } else if (isTRUE(all.equal(x$w, 1/se, tolerance = 1e-4, check.attributes = FALSE))) {
+    weight_type <- "inverse standard errors (1/se)"
+  } else if (all(abs(x$w - 1) < 1e-4)) {
+    weight_type <- "unweighted"
   }
+  base::cat("Weights:", weight_type, "\n")
+  if (!is.null(x$B)) {
+    cat("Number of Monte Carlo samples:", format(x$B, big.mark = ","), "\n")
+  }
+  cat("Number of studies:", x$k, "\n\n")
+  cat("Average effect:", sprintf("%.3f", x$estimate), "\n")
+  cat(paste0(x$level.ci * 100, "%"), "confidence interval from",
+      paste(sprintf("%.3f", x$CI), collapse = " to "), "\n"
+  )
+  cat("Two-sided p-value against H0: mu =", x$mu0, "is", round(x$pval, 5), "\n")
+  invisible(x)
 }
-
-# For RNG seeds
-is.wholepositivenumber <- function(x, tol = .Machine$double.eps^0.5) {
-  if (!is.numeric(x)) return(FALSE)
-  return(is.finite(x) & abs(x - round(x)) < tol & x > 0)
-}
-
-
 
 
 
