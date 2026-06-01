@@ -8,11 +8,11 @@ remaeffect(
   es,
   se,
   method = "MC",
+  w = rep(1, length(es)),
   level.ci = 0.95,
   B = 100000L,
   seed = NULL,
-  mu0 = 0,
-  method.tau2 = "REML"
+  mu0 = 0
 )
 }
 \arguments{
@@ -20,7 +20,9 @@ remaeffect(
 
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
 
-\item{method}{Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach (compare details).}
+\item{method}{Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration (compare details).}
+
+\item{w}{Study-specific weights.}
 
 \item{level.ci}{Confidence level for the interval estimate (default is 0.95).}
 
@@ -29,8 +31,6 @@ remaeffect(
 \item{seed}{Optional integer to ensure reproducibility of the random sampling. Relevant when selecting \code{method = "MC"}.}
 
 \item{mu0}{Parameter value under the null-hypothesis against which two-sided p-value is computed.}
-
-\item{method.tau2}{Method to compute the heterogeneity estimate. Relevant when selecting \code{method = "NHEU"}.}
 }
 \value{
 A list, including not all, but some of these, depending on the method:
@@ -65,8 +65,6 @@ heterogeneity parameter, is constructed, from which point estimates and confiden
 is constructed by change of variables. Global adaptive quadrature integration is used to integrate Edgington's confidence density
 over the confidence density of \eqn{\tau^2}. This typically corresponds to the MC confidence distribution, except if very few
 studies are available. In this case, GAQ integration may produce slightly too wide confidence distributions and intervals.}
-\item{\code{NHEU}:}{Derives point estimates and intervals directly from Edgington's approach wihtout adjusting for uncertainty
-in the heterogeneity estimate (Held et al, 2025).}
 }
 
 The methods \code{MC} and \code{GAQ} always produces confidence intervals reflecting potential heterogeneity, and are applicable only

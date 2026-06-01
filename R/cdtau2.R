@@ -22,7 +22,7 @@
 #' se <- c(0.52, 0.93, 0.63, 0.3, 0.28, 0.45, 0.6)
 #' curve(cdtau2(x, es, se), 0, 7.5, xlab = "tau2", ylab = "c(tau2)")
 cdtau2 <- function(tau2, es, se){
-  vd_es_se(es = es, se = se)
+  vd_es_se_w(es = es, se = se, w = rep(1, length(es))) # w is filler for checking function here
   vd_tau2(tau2)
   cd <- ftau2(es = es, se = se, tau2 = tau2)
   return(cd)

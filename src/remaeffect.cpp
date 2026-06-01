@@ -2,14 +2,16 @@
 #include <Rcpp.h>
 #include "fntl.h"
 
-#include "metaprediction.h"
+#include "edgemeta.h"
 
 using namespace Rcpp;
 using namespace std;
 
 // Normalizing constant: int c(tau2) dtau2
 // [[Rcpp::export]]
-double nor_ctau2(NumericVector es, NumericVector se, double utau2) {
+double nor_ctau2(NumericVector es, 
+                 NumericVector se, 
+                 double utau2) {
   
   fntl::integrate_args args;
   args.subdivisions = 1000L; 
@@ -28,16 +30,20 @@ double nor_ctau2(NumericVector es, NumericVector se, double utau2) {
 
 // Joint confidence density: c(mu | tau2) * c(tau2)
 // [[Rcpp::export]]
-double jointCD(Rcpp::NumericVector mu, Rcpp::NumericVector tau2, 
-               Rcpp::NumericVector es, Rcpp::NumericVector se,
+double jointCD(Rcpp::NumericVector mu, 
+               Rcpp::NumericVector tau2, 
+               Rcpp::NumericVector es, 
+               Rcpp::NumericVector se,
+               Rcpp::NumericVector w,
                double C) {
+  
   int k = se.size();
   Rcpp::NumericVector adj_se(k);
   for (int i = 0; i < k; ++i) {
     adj_se[i] = std::sqrt(se[i] * se[i] + tau2[0]);
   }
   
-  Rcpp::NumericVector cdmu = CD_cpp(mu, es, adj_se, 1e-4);
+  Rcpp::NumericVector cdmu = CD_cpp(mu, es, adj_se, w, 1e-4);
   Rcpp::NumericVector cdtau2 = ftau2(es, se, tau2) / C; // divide by normalizing constant    
   
   return cdmu[0] * cdtau2[0];
@@ -45,7 +51,10 @@ double jointCD(Rcpp::NumericVector mu, Rcpp::NumericVector tau2,
 
 // Marginal confidence density: c(mu) = int c(mu |tau2) * c(tau2) dtau2
 // [[Rcpp::export]]
-double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se,
+double marCDsingle(double mu,
+                   Rcpp::NumericVector es,
+                   Rcpp::NumericVector se,
+                   Rcpp::NumericVector w,
                    double utau2) {
   
   double C = nor_ctau2(es, se, utau2);
@@ -60,7 +69,7 @@ double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se,
   fntl::dfd f = [&](double tau2_scalar) -> double {
     Rcpp::NumericVector tau2_vec(1);
     tau2_vec[0] = tau2_scalar;
-    return jointCD(mu_vec, tau2_vec, es, se, C);
+    return jointCD(mu_vec, tau2_vec, es, se, w, C);
   };
   
   fntl::integrate_result out = fntl::integrate(f, ltau2, utau2, args);
@@ -69,12 +78,15 @@ double marCDsingle(double mu, Rcpp::NumericVector es, Rcpp::NumericVector se,
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericVector marCD(Rcpp::NumericVector mu, Rcpp::NumericVector es,
-                          Rcpp::NumericVector se, double utau2) {
+Rcpp::NumericVector marCD(Rcpp::NumericVector mu, 
+                          Rcpp::NumericVector es,
+                          Rcpp::NumericVector se, 
+                          Rcpp::NumericVector w, 
+                          double utau2) {
   
   Rcpp::NumericVector inter(mu.size());
   for (int ii = 0; ii < mu.size(); ++ii) {
-    inter[ii] = marCDsingle(mu[ii], es, se, utau2);
+    inter[ii] = marCDsingle(mu[ii], es, se, w, utau2);
   }
   
   return inter;
@@ -84,6 +96,7 @@ Rcpp::NumericVector marCD(Rcpp::NumericVector mu, Rcpp::NumericVector es,
 // [[Rcpp::export]]
 NumericMatrix reff(NumericVector es,
                    NumericVector se,
+                   Rcpp::NumericVector w,
                    double utau2,
                    double grid_step = 1e-2) {
   
@@ -102,7 +115,7 @@ NumericMatrix reff(NumericVector es,
   // Marginal confidence density mu
   NumericVector ff(ngrid);
   for (int i = 0; i < ngrid; ++i) {
-    ff[i] = marCDsingle(xgrid[i], es, se, utau2);
+    ff[i] = marCDsingle(xgrid[i], es, se, w, utau2);
   }
   
   // Normalize marginal density (trapezoidal rule)

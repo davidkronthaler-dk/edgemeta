@@ -9,6 +9,7 @@
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
 #' @param method Either "PCD-full" (recommended for practical application), "PCD-simplified" or "PCD-fixed". Check details for information. 
+#' @param w Study-specific weights
 #' @param level.pi Coverage level of the equi-tailed prediction interval (numeric, between 0 and 1).
 #' @param B Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).
 #' @param method.tau2 In case method is "PCD-fixed" or "PCD-simplified", this determines the method of estimating the between-study heterogeneity. 
@@ -66,6 +67,7 @@ PredDist <-
   function(es,
            se,
            method = "PCD-full",
+           w = rep(1, length(es)),
            level.pi = 0.95,
            B = 100000L,
            method.tau2 = "REML",
@@ -74,6 +76,7 @@ PredDist <-
     # validate input
     vd_PredDist(es = es,
                 se = se,
+                w  = w,
                 method = method,
                 lpi = level.pi,
                 B = B,
@@ -92,6 +95,7 @@ PredDist <-
       rt = pd_cd(
         es = es,
         se = se,
+        w  = w,
         mtau2 = method.tau2,
         lpi = level.pi,
         B = B
@@ -100,6 +104,7 @@ PredDist <-
       rt = pd_cd_tau2(
         es = es,
         se = se,
+        w = w,
         lpi = level.pi,
         method = method,
         B = B,
@@ -107,7 +112,7 @@ PredDist <-
       )
     }
     
-    class(rt) <- "metaprediction"
+    class(rt) <- "edgemeta"
     attr(rt, "method") <- method
     attr(rt, "B") <- B
     attr(rt, "level_pi") <- level.pi
@@ -120,6 +125,7 @@ PredDist <-
 # Predictive distribution (fixed tau2)
 pd_cd <- function(es,
                   se, 
+                  w,
                   mtau2, 
                   lpi, 
                   B){
@@ -128,16 +134,19 @@ pd_cd <- function(es,
   ma <- run_metagen(es = es, se = se, mtau2 = mtau2)
   tau2 <- ma$tau2
 
-  # If estimated tau2 is zero, return the confidence interval for mu
   if (tau2 == 0L) {
-    opt <- opti_num(es, se)
-    warning("Tau2 is estimated to be zero (no between-study heterogeneity). 
-             The pooled effect estimate and confidence interval are returned.")
-    return(list(estimate = opt$point, CI = c(opt$cilower, opt$ciupper)))
+    warning(
+      paste0(
+        "Heterogeneity is estimated to be zero. ",
+        "Consider using PCD-simplified or PCD-full ",
+        "to account for heterogeneity estimation uncertainty."
+      ),
+      call. = FALSE
+    )
   }
   
   # Generate samples of mu
-  s_mu <- samplemusimple(B = B, tau2 = tau2, es = es, se = se)
+  s_mu <- samplemusimple(B = B, tau2 = tau2, es = es, se = se, w = w)
 
   # Generate samples of theta_new
   s_tn <- base::suppressWarnings(stats::rnorm(n = B, mean = s_mu, sd = sqrt(tau2)))
@@ -156,6 +165,7 @@ pd_cd <- function(es,
 # Predictive distribution, adjusted for uncertainty in tau2
 pd_cd_tau2 <- function(es, 
                        se, 
+                       w,
                        lpi, 
                        method,
                        B,
@@ -169,9 +179,9 @@ pd_cd_tau2 <- function(es,
                      upper = ma$tau2 + 100 * ma$se.tau2)
   # Samples of mu 
   if (method == "PCD-simplified") {
-    s_mu <- samplemusimple(B = B, tau2 = ma$tau2, es = es, se = se)
+    s_mu <- samplemusimple(B = B, tau2 = ma$tau2, es = es, se = se, w = w)
   } else if (method == "PCD-full") {
-    s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
+    s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se, w = w)
   }
   
   # Samples of theta_new
@@ -190,46 +200,32 @@ pd_cd_tau2 <- function(es,
 
 
 # Estimation of between-study heterogeneity
-run_metagen <- function(es, 
-                        se,
-                        mtau2) {
+run_metagen <- function(es, se, mtau2) {
   
-  r <- tryCatch( # default settings
-    meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2),
-    error = function(e) NULL
+  controls <- list(
+    NULL,
+    list(maxiter = 10000),
+    list(stepadj = 0.5),
+    list(maxiter = 10000, stepadj = 0.5),
+    list(maxiter = 100000, stepadj = 0.25)
   )
   
-  if (is.null(r)) { # increase maxiter
-    r <- tryCatch( 
-      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
-                    control = list(maxiter = 10000)),
-      error = function(e) NULL
-    )
-  }
-  
-  if (is.null(r)) { # decrease step size
+  for (ctrl in controls) {
+    
     r <- tryCatch(
-      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
-                    control = list(stepadj = 0.5)),
+      meta::metagen(
+        TE = es,
+        seTE = se,
+        random = TRUE,
+        method.tau = mtau2,
+        control = ctrl
+      ),
       error = function(e) NULL
     )
+    
+    if (!is.null(r)) {
+      return(r)
+    }
   }
-  
-  if (is.null(r)) { # increase maxiter and decrease step size
-    r <- tryCatch(
-      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
-                    control = list(maxiter = 10000, stepadj = 0.5)),
-      error = function(e) NULL
-    )
-  }
-  
-  if (is.null(r)) { # increase maxiter and decrease step size
-    r <- tryCatch(
-      meta::metagen(TE = es, seTE = se, random = TRUE, method.tau = mtau2,
-                    control = list(maxiter = 100000, stepadj = 0.25)),
-      error = function(e) NULL
-    )
-  }
-  
-  return(r)
+  NULL
 }

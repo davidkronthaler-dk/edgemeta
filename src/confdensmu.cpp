@@ -2,7 +2,7 @@
 #include <Rcpp.h>
 #include "fntl.h"
 
-#include "metaprediction.h"
+#include "edgemeta.h"
 
 using namespace Rcpp;
 using namespace std;
@@ -12,10 +12,11 @@ using namespace std;
 Rcpp::NumericVector CD_cpp(Rcpp::NumericVector h0,
                            Rcpp::NumericVector es,
                            Rcpp::NumericVector se,
+                           Rcpp::NumericVector w,
                            double h = 1e-4) {
   
   fntl::dfv f = [&](Rcpp::NumericVector x) {
-    return pfctedge(x, es, se)[0];
+    return pfctedgew(x, es, se, w)[0];
   };
   
   Rcpp::NumericVector dv(h0.size());

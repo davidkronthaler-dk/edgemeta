@@ -8,6 +8,7 @@ PredDist(
   es,
   se,
   method = "PCD-full",
+  w = rep(1, length(es)),
   level.pi = 0.95,
   B = 100000L,
   method.tau2 = "REML",
@@ -20,6 +21,8 @@ PredDist(
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
 
 \item{method}{Either "PCD-full" (recommended for practical application), "PCD-simplified" or "PCD-fixed". Check details for information.}
+
+\item{w}{Study-specific weights}
 
 \item{level.pi}{Coverage level of the equi-tailed prediction interval (numeric, between 0 and 1).}
 

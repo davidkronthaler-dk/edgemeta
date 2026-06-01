@@ -3,11 +3,10 @@ se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 
 test_that("correct execution for key configurations", {
   conditions <- list(
-    list(method = "MC",    level.ci = 0.05, B = 50,   seed = NULL, mu0 = 0,    method.tau2 = "REML"),
-    list(method = "GAQ",   level.ci = 0.5,  B = 1000, seed = 5,   mu0 = 1,    method.tau2 = "PM"),
-    list(method = "NHEU",  level.ci = 0.99, B = 50,   seed = NULL, mu0 = -Inf, method.tau2 = "REML"),
-    list(method = "MC",    level.ci = 0.5,  B = 1000, seed = 5,   mu0 = Inf,  method.tau2 = "PM"),
-    list(method = "GAQ",   level.ci = 0.01, B = 50,   seed = NULL, mu0 = 0,    method.tau2 = "REML")
+    list(method = "MC",    level.ci = 0.05, B = 50,   seed = NULL, mu0 = 0),
+    list(method = "GAQ",   level.ci = 0.5,  B = 1000, seed = 5,   mu0 = 1),
+    list(method = "MC",    level.ci = 0.5,  B = 1000, seed = 5,   mu0 = Inf),
+    list(method = "GAQ",   level.ci = 0.01, B = 50,   seed = NULL, mu0 = 0)
   )
   
   for (cond in conditions) {
@@ -19,8 +18,7 @@ test_that("correct execution for key configurations", {
         level.ci = cond$level.ci,
         B = cond$B,
         seed = cond$seed,
-        mu0 = cond$mu0,
-        method.tau2 = cond$method.tau2
+        mu0 = cond$mu0
       )
     )
   }
@@ -34,15 +32,12 @@ test_that("handles invalid input types", {
   expect_error(remaeffect(es = "not numeric", se = 1:5))
   expect_error(remaeffect(es = 1:5, se = "not numeric"))
   expect_error(remaeffect(es = 1:5, se = 1:5, method = "INVALID"))
-  expect_error(remaeffect(es = 1:5, se = 1:5, method = "GAQ", method.tau2 = "INVALID"))
   expect_error(remaeffect(es = numeric(0), se = 1:5))
   expect_error(remaeffect(es = 1:5, se = numeric(0)))
   expect_error(remaeffect(c(1, NA), c(1, 0.5), "MC"))
   expect_error(remaeffect(c(1, "a"), c(1,1), "MC"))
   expect_error(remaeffect(es, se, NULL))
   expect_error(remaeffect(es, se, NA))
-  expect_error(remaeffect(es, se, "NHEU", method.tau2 = NA))
-  expect_error(remaeffect(es, se, "NHEU", method.tau2 = NULL))
   expect_error(remaeffect(es, se, "MC", B = 1.5))
   expect_error(remaeffect(es, se, "MC", B = -Inf))
   expect_warning(remaeffect(es, se, "MC", seed = -100))
@@ -57,7 +52,6 @@ test_that("handles mu0 at boundary values", {
   se <- runif(5, 0.1, 2)
   expect_no_error(remaeffect(es, se, method = "GAQ", mu0 = -1e7))
   expect_no_error(remaeffect(es, se, method = "MC", mu0 = Inf))
-  expect_no_error(remaeffect(es, se, method = "NHEU", mu0 = 0))
 })
 
 test_that("tolerates small sample sizes", {
@@ -65,7 +59,6 @@ test_that("tolerates small sample sizes", {
   se <- runif(2, 0.1, 0.5)
   expect_no_error(remaeffect(es, se, method = "MC", B = 5))
   expect_no_error(remaeffect(es, se, method = "GAQ"))
-  expect_no_error(remaeffect(es, se, method = "NHEU"))
   expect_error(remaeffect(es[1], se[1], method = "MC"))
 })
 
@@ -88,13 +81,5 @@ test_that("fails when es and se have different lengths", {
   se <- runif(6, 0.1, 2)
   expect_error(remaeffect(es, se))
 })
-
-test_that("handles method.tau2 choices", {
-  es <- rnorm(5)
-  se <- runif(5, 0.1, 2)
-  expect_no_error(remaeffect(es, se, method = "NHEU", method.tau2 = "REML"))
-  expect_no_error(remaeffect(es, se, method = "NHEU", method.tau2 = "PM"))
-})
-
 
 

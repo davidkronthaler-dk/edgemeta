@@ -80,7 +80,7 @@ pd$PI
 
 # Plot the predictive distribution
 # plot(pd, param = "theta_new", breaks = 200, xlim = c(-7, 7))
-
+# 
 # Futher information: 'help(PredDist)'
 ```
 

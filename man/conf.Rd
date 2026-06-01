@@ -7,7 +7,7 @@
 conf(obj, lower, upper)
 }
 \arguments{
-\item{obj}{An object of class \code{metaprediction}.}
+\item{obj}{An object of class \code{edgemeta}.}
 
 \item{lower}{Lower bound of the interval (default is \code{-Inf}).}
 

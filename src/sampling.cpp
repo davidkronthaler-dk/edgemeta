@@ -2,7 +2,7 @@
 #include <Rcpp.h>
 #include "fntl.h"
 
-#include "metaprediction.h"
+#include "edgemeta.h"
 
 using namespace Rcpp;
 using namespace std;
@@ -11,13 +11,14 @@ using namespace std;
 // [[Rcpp::export]]
 Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
                              Rcpp::NumericVector es,
-                             Rcpp::NumericVector se) {
+                             Rcpp::NumericVector se,
+                             Rcpp::NumericVector w) {
   
   Rcpp::NumericVector roots(s_tau2.size());
   
   for (int ii = 0; ii < s_tau2.size(); ++ii) {
     try {
-      roots[ii] = samponemu(s_tau2[ii], es, se);
+      roots[ii] = samponemu(s_tau2[ii], es, se, w);
     } catch (...) {
       roots[ii] = NA_REAL;
     }
@@ -30,7 +31,8 @@ Rcpp::NumericVector samplemu(Rcpp::NumericVector s_tau2,
 // [[Rcpp::export]]
 double samponemu(double s_tau2,
                  Rcpp::NumericVector es,
-                 Rcpp::NumericVector se) {
+                 Rcpp::NumericVector se,
+                 Rcpp::NumericVector w) {
   
   // Adjust standard errors: adj_se = sqrt(se^2 + tau2)
   Rcpp::NumericVector adj_se = clone(se);
@@ -48,7 +50,7 @@ double samponemu(double s_tau2,
   
   // find root of C(mu*|tau2) = u
   fntl::dfd f = [&](double h0) {
-    return pfctedge(Rcpp::NumericVector::create(h0), es, adj_se)[0] - u;
+    return pfctedgew(Rcpp::NumericVector::create(h0), es, adj_se, w)[0] - u;
   };
   
   fntl::findroot_args args;
@@ -105,7 +107,8 @@ double samponetau2(Rcpp::NumericVector es,
 Rcpp::NumericVector samplemusimple(int B, 
                                    double tau2,
                                    Rcpp::NumericVector es,
-                                   Rcpp::NumericVector se) {
+                                   Rcpp::NumericVector se,
+                                   Rcpp::NumericVector w) {
   
   // Adjust standard errors: adj_se = sqrt(se^2 + tau2)
   Rcpp::NumericVector adj_se = clone(se);
@@ -133,7 +136,7 @@ Rcpp::NumericVector samplemusimple(int B,
     double u_ll = u[ll];
     
     fntl::dfd f = [&](double h0) {
-      return pfctedge(Rcpp::NumericVector::create(h0), es, adj_se)[0] - u_ll;
+      return pfctedgew(Rcpp::NumericVector::create(h0), es, adj_se, w)[0] - u_ll;
     };
     
     auto out = fntl::findroot_brent(f, min_es, max_es, args);

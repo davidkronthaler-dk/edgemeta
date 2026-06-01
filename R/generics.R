@@ -1,10 +1,10 @@
-#' Plot Predictive and Confidence Distributions from metaprediction Class Objects
+#' Plot Predictive and Confidence Distributions from edgemeta Class Objects
 #' 
 #' Displays the predictive distribution for \code{param = "theta_new"} (future effect from random effects).
 #' For \code{param = "mu"} and \code{param = "tau2"}, the corresponding confidence distributions are shown.
 #' The latter is only valid if the estimation method in \code{PredDist} was not set to \code{"PCD-fixed"}.
 #'
-#' @param x An object of class \code{metaprediction}.
+#' @param x An object of class \code{edgemeta}.
 #' @param param The parameter to display. One of \code{theta_new} (predictive distribution), \code{mu} (confidence distribution), or \code{tau2} (confidence distribution).
 #' @param ... Additional arguments passed to \code{graphics::hist()}, including optional \code{main}, \code{xlab}, and \code{ylab} to override default plot title and axis labels.
 #'
@@ -25,7 +25,7 @@
 #' # Plot confidence distribution of mu
 #' plot(pd, param = "mu", xlab = "mu", ylab = "c(mu)")
 #' @export
-plot.metaprediction <- function(x, param = c("theta_new", "mu", "tau2"), ...) {
+plot.edgemeta <- function(x, param = c("theta_new", "mu", "tau2"), ...) {
   param <- base::match.arg(param)
   graphics::par(mar = c(5, 4.5, 4, 2))
   dots <- list(...)
@@ -72,7 +72,7 @@ plot.metaprediction <- function(x, param = c("theta_new", "mu", "tau2"), ...) {
 #' lies within a specified interval, based on the predictive distribution from a 
 #' random-effects meta-analysis.
 #'
-#' @param obj An object of class \code{metaprediction}.
+#' @param obj An object of class \code{edgemeta}.
 #' @param lower Lower bound of the interval (default is \code{-Inf}).
 #' @param upper Upper bound of the interval (default is \code{Inf}).
 #' 
@@ -87,7 +87,7 @@ conf <- function(obj, lower, upper) {
 }
 
 #' @export
-conf.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
+conf.edgemeta <- function(obj, lower = -Inf, upper = Inf) {
   p <- base::mean(obj$samples[,"theta_new"] <= upper &
               obj$samples[,"theta_new"] >= lower,
             na.rm = TRUE)
@@ -97,9 +97,9 @@ conf.metaprediction <- function(obj, lower = -Inf, upper = Inf) {
 }
 
 #' @export
-print.metaprediction <- function(x, lower = NULL, upper = NULL, ...) {
+print.edgemeta <- function(x, lower = NULL, upper = NULL, ...) {
   if (!is.null(x$samples) && nrow(x$samples) > 0) {
-    s <- summary_metaprediction(x)
+    s <- summary_edgemeta(x)
     base::class(s) <- "data.frame"
     param_labels <- base::colnames(x$samples)
     base::rownames(s) <- rev(base::paste(c("CD", "CD", "PD")[base::seq_along(param_labels)], param_labels))
@@ -119,13 +119,13 @@ print.metaprediction <- function(x, lower = NULL, upper = NULL, ...) {
     base::print(round(pd, 3), row.names = FALSE)
 
     if (!is.null(lower) || !is.null(upper)) {
-      conf.metaprediction(x, lower, upper)
+      conf.edgemeta(x, lower, upper)
     }
     
   }
 }
 
-summary_metaprediction <- function(object, probs = c(0.025, 0.25, 0.5, 0.75, 0.975), ...) {
+summary_edgemeta <- function(object, probs = c(0.025, 0.25, 0.5, 0.75, 0.975), ...) {
   method <- base::attr(object, "method")
   stats <- base::t(base::apply(object$samples, 2, function(x) {
     m <- base::mean(x, na.rm = TRUE)
@@ -143,6 +143,6 @@ summary_metaprediction <- function(object, probs = c(0.025, 0.25, 0.5, 0.75, 0.9
   stats <- stats[base::nrow(stats):1, ]
   res <- base::as.data.frame(stats)
   base::attr(res, "method") <- method
-  base::class(res) <- c("summary.metaprediction", "data.frame")
+  base::class(res) <- c("summary.edgemeta", "data.frame")
   return(res)
 }

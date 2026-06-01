@@ -8,12 +8,12 @@
 #'
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
-#' @param method Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration, or "NHEU" for the unadjusted (unmarginalized) approach (compare details).
+#' @param method Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration (compare details).
+#' @param w Study-specific weights.
 #' @param level.ci Confidence level for the interval estimate (default is 0.95).
 #' @param B Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.
 #' @param seed Optional integer to ensure reproducibility of the random sampling. Relevant when selecting \code{method = "MC"}.
 #' @param mu0 Parameter value under the null-hypothesis against which two-sided p-value is computed.
-#' @param method.tau2 Method to compute the heterogeneity estimate. Relevant when selecting \code{method = "NHEU"}.
 #'
 #' @return A list, including not all, but some of these, depending on the method:
 #' \describe{
@@ -42,8 +42,6 @@
 #'      is constructed by change of variables. Global adaptive quadrature integration is used to integrate Edgington's confidence density
 #'      over the confidence density of \eqn{\tau^2}. This typically corresponds to the MC confidence distribution, except if very few
 #'      studies are available. In this case, GAQ integration may produce slightly too wide confidence distributions and intervals.}
-#'      \item{\code{NHEU}:}{Derives point estimates and intervals directly from Edgington's approach wihtout adjusting for uncertainty
-#'      in the heterogeneity estimate (Held et al, 2025).}
 #' }
 #' 
 #' The methods \code{MC} and \code{GAQ} always produces confidence intervals reflecting potential heterogeneity, and are applicable only 
@@ -65,27 +63,28 @@
 remaeffect <- function(es,
                        se,
                        method = "MC",
+                       w = rep(1, length(es)),
                        level.ci = 0.95,
                        B = 100000L,
                        seed = NULL,
-                       mu0 = 0,
-                       method.tau2 = "REML") {
+                       mu0 = 0) {
   
   # validate input
   vd_remaeffect(
     es = es,
     se = se,
+    w = w,
     method = method,
     level.ci = level.ci,
     B = B,
-    mu0 = mu0,
-    method.tau2 = method.tau2
+    mu0 = mu0
   )
   
   if (method == "MC") {
     r <- reffMC(
       es = es,
       se = se,
+      w = w,
       level.ci = level.ci,
       B = B,
       seed = seed,
@@ -95,16 +94,9 @@ remaeffect <- function(es,
     r <- reffAQ(
       es = es,
       se = se,
+      w = w,
       level.ci = level.ci,
       mu0 = mu0
-    )
-  } else if (method == "NHEU") {
-    r <- reffNHEU(
-      es = es,
-      se = se,
-      level.ci = level.ci,
-      mu0 = mu0,
-      mtau2 = method.tau2
     )
   }
   
@@ -116,6 +108,7 @@ remaeffect <- function(es,
 reffMC <-
   function(es,
            se,
+           w, 
            level.ci,
            B,
            seed,
@@ -141,7 +134,7 @@ reffMC <-
     )
     
     # Sampling from Edgingtons confidence distribution
-    s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se)
+    s_mu <- samplemu(s_tau2 = s_tau2, es = es, se = se, w = w)
     
     # Point estimate
     hmu <- base::mean(s_mu, na.rm = T)
@@ -203,6 +196,7 @@ reffMC <-
 # Estimate 'mu' using deterministic global adaptive quadrature integration
 reffAQ <- function(es,
                    se, 
+                   w,
                    level.ci, 
                    mu0) {
   
@@ -211,7 +205,7 @@ reffAQ <- function(es,
   utau2 <- ma$tau2 + 100 * ma$se.tau2
   
   # Marginal confidence distribution function of mu 
-  cdfmu <- reff(es, se, utau2) 
+  cdfmu <- reff(es, se, w, utau2) 
   
   # Confidence interval (by inversion of CDF)
   quant <- function(p) {
@@ -225,6 +219,7 @@ reffAQ <- function(es,
       mu = mu,
       es = es,
       se = se,
+      w = w,
       utau2 = utau2
     )
   
@@ -264,46 +259,6 @@ reffAQ <- function(es,
     fcd = fcd
   ))
 }
-
-# Estimate 'mu' without adjustment for heterogeneity estimation uncertainty
-reffNHEU <- function(es,
-                     se, 
-                     level.ci,
-                     mu0, 
-                     mtau2) {
-  
-  tau2 <- run_metagen(es = es, se = se, mtau2 = mtau2)$tau2
-  hmu <- opti_num(es = es, se = sqrt( se ^ 2 + tau2), 
-                  point = TRUE, ci = TRUE, levelci = level.ci)
-  ci <- c(hmu$cilower, hmu$ciupper)
-  p1s <- pfctedge(h0 = mu0, es = es, se = se)
-  p2s <- p1tp2(p1s)
-  
-  cat("\nRandom-Effects Meta-Analysis using Edgington's Method\n\n")
-  cat("Details: Heterogeneity estimation uncertainty is NOT accounted for.\n")
-  cat("Consider method = 'MC' or 'GAQ' to incorporate this.\n\n")
-  cat("Number of studies:", length(es), "\n")
-  cat("Average effect:", sprintf("%.3f", hmu$point), "\n")
-  cat(
-    paste0(level.ci * 100, "%"),
-    "Confidence interval from",
-    paste(sprintf("%.3f", ci), collapse = " to "),
-    "\n"
-  )
-  cat("Two-sided p-value against H0: mu =",
-      mu0,
-      "is",
-      round(p2s, 5),
-      "\n\n")
-  
-  # Return
-  invisible(list(
-    estimate = hmu$point,
-    CI = ci,
-    pval = p2s
-  ))
-}
-
 
 # Transform one-sided to two-sided p-value
 p1tp2 <- function(p1) {

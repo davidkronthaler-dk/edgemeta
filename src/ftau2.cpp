@@ -4,7 +4,7 @@
 #include <Rcpp.h>
 #include "fntl.h"
 
-#include "metaprediction.h"
+#include "edgemeta.h"
 
 using namespace Rcpp;
 using namespace std;

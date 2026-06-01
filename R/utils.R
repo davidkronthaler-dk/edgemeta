@@ -1,5 +1,6 @@
 vd_PredDist <- function(es, 
                         se, 
+                        w,
                         method = c("PCD-full", "PCD-simplified", "PCD-fixed"),
                         lpi, 
                         B, 
@@ -16,7 +17,7 @@ vd_PredDist <- function(es,
   if (is.null(mtau2) || is.na(mtau2) || is.nan(mtau2)) stop("'method.tau2' must not be NULL or NA.")
   if (!is.character(mtau2)) stop("'method.tau2' must be a character")
   mtau2 <- match.arg(mtau2)
-  vd_es_se(es = es, se = se)
+  vd_es_se_w(es = es, se = se, w = w)
   vd_l(lpi)
   vd_B(B)
 }
@@ -24,11 +25,11 @@ vd_PredDist <- function(es,
 vd_remaeffect <- function(
   es,
   se,
-  method = c("MC", "GAQ", "NHEU"),
+  method = c("MC", "GAQ"),
+  w,
   level.ci,
   B,
-  mu0,
-  method.tau2 = c("REML", "PM", "DL", "ML", "HS", "SJ", "HE", "EB")) {
+  mu0) {
   
   if (!requireNamespace("meta", quietly = TRUE)) {
     stop("Package 'meta' is required. Please install it using 'install.packages(\"meta\")'.")
@@ -37,10 +38,7 @@ vd_remaeffect <- function(
   if (is.null(method) || is.na(method) || is.nan(method)) stop("'method' must not be NULL or NA.")
   if (!is.character(method)) stop("'method' must be a character")
   method <- match.arg(method)
-  if (is.null(method.tau2) || is.na(method.tau2) || is.na(method.tau2)) stop("'method.tau2' must not be NULL or NA.")
-  if (!is.character(method.tau2)) stop("'method.tau2' must be a character")
-  method.tau2 <- match.arg(method.tau2)
-  vd_es_se(es = es, se = se)
+  vd_es_se_w(es = es, se = se, w = w)
   vd_l(level.ci)
   vd_B(B)
   vd_mu0(mu0)
@@ -67,23 +65,44 @@ vd_crps <- function(s, tn) {
   }
 }
 
-vd_es_se <- function(es, se) {
-  if (missing(es) || missing(se)) {
-    stop("Estimates ('es') and standard errors ('se') must be provided.", call. = FALSE)
+vd_es_se_w <- function(es, se, w) {
+  if (missing(es) || missing(se) || missing(w)) {
+    stop("Estimates ('es'), standard errors ('se'), and weights ('w') must be provided.",
+         call. = FALSE)
   }
   
-  if (length(es) != length(se) || length(es) <= 1) {
-    stop("Estimates ('es') and standard errors ('se') must be numeric vectors of the same length (at least 2).", call. = FALSE)
+  if (length(es) != length(se) ||
+      length(es) != length(w) ||
+      length(es) <= 1) {
+    stop(paste0(
+      "Estimates ('es'), standard errors ('se'), ",
+      "and weights ('w') must be numeric vectors ",
+      "of the same length (at least 2)."
+    ), call. = FALSE)
   }
   
-  if (!is.numeric(es) || !is.vector(es) || anyNA(es) || any(!is.finite(es)) ) {
-    stop("Estimates ('es') must be a numeric, finite vector without missing values.", call. = FALSE)
+  if (!is.numeric(es) || !is.vector(es) ||
+      anyNA(es) || any(!is.finite(es))) {
+    stop("Estimates ('es') must be a numeric, finite vector without missing values.",
+         call. = FALSE)
   }
   
-  if (!is.numeric(se) || !is.vector(se) || anyNA(se) || any(!is.finite(se))) {
-    stop("Standard errors ('se') must be a numeric, finite vector without missing values.", call. = FALSE)
+  if (!is.numeric(se) || !is.vector(se) ||
+      anyNA(se) || any(!is.finite(se))) {
+    stop("Standard errors ('se') must be a numeric, finite vector without missing values.",
+         call. = FALSE)
   } else if (any(se <= 0)) {
-    stop("All standard errors ('se') must be greater than 0.", call. = FALSE)
+    stop("All standard errors ('se') must be greater than 0.",
+         call. = FALSE)
+  }
+  
+  if (!is.numeric(w) || !is.vector(w) ||
+      anyNA(w) || any(!is.finite(w))) {
+    stop("Weights ('w') must be a numeric, finite vector without missing values.",
+         call. = FALSE)
+  } else if (any(w <= 0)) {
+    stop("All weights ('w') must be greater than 0.",
+         call. = FALSE)
   }
 }
 
