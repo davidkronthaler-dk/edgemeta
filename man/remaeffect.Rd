@@ -20,7 +20,7 @@ remaeffect(
 
 \item{se}{Numeric vector of standard errors corresponding to each effect estimate (length >= 2).}
 
-\item{method}{Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration (compare details).}
+\item{method}{Either "MC" for Monte Carlo sampling algorithm or "GAQ" for global adaptive quadrature integration (compare details).}
 
 \item{w}{Study-specific weights.}
 
@@ -47,14 +47,13 @@ A list, including not all, but some of these, depending on the method:
 Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
 are combined using Edgington's method. The resulting combined confidence distribution of \eqn{\mu},
 which is conditional on the heterogeneity parameter \eqn{\tau^2}, is integrated over an approximate confidence distribution of the latter
-to account for heterogeneity estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
-heterogeneity estimate.
+to account for heterogeneity estimation uncertainty.
 }
 \details{
 This function performs a random-effects meta-analysis using Edgington's confidence distribution: study-specific confidence distributions, respectively,
 one-sided p-value functions for the alternative "greater" are constructed from normal pivots unter the normal random-effects model. These
 are then combined using Edgington's method, yielding a combined confidence distribution, respectively
-combined p-value function, of the average effect \eqn{\mu}. Then, the three approaches proceed as:
+combined p-value function, of the average effect \eqn{\mu}. Then, the two approaches proceed as:
 \describe{
 \item{\code{MC}:}{Generate samples from the approximate confidence distribution of the heterogeneity parameter \eqn{\tau^2},
 implied by the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled \eqn{\tau^{2*}},
@@ -67,8 +66,10 @@ over the confidence density of \eqn{\tau^2}. This typically corresponds to the M
 studies are available. In this case, GAQ integration may produce slightly too wide confidence distributions and intervals.}
 }
 
-The methods \code{MC} and \code{GAQ} always produces confidence intervals reflecting potential heterogeneity, and are applicable only
-under a random-effects framework.
+Additionally, study-specific weights can be incorporated, for example to weight studies by
+the inverse of their standard errors or variances, or to downweight studies considered to
+be at higher risk of bias. When weights other than one are specified, Edgington's weighted
+\eqn{p}-value function is used to construct the confidence distribution for the average effect.
 }
 \examples{
 es <- c(0.17,  1.20,  1.10, -0.0019, -2.33)

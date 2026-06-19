@@ -9,10 +9,10 @@
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
 #' @param method Either "PCD-full" (recommended for practical application), "PCD-simplified" or "PCD-fixed". Check details for information. 
-#' @param w Study-specific weights
+#' @param w Study-specific weights.
 #' @param level.pi Coverage level of the equi-tailed prediction interval (numeric, between 0 and 1).
 #' @param B Number of Monte Carlo samples used to construct the predictive distribution (default is 100,000).
-#' @param method.tau2 In case method is "PCD-fixed" or "PCD-simplified", this determines the method of estimating the between-study heterogeneity. 
+#' @param method.tau2 In case method is "PCD-fixed" or "PCD-simplified", this determines the method of estimating between-study heterogeneity. 
 #' Check 'help(meta)' for information on estimation methods (default is "REML").
 #' @param seed Optional integer to ensure reproducibility of the random sampling.
 #' @return A list containing:
@@ -51,6 +51,11 @@
 #' The empirical distribution of the sampled \eqn{\theta_{new}^*} values serves as the estimated predictive 
 #' distribution of future effects. This distribution can be used to compute prediction intervals, 
 #' summarize predictive uncertainty, or generate visualizations.
+#' 
+#' Additionally, study-specific weights can be incorporated, for example to weight studies by
+#' the inverse of their standard errors or variances, or to downweight studies considered to 
+#' be at higher risk of bias. When weights other than one are specified, Edgington's weighted
+#' \eqn{p}-value function is used to construct the confidence distribution for the average effect.
 #' 
 #' @references
 #' Viechtbauer, W. (2007). *Confidence intervals for the amount of heterogeneity in meta‐analysis*. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514

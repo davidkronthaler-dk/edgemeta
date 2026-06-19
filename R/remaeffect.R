@@ -3,12 +3,11 @@
 #' Confidence distributions for the average effect \eqn{\mu}, or equivalently, \eqn{p}-value functions, from individual studies
 #' are combined using Edgington's method. The resulting combined confidence distribution of \eqn{\mu}, 
 #' which is conditional on the heterogeneity parameter \eqn{\tau^2}, is integrated over an approximate confidence distribution of the latter
-#' to account for heterogeneity estimation uncertainty. Alternatively, the approach can be performed without such marginalization using a fixed
-#' heterogeneity estimate.
+#' to account for heterogeneity estimation uncertainty.
 #'
 #' @param es Numeric vector of effect estimates from individual studies (length >= 2).
 #' @param se Numeric vector of standard errors corresponding to each effect estimate (length >= 2).
-#' @param method Either "MC" for Monte Carlo sampling algorithm, "GAQ" for global adaptive quadrature integration (compare details).
+#' @param method Either "MC" for Monte Carlo sampling algorithm or "GAQ" for global adaptive quadrature integration (compare details).
 #' @param w Study-specific weights.
 #' @param level.ci Confidence level for the interval estimate (default is 0.95).
 #' @param B Number of Monte Carlo samples used to estimate the confidence distributions (default is 100,000). Relevant when selecting \code{method = "MC"}.
@@ -20,8 +19,8 @@
 #'   \item{estimate}{Point estimate of the average effect \eqn{\mu}.}
 #'   \item{CI}{Confidence interval for the average effect \eqn{\mu}.}
 #'   \item{pval}{Two-sided p-value against H0: \eqn{\mu} = \eqn{\mu_0}.}
-#'   \item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}. Obtained for method \code{MC}}
-#'   \item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}. Obtained for method \code{MC}}
+#'   \item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}. Obtained for method \code{MC}}.
+#'   \item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}. Obtained for method \code{MC}}.
 #'   \item{fcd}{Marginalized confidence density function of \eqn{\mu}. Obtained for method \code{GAQ}.}
 #' }
 #'
@@ -31,7 +30,7 @@
 #' This function performs a random-effects meta-analysis using Edgington's confidence distribution: study-specific confidence distributions, respectively, 
 #' one-sided p-value functions for the alternative "greater" are constructed from normal pivots unter the normal random-effects model. These 
 #' are then combined using Edgington's method, yielding a combined confidence distribution, respectively  
-#' combined p-value function, of the average effect \eqn{\mu}. Then, the three approaches proceed as:
+#' combined p-value function, of the average effect \eqn{\mu}. Then, the two approaches proceed as:
 #' \describe{
 #'      \item{\code{MC}:}{Generate samples from the approximate confidence distribution of the heterogeneity parameter \eqn{\tau^2},
 #'      implied by the generalized heterogeneity statistic (Viechtbauer, 2006). For each sampled \eqn{\tau^{2*}},
@@ -44,8 +43,10 @@
 #'      studies are available. In this case, GAQ integration may produce slightly too wide confidence distributions and intervals.}
 #' }
 #' 
-#' The methods \code{MC} and \code{GAQ} always produces confidence intervals reflecting potential heterogeneity, and are applicable only 
-#' under a random-effects framework.
+#' Additionally, study-specific weights can be incorporated, for example to weight studies by
+#' the inverse of their standard errors or variances, or to downweight studies considered to 
+#' be at higher risk of bias. When weights other than one are specified, Edgington's weighted
+#' \eqn{p}-value function is used to construct the confidence distribution for the average effect.
 #'
 #' @references
 #' Viechtbauer, W. (2007). *Confidence intervals for the amount of heterogeneity in meta‐analysi*s. Statistics in medicine, 26(1), 37-52. https://doi.org/10.1002/sim.2514
@@ -172,6 +173,7 @@ reffAQ <- function(es, se, w, level.ci, mu0) {
   ))
 }
 
+#' @export
 print.remaeffect <- function(x, ...) {
   cat("\nCD-Edgington Random-Effects Meta-Analysis\n\n")
   cat("Method:", x$method, "\n")
