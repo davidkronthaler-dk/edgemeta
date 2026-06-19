@@ -38,8 +38,8 @@ A list, including not all, but some of these, depending on the method:
 \item{estimate}{Point estimate of the average effect \eqn{\mu}.}
 \item{CI}{Confidence interval for the average effect \eqn{\mu}.}
 \item{pval}{Two-sided p-value against H0: \eqn{\mu} = \eqn{\mu_0}.}
-\item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}. Obtained for method \code{MC}}
-\item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}. Obtained for method \code{MC}}
+\item{cd_mu}{Vector of samples from the confidence distribution of the average effect \eqn{\mu}. Obtained for method \code{MC}}.
+\item{cd_tau2}{Vector of samples from the confidence distribution of the between-study heterogeneity \eqn{\tau^2}. Obtained for method \code{MC}}.
 \item{fcd}{Marginalized confidence density function of \eqn{\mu}. Obtained for method \code{GAQ}.}
 }
 }

@@ -197,7 +197,6 @@ pd_cd_tau2 <- function(es,
   return(list(PI = PI, samples = s))
 }
 
-
 # Estimation of between-study heterogeneity
 run_metagen <- function(es, se, mtau2) {
   
@@ -229,13 +228,11 @@ run_metagen <- function(es, se, mtau2) {
   NULL
 }
 
-
 # For RNG seeds
 is.wholepositivenumber <- function(x, tol = .Machine$double.eps^0.5) {
   if (!is.numeric(x)) return(FALSE)
   return(is.finite(x) & abs(x - round(x)) < tol & x > 0)
 }
-
 
 #' Plot Predictive and Confidence Distributions from edgemeta Class Objects
 #' 
@@ -351,7 +348,7 @@ print.edgemeta <- function(x, lower = NULL, upper = NULL, ...) {
     weight_type <- "custom"
     if (isTRUE(all.equal(x$w, 1/x$se^2, tolerance = 1e-4, check.attributes = FALSE))) {
       weight_type <- "inverse squared standard errors (1/se^2)"
-    } else if (isTRUE(all.equal(x$w, 1/se, tolerance = 1e-4, check.attributes = FALSE))) {
+    } else if (isTRUE(all.equal(x$w, 1/x$se, tolerance = 1e-4, check.attributes = FALSE))) {
       weight_type <- "inverse standard errors (1/se)"
     } else if (all(abs(x$w - 1) < 1e-4)) {
       weight_type <- "unweighted"

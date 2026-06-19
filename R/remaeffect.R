@@ -180,7 +180,7 @@ print.remaeffect <- function(x, ...) {
   weight_type <- "custom"
   if (isTRUE(all.equal(x$w, 1/x$se^2, tolerance = 1e-4, check.attributes = FALSE))) {
     weight_type <- "inverse squared standard errors (1/se^2)"
-  } else if (isTRUE(all.equal(x$w, 1/se, tolerance = 1e-4, check.attributes = FALSE))) {
+  } else if (isTRUE(all.equal(x$w, 1/x$se, tolerance = 1e-4, check.attributes = FALSE))) {
     weight_type <- "inverse standard errors (1/se)"
   } else if (all(abs(x$w - 1) < 1e-4)) {
     weight_type <- "unweighted"

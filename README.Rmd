@@ -30,8 +30,11 @@ A combined $p$-value function, or equivalently, confidence distribution, is cons
 ## Prediction
 
 The methods assumes that future effects and effects from observed studies are exchangeable and distributed according to a normal distribution. This joint effect distribution is maginalized over the confidence distribution from Edgington's method and over the confidence distribution of the heterogeneity parameter, thereby incorporating uncertainty about parameter estimation in both parameters. The predictive distributions are computed using a Monte Carlo sampling algorithm. Implemented are three forms of the predictive distribution:
+
 - PCD-full: Uses the full marginalization scheme and is therein the most accurate (recommended).
+
 - PCD-simplified: Uses a simplified approach, but accounts for uncertainty about both parameters.
+
 - PCD-fixed: Does not account for heterogeneity estimation uncertainty and is typically too narrow except for a large number of studies.
 
 ## Installation
@@ -50,7 +53,7 @@ devtools::install_github("davidkronthaler-dk/edgemeta")
 
 Assume observed data (estimates and standard errors) from *k = 5* independent studies. The average effect can be estimated using the `remaeffect` function:
 
-```{r example average effect}
+```{r remaeffect-example}
 library(edgemeta)
 
 # Estimates and standard errors from 5 studies
@@ -61,14 +64,13 @@ se <- c(0.52, 0.93, 0.63, 0.3, 0.28)
 remaeffect(es = es, se = se, method = "MC") 
 
 # or: remaeffect(es = es, se = se, method = "GAQ")
-# or: remaeffect(es = es, se = se, method = "MHEU")
 
 # Further information: 'help(remaeffect)'
 ```
 
 A frequentist predictive distribution can be computed using:
 
-```{r example predictive distribution, fig.show='hide'}
+```{r preddist-example}
 # Computation of predictive distribution
 pd <- PredDist(es = es, se = se, method = "PCD-full")
 
